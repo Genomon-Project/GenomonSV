@@ -23,7 +23,7 @@ while(<IN>) {
     my $mapQ = $F[4];
 
     # skip supplementary alignment
-    next if ($flags[8] eq "1" or $flags[11] eq "1");
+    next if ($flags[8] == 1 or $flags[11] == 1);
 
     # skip reads aligned to "hs37d5"
     next if ($chr_current eq "hs37d5" or $chr_pair eq "hs37d5");
