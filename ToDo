@@ -1,0 +1,20 @@
+For the result
+
+1. integrate the infromation of improper short reads
+2. addition of non-matched normal filter (for removing common germline SV and other artifacts easily)
+3. addition of Fisher's exact test or other simple filtering method?? 
+(evaluate the allele frequency of SV in matched normal sample and filter if the AF is >= 10%, e.g.). 
+(for removing non-common germline SV)
+4. ebCall (this is a bit minor...?) 
+
+
+For efficiency
+
+1. use pysam package (in the long run, hstlib) for extracting junction supporting short reads
+2. organize the format for junction supporting short reads (especially, add the information on the relathionship with the pair reads)
+(This is important for communitating with K. Chiba for extending this program so that it can capture short tandem duplications)
+3. use destruct package (make the intermediate output binary)
+4. use pytabix package effectively for extracting the location information
+5. organize the format for the merged break point information (candidate SVs)
+
+
