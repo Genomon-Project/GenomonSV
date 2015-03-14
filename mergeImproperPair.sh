@@ -5,11 +5,11 @@
 
 OUTPUTDIR=$1
 
-echo "cat ${OUTPUTDIR}/*improperPair.temp.txt | sort -k1 - > ${OUTPUTDIR}/merge.improperPair.temp.txt"
-cat ${OUTPUTDIR}/*improperPair.temp.txt | sort -k1 - > ${OUTPUTDIR}/merge.improperPair.temp.txt
+echo "cat ${OUTPUTDIR}/tmp/*improperPair.txt | sort -k1 - > ${OUTPUTDIR}/merge.improperPair.txt"
+cat ${OUTPUTDIR}/tmp/*improperPair.txt | sort -k1 - > ${OUTPUTDIR}/merge.improperPair.txt
 
-echo "perl makeBedpeFromImproperPair.pl ${OUTPUTDIR}/merge.improperPair.temp.txt | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.bedpe"
-perl makeBedpeFromImproperPair.pl ${OUTPUTDIR}/merge.improperPair.temp.txt | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.bedpe
+echo "perl makeBedpeFromImproperPair.pl ${OUTPUTDIR}/merge.improperPair.txt | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.bedpe"
+perl makeBedpeFromImproperPair.pl ${OUTPUTDIR}/merge.improperPair.txt | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.bedpe
 
 echo "perl summarize.improperPairBedpe.pl ${OUTPUTDIR}/merge.improperPair.bedpe | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.summarized.bedpe"
 perl summarize.improperPairBedpe.pl ${OUTPUTDIR}/merge.improperPair.bedpe | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUTDIR}/merge.improperPair.summarized.bedpe
