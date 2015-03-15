@@ -33,7 +33,7 @@ while(<IN>) {
             my %count = (); 
             @talns_a2 = grep {!$count{$_}++} @talns_a2;
 
-            if ($#talns_a1 > 0 or $#talns_a2 > 0) {
+            if ($#talns_a1 >= 0 or $#talns_a2 >= 0) {
                 print $tchr1 . "\t" . $tstart1 . "\t" . $tend1 . "\t" . $tchr2 . "\t" . $tstart2 . "\t" . $tend2 . "\t";
                 print $tids . "\t" . $tmqs1 . "\t" . $tdir1 . "\t" . $tdir2 . "\t" . $talns1 . "\t" . $tinseqs . "\t" . $tmqs2 . "\t" . $talns2 . "\t" . $tpinds . "\n";
             }

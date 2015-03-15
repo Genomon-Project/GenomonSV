@@ -2,14 +2,15 @@
 #$ -S /bin/sh
 #$ -cwd
 
-export PATH=/home/yshira/bin/tabix-0.2.6:$PATH
+source ./config.sh
 
 SEQDIR=$1
 OUTPUTDIR=$2
-REGION=$3
+INTERVALLIST=$3
+REGION=`head -n ${SGE_TASK_ID} ${INTERVALLIST} | tail -n 1`
 
-echo "python getPairInfoFromBam.py ${INPUTBAM} ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/${REGION}.juncPairInfo.txt"
-python getPairInfoFromBam.py ${INPUTBAM} ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/${REGION}.juncPairInfo.txt
+echo "python getPairInfoFromBam.py ${INPUTBAM} ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/tmp/${REGION}.juncPairInfo.txt"
+python getPairInfoFromBam.py ${INPUTBAM} ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/tmp/${REGION}.juncPairInfo.txt
  
 # echo "tabix ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/${REGION}.junctionPair.sort.bed"
 # tabix ${OUTPUTDIR}/merge.junctionPair.sort.bed.gz ${REGION} > ${OUTPUTDIR}/${REGION}.junctionPair.sort.bed 

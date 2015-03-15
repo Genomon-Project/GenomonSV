@@ -9,6 +9,8 @@ import sys
 inputFile = sys.argv[1]
 
 junction_dist = 500;
+clipping_margin = 10;
+
 tempID, tempPairNum, tempChr, tempStart, tempEnd, tempDir, tempMapQ = "", "", "", "", "", "", ""
 
 hIN = open(inputFile, 'r')
@@ -22,19 +24,19 @@ for line in hIN:
         
         chr1, dir1, start1, end1, mapQ1, align1 = tempChr, tempDir, 0, 0, tempMapQ, tempChr + ":" + str(tempStart) + "-" + str(tempEnd) 
         if dir1 == "+":
-            start1 = tempEnd
+            start1 = tempEnd - clipping_margin
             end1 = tempEnd + junction_dist
         else:
             start1 = tempStart - junction_dist
-            end1 = tempStart
+            end1 = tempStart + clipping_margin
 
         chr2, dir2, start2, end2, mapQ2, align2 = F[1], F[4], 0, 0, F[5], F[1] + ":" + F[2] + "-" + F[3]
         if dir2 == "+":
-            start2 = int(F[3])
+            start2 = int(F[3]) - clipping_margin
             end2 = int(F[3]) + junction_dist
         else:
             start2 = int(F[2]) - junction_dist
-            end2 = int(F[2])
+            end2 = int(F[2]) + clipping_margin
  
         if chr1 < chr2:
             print '\t'.join([chr1, str(start1), str(end1), chr2, str(start2), str(end2), tempID, mapQ1 + "," + mapQ2, dir1, dir2, align1 + "," + align2])
