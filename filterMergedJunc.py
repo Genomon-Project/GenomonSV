@@ -110,12 +110,16 @@ for line in inFile:
 
     MQs = F[7].split(';')
     coveredRegions = F[10].split(';')
-    pairCoveredRegions = F[12].split(';')
-    pairMQs = F[13].split(';')
+    pairCoveredRegions = F[13].split(';')
+    pairMQs = F[12].split(';')
     juncReadTypes = F[14].split(';')
+    improperCoveredRegion = ([] if F[17] == "---" else F[17].split(';'))
 
-    # skip if the number of suppor read is below 3
-    if len(MQs) < 3:
+    # enumerate support read number
+    juncSupport = len(MQs)
+    improperSupport = (0 if F[16] == "---" else len(F[16].split(';')))
+    # skip if the number of suppor read is below the minSupReadNum 
+    if juncSupport + improperSupport < minSupReadNum:
         continue
 
     ##########
@@ -173,6 +177,16 @@ for line in inFile:
         elif regionMerge(targetRegion2, pairCoveredRegions[i]):
             region2.addMerge(pairCoveredRegions[i])
 
+    """
+    for i in range(0, len(improperCoveredRegion)):
+        regPair = improperCoveredRegion[i].split(',')
+        if regionMerge(targetRegion1, regPair[0]) and regionMerge(targetRegion2, regPair[1]):
+            region1.addMerge(regPair[0])
+            region2.addMerge(regPair[1])
+        elif regionMerge(targetRegion1, regPair[1]) and regionMerge(targetRegion2, regPair[0]):
+            region1.addMerge(regPair[1])
+            region2.addMerge(regPair[0])
+    """
 
     # print >> sys.stderr, F[6] 
     region1.reduceMerge()
@@ -187,7 +201,3 @@ for line in inFile:
 
 inFile.close()
 
-"""
-6       68101530        68101531        6       68112166        68112167        HWI-ST1021:119:C14DVACXX:1:1102:20006:184933/2;HWI-ST1021:119:C14DVACXX:1:1106:2199:186522/2;HWI-ST1021:119:C14DVACXX:1:1201:16611:118553/1;HWI-ST1021:119:C14DVACXX:1:1202:1982:20447/1;HWI-ST1021:119:C14DVACXX:1:1302:12876:136502/1;HWI-ST1021:119:C14DVACXX:1:2301:4759:99248/1;HWI-ST1021:119:C14DVACXX:2:1104:5660:134004/1;HWI-ST1021:119:C14DVACXX:2:1308:15064:122646/2;HWI-ST1021:119:C14DVACXX:2:2203:10518:182631/1;HWI-ST1021:119:C14DVACXX:2:2203:5218:150544/2;HWI-ST1021:119:C14DVACXX:3:1105:7846:125552/1;HWI-ST1021:119:C14DVACXX:3:1204:20044:190218/2;HWI-ST1021:119:C14DVACXX:3:2103:3278:6204/1;HWI-ST1021:119:C14DVACXX:3:2106:4213:197280/2;HWI-ST1021:119:C14DVACXX:4:1207:2386:107490/2;HWI-ST1021:119:C14DVACXX:4:2102:20164:117991/1;HWI-ST1021:119:C14DVACXX:1:1207:21302:164881/2;HWI-ST1021:119:C14DVACXX:1:1208:17356:71686/2;HWI-ST1021:119:C14DVACXX:1:1208:9461:35537/2;HWI-ST1021:119:C14DVACXX:1:1306:14515:131778/1;HWI-ST1021:119:C14DVACXX:1:1308:15649:25363/1;HWI-ST1021:119:C14DVACXX:1:1308:19784:144028/1;HWI-ST1021:119:C14DVACXX:1:2305:7547:3560/2;HWI-ST1021:119:C14DVACXX:2:1103:2175:77847/2;HWI-ST1021:119:C14DVACXX:2:1305:15740:51473/1;HWI-ST1021:119:C14DVACXX:3:2107:19705:32255/1   60;60;60;53;60;58;58;60;60;53;60;60;60;60;60;58;60;60;60;60;60;60;60;60;60;60   +       -
-
-"""

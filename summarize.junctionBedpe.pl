@@ -5,6 +5,7 @@ use List::Util qw(min max);
 
 my $input = $ARGV[0];
 my $checkMarginSize = 1000;
+my $supportReadThres = 2;
 
 my %mergedBedpe = ();
 open(IN, $input) || die "cannot open $!";
@@ -33,7 +34,7 @@ while(<IN>) {
             my %count = (); 
             @talns_a2 = grep {!$count{$_}++} @talns_a2;
 
-            if ($#talns_a1 >= 0 or $#talns_a2 >= 0) {
+            if ($#talns_a1 + 1 >= $supportReadThres) {
                 print $tchr1 . "\t" . $tstart1 . "\t" . $tend1 . "\t" . $tchr2 . "\t" . $tstart2 . "\t" . $tend2 . "\t";
                 print $tids . "\t" . $tmqs1 . "\t" . $tdir1 . "\t" . $tdir2 . "\t" . $talns1 . "\t" . $tinseqs . "\t" . $tmqs2 . "\t" . $talns2 . "\t" . $tpinds . "\n";
             }

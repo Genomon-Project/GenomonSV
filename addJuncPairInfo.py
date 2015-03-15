@@ -27,7 +27,7 @@ for line2 in hPairInfoFile:
         ID1 = F1[6]
         ID1 = re.sub(r'/\d$', '', ID1)
     
-    print '\t'.join(F1[0:12]) + '\t' + F2[5] + '\t' + F2[6] + '\t' + F1[13]
+    print '\t'.join(F1[0:12]) + '\t' + F2[6] + '\t' + F2[5] + '\t' + F1[13]
 
 hOriginalFile.close()
 hPairInfoFile.close()

@@ -33,17 +33,18 @@ echo "qsub -t 1-${REGIONCOUNT}:1 -N ${job_parseImproper} -e log/ -o log/ parseIm
 
 job_mergeJunction=mergeJunction.$(date +%s%N)
 echo "qsub -N ${job_mergeJunction} -hold_jid ${job_parseJunction} -e log/ -o log/ mergeJunction.sh ${OUTPUTDIR}"
-qsub -N ${job_mergeJunction} -hold_jid ${job_parseJunction} -e log/ -o log/ mergeJunction.sh ${OUTPUTDIR}
+# qsub -N ${job_mergeJunction} -hold_jid ${job_parseJunction} -e log/ -o log/ mergeJunction.sh ${OUTPUTDIR}
 
 job_mergeImproper=mergeImproper.$(date +%s%N)
 echo "qsub -N ${job_mergeImproper} -hold_jid ${job_parseImproper} -e log/ -o log/ mergeImproperPair.sh ${OUTPUTDIR}"
-qsub -N ${job_mergeImproper} -hold_jid ${job_parseImproper} -e log/ -o log/ mergeImproperPair.sh ${OUTPUTDIR}
+# qsub -N ${job_mergeImproper} -hold_jid ${job_parseImproper} -e log/ -o log/ mergeImproperPair.sh ${OUTPUTDIR}
 
 job_getPairInfoJunc=getPairInfoJunc.$(date +%s%N)
 echo "qsub -t 1-${REGIONCOUNT}:1 -N ${job_getPairInfoJunc} -hold_jid ${job_mergeJunction} -e log/ -o log/ getPairInfoFromBam.sh ${INPUTBAM} ${OUTPUTDIR} ${INTERVALLIST}"
 # qsub -t 1-${REGIONCOUNT}:1 -N ${job_getPairInfoJunc} -hold_jid ${job_mergeJunction} -e log/ -o log/ getPairInfoFromBam.sh ${INPUTBAM} ${OUTPUTDIR} ${INTERVALLIST}
 
-
-
+job_summarizeJunction=summarizeJunction.$(date +%s%N)
+echo "qsub -N ${job_summarizeJunction} -hold_jid ${job_mergeJunction},${job_mergeImproper} -e log/ -o log/ summarizeJunction.sh ${OUTPUTDIR}"
+qsub -N ${job_summarizeJunction} -hold_jid ${job_mergeJunction},${job_mergeImproper} -e log/ -o log/ summarizeJunction.sh ${OUTPUTDIR}
 
 
