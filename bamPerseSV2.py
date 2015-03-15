@@ -23,7 +23,7 @@ soft_clip_thres = 5
 
 bamfile = pysam.Samfile(inputBAM, "rb")
 
-regionMatch = re.search(r'(\w):(\d+)\-(\d+)', region)
+regionMatch = re.search(r'(\w+):(\d+)\-(\d+)', region)
 chr_region = regionMatch.group(1)
 start_region = regionMatch.group(2)
 end_region = regionMatch.group(3)
