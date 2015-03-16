@@ -5,7 +5,7 @@ use List::Util qw(min max);
 
 my $input = $ARGV[0];
 my $checkMarginSize = 1000;
-my $supportReadThres = 2;
+my $supportReadThres = 1;
 
 my %mergedBedpe = ();
 open(IN, $input) || die "cannot open $!";

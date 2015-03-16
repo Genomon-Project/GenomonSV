@@ -177,7 +177,6 @@ for line in inFile:
         elif regionMerge(targetRegion2, pairCoveredRegions[i]):
             region2.addMerge(pairCoveredRegions[i])
 
-    """
     for i in range(0, len(improperCoveredRegion)):
         regPair = improperCoveredRegion[i].split(',')
         if regionMerge(targetRegion1, regPair[0]) and regionMerge(targetRegion2, regPair[1]):
@@ -186,7 +185,6 @@ for line in inFile:
         elif regionMerge(targetRegion1, regPair[1]) and regionMerge(targetRegion2, regPair[0]):
             region1.addMerge(regPair[1])
             region2.addMerge(regPair[0])
-    """
 
     # print >> sys.stderr, F[6] 
     region1.reduceMerge()

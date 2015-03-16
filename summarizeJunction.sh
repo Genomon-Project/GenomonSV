@@ -15,6 +15,6 @@ python addJuncPairInfo.py ${INPUTDIR}/merge.junction.sort.txt ${INPUTDIR}/merge.
 echo "perl summarize.junctionBedpe.pl ${INPUTDIR}/merge.juncWithPair.txt > ${INPUTDIR}/merge.junction.summarized.bedpe"
 perl summarize.junctionBedpe.pl ${INPUTDIR}/merge.juncWithPair.txt > ${INPUTDIR}/merge.junction.summarized.bedpe
  
-echo "python addImproperInfo.py ${INPUTDIR}/merge.junction.summarized.bedpe ${INPUTDIR}/merge.improperPair.summarized.bedpe.gz > ${INPUTDIR}/merge.junction.improper.summarized.bedpe"
-python addImproperInfo.py ${INPUTDIR}/merge.junction.summarized.bedpe ${INPUTDIR}/merge.improperPair.summarized.bedpe.gz > ${INPUTDIR}/merge.junction.improper.summarized.bedpe 
+# echo "python addImproperInfo.py ${INPUTDIR}/merge.junction.summarized.bedpe ${INPUTDIR}/merge.improperPair.summarized.bedpe.gz > ${INPUTDIR}/merge.junction.improper.summarized.bedpe"
+# python addImproperInfo.py ${INPUTDIR}/merge.junction.summarized.bedpe ${INPUTDIR}/merge.improperPair.summarized.bedpe.gz > ${INPUTDIR}/merge.junction.improper.summarized.bedpe 
 
