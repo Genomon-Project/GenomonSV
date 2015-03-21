@@ -8,6 +8,8 @@
     and the 2nd column is the path for the individual junction list file
 _COMMENT_OUT_
 
+source ./config.sh
+
 CONTROLLIST=$1
 OUTPUT=$2
 

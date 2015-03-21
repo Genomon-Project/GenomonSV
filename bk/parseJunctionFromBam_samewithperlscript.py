@@ -16,9 +16,9 @@ inputBAM = sys.argv[1]
 region = sys.argv[2]
 
 junction_dist = 800
-abnormal_insert_size = 1000
-min_major_clip_size = 20
-max_minor_clip_size = 15 
+abnormal_insert_size = 2000
+min_clip_size_for_primary = 20
+
 bamfile = pysam.Samfile(inputBAM, "rb")
 
 regionMatch = re.search(r'(\w+):(\d+)\-(\d+)', region)
@@ -34,6 +34,9 @@ cigarHSRe_left = re.compile('^(\d+)([HS])')
 
 for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
+    # if read.qname == "ST-E00104:162:H03UUALXX:5:1105:7354:28224":
+    #     print read.qname
+
     # get the flag information
     flags = format(int(read.flag), "#014b")[:1:-1]
 
@@ -43,26 +46,22 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
     # skip supplementary alignment
     if flags[8] == "1" or flags[11] == "1": continue
 
-    # skip duplicated reads
-    if flags[10] == "1": continue
-
-    # no clipping
-    if len(read.cigar) == 1: continue
-
     # skip if the read aligned to hs37d5"
     # (in the future, this step will be replaced to some more sophisticated way;
     # (e.g., the user can input the target chromosomes and ignore if the read is aligned to non-target chromosomes, and so on..
     if bamfile.getrname(read.tid) == "hs37d5" or bamfile.getrname(read.rnext) == "hs37d5": continue
 
+    # no clipping
+    if len(read.cigar) == 1: continue
 
     # get the clipping size in the both side
     left_clipping = (read.cigar[0][1] if read.cigar[0][0] in [4, 5] else 0)
     right_clipping = (read.cigar[len(read.cigar) - 1][1] if read.cigar[len(read.cigar) - 1][0] in [4, 5] else 0)
 
-    if left_clipping < min_major_clip_size and right_clipping < min_major_clip_size: continue
+    if left_clipping < min_clip_size_for_primary and right_clipping < min_clip_size_for_primary: continue
 
     # for comparing with the previous script (this will removed soon)
-    if left_clipping > max_minor_clip_size and right_clipping > max_minor_clip_size: continue
+    if left_clipping > 0 and right_clipping > 0: continue
 
     # skip if there is no SA tags
     SA_str = None 
@@ -80,24 +79,9 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
     pos_pair = int(read.pnext + 1)
     dir_pair = ("-" if flags[5] == "1" else "+")
 
-    chr_SA, pos_SA, dir_SA, cigar_SA = SA_str.group(1), int(SA_str.group(2)), SA_str.group(3), SA_str.group(4)
+    if right_clipping >= min_clip_size_for_primary:
 
-    # get the soft clipping information on the supplementary alignment
-    right_clipping_SA = 0
-    tempMatch = cigarHSRe_right.search(cigar_SA)
-    if tempMatch is not None: right_clipping_SA = int(tempMatch.group(1))
-
-    left_clipping_SA = 0
-    tempMatch = cigarHSRe_left.search(cigar_SA)
-    if tempMatch is not None: left_clipping_SA = int(tempMatch.group(1))
-
-    # skip if the both sides of the supplementary alignemt is clipped than the specified threshould
-    if left_clipping_SA > max_minor_clip_size and right_clipping_SA > max_minor_clip_size: continue
-
-
-    # when the right side is clipped...
-    if right_clipping >= min_major_clip_size:
-
+        chr_SA, pos_SA, dir_SA, cigar_SA = SA_str.group(1), int(SA_str.group(2)), SA_str.group(3), SA_str.group(4)
         clipLen_current = right_clipping
         alignmentSize_current = read.alen
         readLength_current = read.rlen
@@ -105,6 +89,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
         juncChr_current = chr_current
         juncPos_current = pos_current + alignmentSize_current - 1
         juncDir_current = "+"
+        juncPos_SA = chr_SA
         coverRegion_current = chr_current + ":" + str(pos_current) + "-" + str(juncPos_current)
         juncChr_SA = chr_SA
 
@@ -116,6 +101,15 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
         alignmentSize_SA = 0
         for item in cigarMDRe.finditer(cigar_SA):
             alignmentSize_SA += int(item.group(1))        
+
+        # get the soft clipping information on the supplementary alignment
+        right_clipping_SA = 0 
+        tempMatch = cigarHSRe_right.search(cigar_SA)
+        if tempMatch is not None: right_clipping_SA = int(tempMatch.group(1))
+
+        left_clipping_SA = 0 
+        tempMatch = cigarHSRe_left.search(cigar_SA)
+        if tempMatch is not None: left_clipping_SA = int(tempMatch.group(1))
 
 
         validFlag = 0
@@ -130,7 +124,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA + alignmentSize_SA - 1
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA - (expected_clipLen_SA - clipLen_SA) 
                 coverRegion_SA = chr_SA + ":" + str(pos_SA) + "-" + str(juncPos_SA)
-                juncType = 1
                 validFlag = 1
 
             if dir_SA == "-" and expected_clipDir_SA == "-" and left_clipping_SA > 0:
@@ -139,7 +132,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA + (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(juncPos_SA) + "-" + str(juncPos_SA + alignmentSize_SA - 1)
-                juncType = 1
                 validFlag = 1
 
         # when the supplementary read is aligned on the same chromosome with the paired read
@@ -151,7 +143,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA + alignmentSize_SA - 1
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA - (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(pos_SA) + "-" + str(juncPos_SA) 
-                juncType = 2 
                 validFlag = 1
 
             if dir_SA == "+" and dir_pair == "-" and 0 <= pos_pair - pos_SA < abnormal_insert_size and expected_clipDir_SA == "-" and left_clipping_SA > 0:
@@ -160,7 +151,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA + (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(juncPos_SA) + "-" + str(juncPos_SA + alignmentSize_SA - 1)
-                juncType = 2
                 validFlag = 1
 
 
@@ -172,20 +162,15 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 surPlus_end = surPlus_start + clipLen_SA - expected_clipLen_SA
                 juncSurplus = read.seq[surPlus_start:surPlus_end]
 
-            # reorder by the chromosome position and print
-            if juncChr_current < juncChr_SA or juncChr_current == juncChr_SA and juncPos_current <= juncPos_SA:
-                print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
-            else: 
-                print '\t'.join([juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), juncChr_current, str(juncPos_current - 1), str(juncPos_current), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_SA, juncDir_current, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
+            print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
+                             read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
+                             coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair)])
+
  
 
+    if left_clipping >= min_clip_size_for_primary:
 
-    if left_clipping >= min_major_clip_size:
-
+        chr_SA, pos_SA, dir_SA, cigar_SA = SA_str.group(1), int(SA_str.group(2)), SA_str.group(3), SA_str.group(4)
         clipLen_current = left_clipping
         alignmentSize_current = read.alen
         readLength_current = read.rlen
@@ -193,6 +178,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
         juncChr_current = chr_current
         juncPos_current = pos_current
         juncDir_current = "-"
+        juncPos_SA = chr_SA
         coverRegion_current = chr_current + ":" + str(pos_current) + "-" + str(pos_current + alignmentSize_current - 1)
         juncChr_SA = chr_SA
 
@@ -202,6 +188,15 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
         alignmentSize_SA = 0
         for item in cigarMDRe.finditer(cigar_SA):
             alignmentSize_SA += int(item.group(1))
+
+        # get the soft clipping information on the supplementary alignment
+        right_clipping_SA = 0
+        tempMatch = cigarHSRe_right.search(cigar_SA)
+        if tempMatch is not None: right_clipping_SA = int(tempMatch.group(1))
+
+        left_clipping_SA = 0
+        tempMatch = cigarHSRe_left.search(cigar_SA)
+        if tempMatch is not None: left_clipping_SA = int(tempMatch.group(1))
 
 
         validFlag = 0
@@ -216,7 +211,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA + alignmentSize_SA - 1
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA - (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(pos_SA) + "-" + str(juncPos_SA)
-                juncType = 1
                 validFlag = 1
 
             if dir_SA == "-" and expected_clipDir_SA == "-" and left_clipping_SA > 0:
@@ -225,7 +219,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA + (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(juncPos_SA) + "-" + str(juncPos_SA + alignmentSize_SA - 1)
-                juncType = 1
                 validFlag = 1
 
 
@@ -237,7 +230,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA + alignmentSize_SA - 1
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA - (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(pos_SA) + "-" + str(juncPos_SA)
-                juncType = 2
                 validFlag = 1
 
            if dir_SA == "+" and dir_pair == "-" and 0 <= pos_pair - pos_SA < abnormal_insert_size and expected_clipDir_SA == "-" and left_clipping_SA:
@@ -246,7 +238,6 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 juncPos_SA = pos_SA
                 if clipLen_SA < expected_clipLen_SA: juncPos_SA = juncPos_SA + (expected_clipLen_SA - clipLen_SA)
                 coverRegion_SA = chr_SA + ":" + str(juncPos_SA) + "-" + str(juncPos_SA + alignmentSize_SA - 1)
-                juncType = 2
                 validFlag = 1
 
 
@@ -259,13 +250,8 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 surPlus_start = surPlus_end - (clipLen_SA - expected_clipLen_SA)
                 juncSurplus = read.seq[surPlus_start:surPlus_end]
 
-            # reorder by the chromosome position and print
-            if juncChr_current < juncChr_SA or juncChr_current == juncChr_SA and juncPos_current <= juncPos_SA: 
-                print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
-            else:                
-                print '\t'.join([juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), juncChr_current, str(juncPos_current - 1), str(juncPos_current), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_SA, juncDir_current, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
+            print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
+                             read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
+                             coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair)])
+
 
