@@ -43,6 +43,6 @@ echo "tabix -p bed -f ${OUTPUT}.gz"
 tabix -p bed -f ${OUTPUT}.gz
 
 
-rm -rf ${OUTPUT}.temp
-rm -rf ${OUTPUT}.temp.sort
+# rm -rf ${OUTPUT}.temp
+# rm -rf ${OUTPUT}.temp.sort
 

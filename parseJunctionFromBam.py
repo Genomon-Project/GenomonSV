@@ -1,12 +1,22 @@
 #! /usr/local/bin/python
 
+"""
+
+    This script utilizes the SA tags (SA:Z:rname, pos, strand, CIGAR, mapQ, number of mismatch).
+    The strand of the supplementary alignment information in the SA tag is determined by the orignal sequence (before taking complement).
+    Therefore, please not that when the primary alignment is in the reverse direction, the sequence shown in the bam file does not match
+    to the SA tags..
+
+
+"""
+
 import sys, pysam, re
 
 inputBAM = sys.argv[1]
 region = sys.argv[2]
 
 junction_dist = 800
-abnormal_insert_size = 1000
+abnormal_insert_size = 2000
 min_clip_size_for_primary = 20
 
 bamfile = pysam.Samfile(inputBAM, "rb")
@@ -19,13 +29,13 @@ end_region = regionMatch.group(3)
 SAre = re.compile('(\w+),(\d+),([\-\+]),(\w+),(\d+)')
 cigarMDRe = re.compile('(\d+)([MD])')
 cigarHIMSRe = re.compile('(\d+)([HIMS])')
-cigarHSRe_right = re.compile('(\d+)([HIMS])$')
-cigarHSRe_left = re.compile('^(\d+)([HIMS])')
+cigarHSRe_right = re.compile('(\d+)([HS])$')
+cigarHSRe_left = re.compile('^(\d+)([HS])')
 
 for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
-    if read.qname == "ST-E00129:110:H0E3PALXX:1:1111:23451:14863":
-        print read.qname
+    # if read.qname == "ST-E00104:162:H03UUALXX:5:1105:7354:28224":
+    #     print read.qname
 
     # get the flag information
     flags = format(int(read.flag), "#014b")[:1:-1]
@@ -39,7 +49,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
     # skip if the read aligned to hs37d5"
     # (in the future, this step will be replaced to some more sophisticated way;
     # (e.g., the user can input the target chromosomes and ignore if the read is aligned to non-target chromosomes, and so on..
-    if read.tid == "hs37d5" or read.rnext == "hs37d5": continue
+    if bamfile.getrname(read.tid) == "hs37d5" or bamfile.getrname(read.rnext) == "hs37d5": continue
 
     # no clipping
     if len(read.cigar) == 1: continue
@@ -69,7 +79,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
     pos_pair = int(read.pnext + 1)
     dir_pair = ("-" if flags[5] == "1" else "+")
 
-    if right_clipping > min_clip_size_for_primary:
+    if right_clipping >= min_clip_size_for_primary:
 
         chr_SA, pos_SA, dir_SA, cigar_SA = SA_str.group(1), int(SA_str.group(2)), SA_str.group(3), SA_str.group(4)
         clipLen_current = right_clipping
@@ -83,6 +93,8 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
         coverRegion_current = chr_current + ":" + str(pos_current) + "-" + str(juncPos_current)
         juncChr_SA = chr_SA
 
+        # get the expected clipped size in the supplementary read and the side of the clipping
+        # for getting the expected side of the clipping, we have to be carefully consult with the definition of SA tag.
         expected_clipLen_SA = readLength_current - clipLen_current
         expected_clipDir_SA = ("-" if dir_current == dir_SA else "+")
 
@@ -92,11 +104,11 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
         # get the soft clipping information on the supplementary alignment
         right_clipping_SA = 0 
-        tempMatch = cigarHSRe_right.match(cigar_SA)
+        tempMatch = cigarHSRe_right.search(cigar_SA)
         if tempMatch is not None: right_clipping_SA = int(tempMatch.group(1))
 
         left_clipping_SA = 0 
-        tempMatch = cigarHSRe_left.match(cigar_SA)
+        tempMatch = cigarHSRe_left.search(cigar_SA)
         if tempMatch is not None: left_clipping_SA = int(tempMatch.group(1))
 
 
@@ -122,7 +134,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
                 coverRegion_SA = chr_SA + ":" + str(juncPos_SA) + "-" + str(juncPos_SA + alignmentSize_SA - 1)
                 validFlag = 1
 
-
+        # when the supplementary read is aligned on the same chromosome with the paired read
         if dir_current == "+" and chr_SA == chr_pair:
 
             if dir_SA == "-" and dir_pair == "+" and 0 <= pos_SA - pos_pair < abnormal_insert_size and expected_clipDir_SA == "+" and right_clipping_SA > 0:
@@ -146,7 +158,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
             juncSurplus = "---"
             if clipLen_SA > expected_clipLen_SA and readLength_current == len(read.seq):
-                surPlus_start = read.alen - clipLen_current
+                surPlus_start = readLength_current - clipLen_current
                 surPlus_end = surPlus_start + clipLen_SA - expected_clipLen_SA
                 juncSurplus = read.seq[surPlus_start:surPlus_end]
 
@@ -156,7 +168,7 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
  
 
-    if left_clipping > min_clip_size_for_primary:
+    if left_clipping >= min_clip_size_for_primary:
 
         chr_SA, pos_SA, dir_SA, cigar_SA = SA_str.group(1), int(SA_str.group(2)), SA_str.group(3), SA_str.group(4)
         clipLen_current = left_clipping
@@ -179,11 +191,11 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
         # get the soft clipping information on the supplementary alignment
         right_clipping_SA = 0
-        tempMatch = cigarHSRe_right.match(cigar_SA)
+        tempMatch = cigarHSRe_right.search(cigar_SA)
         if tempMatch is not None: right_clipping_SA = int(tempMatch.group(1))
 
         left_clipping_SA = 0
-        tempMatch = cigarHSRe_left.match(cigar_SA)
+        tempMatch = cigarHSRe_left.search(cigar_SA)
         if tempMatch is not None: left_clipping_SA = int(tempMatch.group(1))
 
 
@@ -233,8 +245,9 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
             juncSurplus = "---"
             if clipLen_SA > expected_clipLen_SA and readLength_current == len(read.seq):
-                surPlus_start = read.alen - clipLen_current
-                surPlus_end = surPlus_start + clipLen_SA - expected_clipLen_SA
+                surPlus_end = clipLen_current - 1 # this is not correct. but there seems to be a bug in the original perl script
+                # surPlus_end = clipLen_current # this is right
+                surPlus_start = surPlus_end - (clipLen_SA - expected_clipLen_SA)
                 juncSurplus = read.seq[surPlus_start:surPlus_end]
 
             print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
