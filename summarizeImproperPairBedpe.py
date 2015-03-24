@@ -1,5 +1,9 @@
 #! /usr/local/bin/python
 
+"""
+    script for merging and gummarizing improper pair information 
+"""
+
 import sys
 
 inputFile = sys.argv[1]

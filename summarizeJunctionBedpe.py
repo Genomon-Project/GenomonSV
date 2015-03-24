@@ -1,5 +1,9 @@
 #! /usr/local/bin/python
 
+"""
+    script for merging and summarizing junction read pairs
+"""
+
 import sys
 
 inputFile = sys.argv[1]
@@ -64,7 +68,7 @@ for line in hIN:
                     newAlns2 = talns2 + ';' + F[13]
 
 
-                    mergedBedpe[key] = '\t'.join([newIds, newMq1, newAlns1, newInseqs, newMqs2, newAlns2, newPinds, newCinds])
+                    mergedBedpe[key] = '\t'.join([newIds, newMqs1, newAlns1, newInseqs, newMqs2, newAlns2, newPinds, newCinds])
 
     for item in delList:
         del mergedBedpe[item]

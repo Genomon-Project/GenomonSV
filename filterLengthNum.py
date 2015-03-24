@@ -4,13 +4,13 @@
     script for filtering by the length of SV size and support read junctions
 """
 
-import sys
+import sys, gzip
 
 inputFile = sys.argv[1]
 minJuncNum = sys.argv[2]
 minSize = sys.argv[3]
 
-hIN = open(inputFile, 'r')
+hIN = gzip.open(inputFile, 'r')
 for line in hIN:
     F = line.rstrip('\n').split('\t')
 

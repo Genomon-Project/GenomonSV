@@ -1,5 +1,8 @@
 #! /usr/local/bin/python
 
+"""
+    script for adding junction pair position and mapping quality information
+"""
 import sys, re
 
 originalFile = sys.argv[1]

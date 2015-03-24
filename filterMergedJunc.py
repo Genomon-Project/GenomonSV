@@ -111,13 +111,14 @@ for line in inFile:
     MQs = F[7].split(';')
     coveredRegions = F[10].split(';')
     pairCoveredRegions = F[13].split(';')
-    pairMQs = F[12].split(';')
+    pairMQs = map(lambda x: int(x), F[12].split(';'))
     juncReadTypes = F[14].split(';')
-    improperCoveredRegion = ([] if F[17] == "---" else F[17].split(';'))
+    improperCoveredRegion = ([] if F[18] == "---" else F[18].split(';'))
 
     # enumerate support read number
     juncSupport = len(MQs)
-    improperSupport = (0 if F[16] == "---" else len(F[16].split(';')))
+    improperMQs = ([] if F[17] == "---" else F[17].split(';'))
+    improperSupport = len(improperMQs)
     # skip if the number of suppor read is below the minSupReadNum 
     if juncSupport + improperSupport < minSupReadNum:
         continue
@@ -132,7 +133,15 @@ for line in inFile:
         else:
             MQs2.append(int(MQs[i]))
 
-    
+    # improper pair
+    IMQs1 = [];
+    IMQs2 = [];
+    for i in range(0, len(improperMQs)):
+        tempMQ = improperMQs[i].split(',')
+        IMQs1.append(int(tempMQ[0]))
+        IMQs2.append(int(tempMQ[1]))
+
+ 
     mapFlag = 0
     if len(MQs1) > 0 and numpy.median(MQs1) >= minMapQ:
         mapFlag = 1
@@ -140,7 +149,10 @@ for line in inFile:
     if len(MQs2) > 0 and numpy.median(MQs2) >= minMapQ:
         mapFlag = 1     
 
-    if len(pairMQs) > 0 and numpy.median(pairMQs) >= minMapQ:
+    if len(IMQs1) > 0 and numpy.median(IMQs1) >= minMapQ:
+        mapFlag = 1
+
+    if len(IMQs2) > 0 and numpy.median(IMQs2) >= minMapQ:
         mapFlag = 1
 
     if mapFlag == 0:

@@ -13,6 +13,7 @@ normalBamPath = sys.argv[5]
 ##########
 # function
 
+# getting the "proper" read pairs covering the break point (considering some margin for judging "cover")
 def getCoverReadsNum(bamfile, varIDs, chr_region, pos_region, searchLength, margin):
 
     readIDs = []    
@@ -36,6 +37,7 @@ def getCoverReadsNum(bamfile, varIDs, chr_region, pos_region, searchLength, marg
         # skip if not reverse read
         if flags[4] == "0": continue
 
+        # add some margins to define "cover"
         if read.pnext + margin <= pos_region <= read.aend - margin:
             if read.qname not in varIDs:
                 readIDs.append(read.qname)

@@ -14,7 +14,6 @@ REGION=`head -n ${SGE_TASK_ID} ${INTERVALLIST} | tail -n 1`
 
 echo "python parseJunctionFromBam.py ${INPUTBAM} ${REGION} > ${OUTPUTDIR}/tmp/${REGION}.junction.temp.txt"
 python parseJunctionFromBam.py ${INPUTBAM} ${REGION} > ${OUTPUTDIR}/tmp/${REGION}.junction.temp.txt
+check_error $?
 
-# echo "samtools view ${INPUTBAM} ${REGION} | perl bamPerseSV.pl - > ${OUTPUTDIR}/tmp/${REGION}.junction.temp.txt"
-# samtools view ${INPUTBAM} ${REGION} | perl bamPerseSV.pl - > ${OUTPUTDIR}/tmp/${REGION}.junction.temp.txt
 
