@@ -18,7 +18,7 @@ for line in hIN:
 
     match = 0
     delList = []
-    for key in mergedBedpe:
+    for key in sorted(mergedBedpe):
 
         tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2 = key.split('\t')
         tids, tmqs, talns = mergedBedpe[key].split('\t')
