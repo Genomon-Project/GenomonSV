@@ -27,7 +27,7 @@ for line in hIN:
             controlSamples = record[6].split(',')
             controlNums = record[7].split(',')
             for i in range(0, len(controlSamples)):
-                if re.match(matchedNormal, controlSamples[i]) is not None and int(controlNums[i]) >= int(supportReadThres):
+                if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(supportReadThres):
                 # if controlSamples[i] != matchedNormal and int(controlNums[i]) >= int(supportReadThres):
                     controlFlag = 1
             

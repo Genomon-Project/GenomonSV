@@ -140,6 +140,9 @@ for line in inFile:
     if len(MQs2) > 0 and numpy.median(MQs2) >= minMapQ:
         mapFlag = 1     
 
+    if len(pairMQs) > 0 and numpy.median(pairMQs) >= minMapQ:
+        mapFlag = 1
+
     if mapFlag == 0:
         continue
     ##########

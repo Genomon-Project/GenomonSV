@@ -27,22 +27,27 @@ do
 
     echo "python simplifyJunc.py $path $sample >> ${OUTPUT}.temp"
     python simplifyJunc.py $path $sample >> ${OUTPUT}.temp
+    check_error $?
  
 done < ${CONTROLLIST}
 
 echo "sort -k1,1 -k2,2n -k4,4 -k5,5n ${OUTPUT}.temp > ${OUTPUT}.temp.sort"
 sort -k1,1 -k2,2n -k4,4 -k5,5n ${OUTPUT}.temp > ${OUTPUT}.temp.sort
+check_error $?
 
 # _COMMENT_OUT_
 
 echo "python organizeControl.py ${OUTPUT}.temp.sort > ${OUTPUT}"
 python organizeControl.py ${OUTPUT}.temp.sort > ${OUTPUT}
+check_error $?
 
 echo "bgzip -f ${OUTPUT} > ${OUTPUT}.gz"
 bgzip -f ${OUTPUT} > ${OUTPUT}.gz
+check_error $?
 
 echo "tabix -p bed -f ${OUTPUT}.gz"
 tabix -p bed -f ${OUTPUT}.gz
+check_error $?
 
 
 # rm -rf ${OUTPUT}.temp

@@ -20,7 +20,7 @@ for line in hIN:
     if key != tempKey:
 
         if tempKey != "":
-            FF = key.split('\t')
+            FF = tempKey.split('\t')
             print '\t'.join(FF[0:6]) + '\t' + tempSamples + '\t' + tempNums + '\t' + FF[6] + '\t' + FF[7]
 
         tempKey = key
@@ -36,5 +36,5 @@ hIN.close()
 
 if tempKey != "":
     FF = key.split('\t')
-    print '\t'.join(FF[0:6]) + tempSamples + '\t' + tempNums + '\t' + FF[6] + FF[7]
+    print '\t'.join(FF[0:6]) + '\t' + tempSamples + '\t' + tempNums + '\t' + FF[6] + '\t' + FF[7]
 
