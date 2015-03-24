@@ -4,7 +4,7 @@ import sys
 
 inputFile = sys.argv[1]
 
-junction_dist = 3000
+checkMarginSize = 1200
 
 hIN = open(inputFile, 'r')
 
@@ -26,7 +26,7 @@ for line in hIN:
         # if F[6] == "HWI-ST1021:119:C14DVACXX:2:1203:19326:189526":
         #     print tids
 
-        if F[0] != tchr1 or int(F[1]) > int(tend1) + junction_dist:
+        if F[0] != tchr1 or int(F[1]) > int(tend1) + checkMarginSize:
             talns_a = talns.split(';')
             talns_a_uniq = list(set(talns_a))
 
@@ -68,3 +68,19 @@ for line in hIN:
 
 
 hIN.close()
+
+
+for key in sorted(mergedBedpe):
+
+    tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2 = key.split('\t')
+    tids, tmqs, talns = mergedBedpe[key].split('\t')
+
+    talns_a = talns.split(';')
+    talns_a_uniq = list(set(talns_a))
+
+    if len(talns_a_uniq) >= 1:
+
+        print '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
+                         tids, tmqs, tdir1, tdir2, talns])
+
+

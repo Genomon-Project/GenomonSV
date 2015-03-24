@@ -14,7 +14,7 @@ while(<IN>) {
     my @F = split("\t", $_);
 
     my $match = 0;
-    foreach my $key (keys %mergedBedpe) {
+    foreach my $key (sort keys %mergedBedpe) {
 
         my ($tchr1, $tstart1, $tend1, $tchr2, $tstart2, $tend2, $tdir1, $tdir2, $inseqSize) = split("\t", $key);
         my ($tids, $tmqs1, $talns1, $tinseqs, $tmqs2, $talns2, $tpinds)  = split("\t", $mergedBedpe{$key});
