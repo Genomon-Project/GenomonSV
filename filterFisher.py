@@ -113,11 +113,14 @@ for line in hIN:
 
     # tumor surrounding read pair count
     # print F[0]
-    tumorProperNum = getCoverReadsNum(tumorBam_ps, tumorJunctionImproperIDs, F[0], int(F[1]), 1000, 20)
+    tumorProperNum1 = getCoverReadsNum(tumorBam_ps, tumorJunctionImproperIDs, F[0], int(F[2]), 1000, 20)
+    tumorProperNum2 = getCoverReadsNum(tumorBam_ps, tumorJunctionImproperIDs, F[3], int(F[5]), 1000, 20)
+    tumorProperNum = list(set(tumorProperNum1 + tumorProperNum2))
 
     # normal surrounding read pair count
-    normalProperNum = getCoverReadsNum(normalBam_ps, normalJunctionImproperIDs, F[0], int(F[1]), 1000, 20)
-
+    normalProperNum1 = getCoverReadsNum(normalBam_ps, normalJunctionImproperIDs, F[0], int(F[2]), 1000, 20)
+    normalProperNum2 = getCoverReadsNum(normalBam_ps, normalJunctionImproperIDs, F[3], int(F[5]), 1000, 20)
+    normalProperNum = list(set(normalProperNum1 + normalProperNum2))
 
     # fisher test
     oddsratio, pvalue = stats.fisher_exact([[len(tumorJunctionImproperIDs), len(normalJunctionImproperIDs)], [len(tumorProperNum), len(normalProperNum)]])
