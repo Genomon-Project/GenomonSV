@@ -4,12 +4,12 @@
     script for creating control junction information for filtering
 """
 
-import sys
+import sys, gzip
 
 inputFile = sys.argv[1]
 label = sys.argv[2]
 
-hIN = open(inputFile, 'r')
+hIN = gzip.open(inputFile, 'r')
 for line in hIN:
     F = line.rstrip('\n').split('\t')
 

@@ -2,6 +2,7 @@
 #$ -S /bin/sh
 #$ -cwd
 #$ -e log/ -o log/
+#$ -q mjobs.q
 
 source ./config.sh
 

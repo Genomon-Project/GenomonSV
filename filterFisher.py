@@ -59,6 +59,9 @@ for line in hIN:
 
     F = line.strip('\n').split('\t')
 
+    # if F[2] == "110709381":
+    #     print F[0]
+
     # print '\t'.join(F)
 
     # tumor junction read pair count
@@ -66,7 +69,7 @@ for line in hIN:
     tumorJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), tumorJunctionIDs_temp)    
  
     # tumor improper read pair count
-    tumorImproperIDs = F[15].split(';')
+    tumorImproperIDs = F[16].split(';')
 
     # tumor junction and improper read pair
     tumorJunctionImproperIDs = list(set(tumorJunctionIDs + tumorImproperIDs))

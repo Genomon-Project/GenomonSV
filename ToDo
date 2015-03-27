@@ -1,3 +1,26 @@
+3/27, 2015
+
+1. Test about the validity of the Fisher's exact test
+2. debugging of many small errors
+3. Compare with Totoki List
+4. Perform on simulation data
+5. annotation (repeat region, gene)
+
+mid term
+1. detection of small insertions and deletions
+2. estimation and display of short inserted sequences
+3. integrate Ruffus
+4. Visualization function addition
+5. Perform on 4614, 8128 data
+
+long term
+1. use hstlib
+2. write paper
+
+
+
+3/13. 2015
+
 For the result
 
 1. integrate the infromation of improper short reads

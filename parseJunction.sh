@@ -1,6 +1,7 @@
 #! /bin/sh
 #$ -S /bin/sh
 #$ -cwd
+#$ -q mjobs.q
 
 source ./config.sh
 

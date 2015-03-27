@@ -4,14 +4,15 @@
     script for obtaining pair read information (mainly end position, because it cannot recovered from bam files)
 """
 
-import sys, re, pysam
+import sys, re, pysam, tabix
 
 inputBAM = sys.argv[1]
 inputBedpe = sys.argv[2]
 region = sys.argv[3]
 
 bamfile = pysam.Samfile(inputBAM, "rb")
-tabixfile = pysam.Tabixfile(inputBedpe)
+# tabixfile = pysam.Tabixfile(inputBedpe)
+tabixfile = tabix.open(inputBedpe)
  
 regionMatch = re.search(r'(\w+):(\d+)\-(\d+)', region)
 chr_region = regionMatch.group(1)
@@ -19,9 +20,21 @@ start_region = regionMatch.group(2)
 end_region = regionMatch.group(3)
 
 ID2info = {}
-for row in tabixfile.fetch(chr_region, int(start_region), int(end_region)):
-    F = row.rstrip('\n').split('\t')
-    ID2info[F[3]] = '\t'.join(F)
+# for row in tabixfile.fetch(chr_region, int(start_region), int(end_region)):
+#     F = row.rstrip('\n').split('\t')
+#     ID2info[F[3]] = '\t'.join(F)
+
+tabixErrorFlag = 0
+try:
+    records = tabixfile.query(chr_region, int(start_region), int(end_region))
+except Exception as inst:
+    print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+    tabixErrorFlag = 1
+
+normalJunctionIDs = [];
+if tabixErrorFlag == 0:
+    for record in records:
+        ID2info[record[3]] = '\t'.join(record)
 
 
 for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
