@@ -9,7 +9,7 @@ import sys
 inputFile = sys.argv[1]
 
 junction_dist = 500;
-clipping_margin = 10;
+clipping_margin = 30;
 
 tempID, tempPairNum, tempChr, tempStart, tempEnd, tempDir, tempMapQ = "", "", "", "", "", "", ""
 

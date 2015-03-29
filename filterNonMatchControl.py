@@ -22,7 +22,7 @@ for line in hIN:
     F = line.rstrip('\n').split('\t')
 
     controlFlag = 0
-    records = control_tb.query(F[0], int(F[1]), int(F[1]) + 1)
+    records = control_tb.query(F[0], int(F[1]) - margin, int(F[2]) + margin)
     for record in records:
         # if "\t".join(F[0:6]) == "\t".join(record[0:6]):
         # this is a temporary procedure, ideally, we should consider the length of inserted bases and perform comparison in a single base pair resolution

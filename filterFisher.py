@@ -59,7 +59,7 @@ for line in hIN:
 
     F = line.strip('\n').split('\t')
 
-    # if F[2] == "110709381":
+    # if F[2] == "1":
     #     print F[0]
 
     # print '\t'.join(F)
@@ -69,7 +69,10 @@ for line in hIN:
     tumorJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), tumorJunctionIDs_temp)    
  
     # tumor improper read pair count
-    tumorImproperIDs = F[16].split(';')
+    if F[16] != "---":
+        tumorImproperIDs = F[16].split(';')
+    else:
+        tumorImproperIDs = []
 
     # tumor junction and improper read pair
     tumorJunctionImproperIDs = list(set(tumorJunctionIDs + tumorImproperIDs))
@@ -78,7 +81,7 @@ for line in hIN:
     # normal junction read pair count
     tabixErrorFlag = 0
     try:
-        records = normalJunction_tb.query(F[0], int(F[1]), int(F[1]) + 1)
+        records = normalJunction_tb.query(F[0], int(F[1]) - 5, int(F[2]) + 5)
     except Exception as inst:
         print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
         print >> sys.stderr, '\t'.join(F)
@@ -129,7 +132,10 @@ for line in hIN:
 
     # fisher test
     oddsratio, pvalue = stats.fisher_exact([[len(tumorJunctionImproperIDs), len(normalJunctionImproperIDs)], [len(tumorProperNum), len(normalProperNum)]])
-    
+
+    if pvalue < 1e-100:
+        pvalue = 1e-100
+
     print '\t'.join(F[0:6]) + '\t' + "genomonSV_" + str(SVNum) + '\t' + "0" + '\t' + F[8] + '\t' + F[9] + '\t' + \
           '\t'.join([str(len(tumorJunctionIDs)), str(len(tumorImproperIDs)), str(len(tumorJunctionImproperIDs)), str(len(tumorProperNum)), \
                      str(len(normalJunctionIDs)), str(len(normalImproperIDs)), str(len(normalJunctionImproperIDs)), str(len(normalProperNum))]) + '\t' + \

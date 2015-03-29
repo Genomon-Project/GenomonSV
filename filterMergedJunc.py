@@ -102,9 +102,11 @@ for line in inFile:
     F = line.rstrip('\n').split('\t')
 
     ##########
+    """
     # for now only consider long ranged SV??
     if F[0] == F[3] and abs(int(F[2]) - int(F[5])) < 1000:
         continue
+    """
     ##########
 
 
@@ -112,7 +114,8 @@ for line in inFile:
     coveredRegions = F[10].split(';')
     pairCoveredRegions = F[13].split(';')
     pairMQs = map(lambda x: int(x), F[12].split(';'))
-    juncReadTypes = F[14].split(';')
+    juncPairPos = F[14].split(';')
+    juncReadTypes = F[15].split(';')
     improperCoveredRegion = ([] if F[18] == "---" else F[18].split(';'))
 
     # enumerate support read number
@@ -174,32 +177,19 @@ for line in inFile:
             region1.addMerge(regPair[1])
             region2.addMerge(regPair[0])
 
-    targetRegion1 = ""
-    if F[8] == "+":
-        targetRegion1 = F[0] + ":" + str(max(0, int(F[2]) - 1000)) + "-" + F[2]
-    else:
-        targetRegion1 = F[0] + ":" + F[2] + "-" + str(int(F[2]) + 1000)
-
-    targetRegion2 = ""
-    if F[9] == "+":
-        targetRegion2 = F[3] + ":" + str(max(0, int(F[5]) - 1000)) + "-" + F[5]
-    else:
-        targetRegion2 = F[3] + ":" + F[5] + "-" + str(int(F[5]) + 1000)
 
     for i in range(0, len(pairCoveredRegions)):
-        if regionMerge(targetRegion1, pairCoveredRegions[i]):
-            region1.addMerge(pairCoveredRegions[i])        
-        elif regionMerge(targetRegion2, pairCoveredRegions[i]):
+        if (juncReadTypes[i] == "1" and juncPairPos[i] == "1") or (juncReadTypes[i] == "2" and juncPairPos[i] == "2"): 
+            region1.addMerge(pairCoveredRegions[i])
+        elif (juncReadTypes[i] == "1" and juncPairPos[i] == "2") or (juncReadTypes[i] == "2" and juncPairPos[i] == "1"):
             region2.addMerge(pairCoveredRegions[i])
+
 
     for i in range(0, len(improperCoveredRegion)):
         regPair = improperCoveredRegion[i].split(',')
-        if regionMerge(targetRegion1, regPair[0]) and regionMerge(targetRegion2, regPair[1]):
-            region1.addMerge(regPair[0])
-            region2.addMerge(regPair[1])
-        elif regionMerge(targetRegion1, regPair[1]) and regionMerge(targetRegion2, regPair[0]):
-            region1.addMerge(regPair[1])
-            region2.addMerge(regPair[0])
+        region1.addMerge(regPair[0])
+        region2.addMerge(regPair[1])
+
 
     # print >> sys.stderr, F[6] 
     region1.reduceMerge()
