@@ -13,8 +13,8 @@ NORMALBAM=$4
 CONTROL=$5
 MATCHEDNORMAL=$6
 
-echo "python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 2 1000 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe"
-python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 2 1000 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe
+echo "python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 1000 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe"
+python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 1000 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe
 check_error $?
 
 echo "python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe"

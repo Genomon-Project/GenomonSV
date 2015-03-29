@@ -87,7 +87,9 @@ for line in hIN:
     normalJunctionIDs = [];
     if tabixErrorFlag == 0:
         for record in records:
-            if "\t".join(F[0:6]) == "\t".join(record[0:6]):
+            # if "\t".join(F[0:6]) == "\t".join(record[0:6]):
+            # this is a temporary procedure, ideally, we should consider the length of inserted bases and perform comparison in a single base pair resolution
+            if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9] and int(record[2]) - 5 <= int(F[2]) <= int(record[2]) + 5 and int(record[5]) - 5 <= int(F[5]) <= int(record[5]) + 5:
                 normalJunctionIDs_temp = record[6].split(';')
                 normalJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), normalJunctionIDs_temp)
 
