@@ -93,8 +93,10 @@ for line in hIN:
             # if "\t".join(F[0:6]) == "\t".join(record[0:6]):
             # this is a temporary procedure, ideally, we should consider the length of inserted bases and perform comparison in a single base pair resolution
             if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9] and int(record[2]) - 5 <= int(F[2]) <= int(record[2]) + 5 and int(record[5]) - 5 <= int(F[5]) <= int(record[5]) + 5:
-                normalJunctionIDs_temp = record[6].split(';')
-                normalJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), normalJunctionIDs_temp)
+                normalJunctionIDs_temp1 = record[6].split(';')
+                normalJunctionIDs_temp2 = map(lambda x: re.sub(r'/\d$', '', x), normalJunctionIDs_temp1)
+                if len(normalJunctionIDs_temp2) > len(normalJunctionIDs):
+                    normalJunctionIDs = normalJunctionIDs_temp2
 
 
     # normal improper read pair count
@@ -110,8 +112,9 @@ for line in hIN:
     if tabixErrorFlag == 0:
         for FF in records:
             if F[0] == FF[0] and F[3] == FF[3] and int(F[1]) >= int(FF[1]) and int(F[2]) <= int(FF[2]) and int(F[4]) >= int(FF[4]) and int(F[5]) <= int(FF[5]) and F[8] == FF[8] and F[9] == FF[9]:
-                normalImproperIDs = FF[6].split(';')
-
+                normalImproperIDs_temp = FF[6].split(';')
+                if len(normalImproperIDs_temp) > len(normalImproperIDs):
+                    normalImproperIDs = normalImproperIDs_temp
 
     # normal junction and improper read pair
     normalJunctionImproperIDs = list(set(normalJunctionIDs + normalImproperIDs))

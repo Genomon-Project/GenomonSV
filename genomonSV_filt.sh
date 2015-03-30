@@ -14,15 +14,15 @@ CONTROL=$5
 MATCHEDNORMAL=$6
 
 echo "python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 20 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe"
-# python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 20 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe
+python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 20 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe
 check_error $?
 
 echo "python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe"
-# python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe 
+python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe 
 check_error $?
 
 echo "python addImproperInfo.py ${TUMORDIR}/merge.junction.summarized.filt2.bedpe ${TUMORDIR}/merge.improperPair.summarized.bedpe.gz > ${TUMORDIR}/merge.junction.summarized.filt3.bedpe"
-# python addImproperInfo.py ${TUMORDIR}/merge.junction.summarized.filt2.bedpe ${TUMORDIR}/merge.improperPair.summarized.bedpe.gz > ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 
+python addImproperInfo.py ${TUMORDIR}/merge.junction.summarized.filt2.bedpe ${TUMORDIR}/merge.improperPair.summarized.bedpe.gz > ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 
 check_error $?
 
 echo "python filterMergedJunc.py ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 3 40 100 > ${TUMORDIR}/merge.junction.summarized.filt4.bedpe"
