@@ -9,19 +9,15 @@ for line in hIN:
     F = line.rstrip('\n').split('\t')
 
     chr = F[2]
-    starts = F[9].split(',')
-    ends = F[10].split(',')
+    start = F[4]
+    end = F[7]
     strand = F[3]
-    exonNum = int(F[8])
-    gene = F[1]
     symbol = F[12]
 
-    for i in range(0, len(starts) - 1):
-        key = chr + '\t' + starts[i] + '\t' + ends[i]
-        if strand == "+":
-            print key + '\t' + symbol + "(" + gene + ")" + "." + str(i) + '\t' + "0" + '\t' + "+"
-        else:
-            print key + '\t' + symbol + "(" + gene + ")" + "." + str(exonNum - i - 1) + '\t' + "0" + '\t' + "-"
+    chr = chr.replace('chr', '')
+
+    key = chr + '\t' + start + '\t' + end
+    print key + '\t' + symbol + '\t' + "0" + '\t' + strand
 
 hIN.close()
 

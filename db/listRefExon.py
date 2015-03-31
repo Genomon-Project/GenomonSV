@@ -16,14 +16,16 @@ for line in hIN:
     gene = F[1]
     symbol = F[12]
 
+    chr = chr.replace('chr', '')
 
     for i in range(0, len(starts) - 1):
         key = chr + '\t' + starts[i] + '\t' + ends[i]
         if strand == "+":
-            print key + '\t' + symbol + "(" + gene + ")" + "." + str(i) + '\t' + "0" + '\t' + "+"
+            # print key + '\t' + symbol + "(" + gene + ")" + "." + str(i) + '\t' + "0" + '\t' + "+"
+            print key + '\t' + symbol + '\t' + "0" + '\t' + "+"
         else:
-            print key + '\t' + symbol + "(" + gene + ")" + "." + str(exonNum - i - 1) + '\t' + "0" + '\t' + "-"
-
+            # print key + '\t' + symbol + "(" + gene + ")" + "." + str(exonNum - i - 1) + '\t' + "0" + '\t' + "-"
+            print key + '\t' + symbol + '\t' + "0" + '\t' + "-"
 
 hIN.close()
 

@@ -175,12 +175,12 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
             # reorder by the chromosome position and print
             if juncChr_current < juncChr_SA or juncChr_current == juncChr_SA and juncPos_current <= juncPos_SA:
                 print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
+                                 read.qname + ("/1" if flags[6] == "1" else "/2"), juncSurplus, juncDir_current, juncDir_SA, \
+                                 str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
             else: 
                 print '\t'.join([juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), juncChr_current, str(juncPos_current - 1), str(juncPos_current), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_SA, juncDir_current, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
+                                 read.qname + ("/1" if flags[6] == "1" else "/2"), juncSurplus, juncDir_SA, juncDir_current, \
+                                 str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
  
 
 
@@ -254,18 +254,18 @@ for read in bamfile.fetch(chr_region, int(start_region), int(end_region)):
 
             juncSurplus = "---"
             if clipLen_SA > expected_clipLen_SA and readLength_current == len(read.seq):
-                surPlus_end = clipLen_current - 1 # this is not correct. but there seems to be a bug in the original perl script
-                # surPlus_end = clipLen_current # this is right
+                # surPlus_end = clipLen_current - 1 # this is not correct. but there seems to be a bug in the original perl script
+                surPlus_end = clipLen_current # this is right
                 surPlus_start = surPlus_end - (clipLen_SA - expected_clipLen_SA)
                 juncSurplus = read.seq[surPlus_start:surPlus_end]
 
             # reorder by the chromosome position and print
             if juncChr_current < juncChr_SA or juncChr_current == juncChr_SA and juncPos_current <= juncPos_SA: 
                 print '\t'.join([juncChr_current, str(juncPos_current - 1), str(juncPos_current), juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_current, juncDir_SA, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
+                                 read.qname + ("/1" if flags[6] == "1" else "/2"), juncSurplus, juncDir_current, juncDir_SA, \
+                                 str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "1"])
             else:                
                 print '\t'.join([juncChr_SA, str(juncPos_SA - 1), str(juncPos_SA), juncChr_current, str(juncPos_current - 1), str(juncPos_current), \
-                                 read.qname + ("/1" if flags[6] == "1" else "/2"), str(read.mapq), juncDir_SA, juncDir_current, \
-                                 coverRegion_current + "," + coverRegion_SA, juncSurplus, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
+                                 read.qname + ("/1" if flags[6] == "1" else "/2"), juncSurplus, juncDir_SA, juncDir_current, \
+                                 str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
 
