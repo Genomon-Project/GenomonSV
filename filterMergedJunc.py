@@ -102,25 +102,19 @@ for line in inFile:
     F = line.rstrip('\n').split('\t')
 
     ##########
-    """
-    # for now only consider long ranged SV??
-    if F[0] == F[3] and abs(int(F[2]) - int(F[5])) < 1000:
-        continue
-    """
-    ##########
 
 
-    MQs = F[7].split(';')
-    coveredRegions = F[10].split(';')
+    MQs = F[10].split(';')
+    coveredRegions = F[11].split(';')
     pairCoveredRegions = F[13].split(';')
     pairMQs = map(lambda x: int(x), F[12].split(';'))
     juncPairPos = F[14].split(';')
     juncReadTypes = F[15].split(';')
-    improperCoveredRegion = ([] if F[18] == "---" else F[18].split(';'))
+    improperCoveredRegion = ([] if F[19] == "---" else F[19].split(';'))
 
     # enumerate support read number
     juncSupport = len(MQs)
-    improperMQs = ([] if F[17] == "---" else F[17].split(';'))
+    improperMQs = ([] if F[18] == "---" else F[18].split(';'))
     improperSupport = len(improperMQs)
     # skip if the number of suppor read is below the minSupReadNum 
     if juncSupport + improperSupport < minSupReadNum:

@@ -55,22 +55,19 @@ normalBam_ps = pysam.Samfile(normalBamPath, 'rb')
 
 
 SVNum = 1
+margin = 40
 for line in hIN:
 
     F = line.strip('\n').split('\t')
-
-    # if F[2] == "1":
-    #     print F[0]
-
-    # print '\t'.join(F)
+    inseqSize = (0 if F[7] == "---" else len(F[7]))
 
     # tumor junction read pair count
     tumorJunctionIDs_temp = F[6].split(';')
     tumorJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), tumorJunctionIDs_temp)    
  
     # tumor improper read pair count
-    if F[16] != "---":
-        tumorImproperIDs = F[16].split(';')
+    if F[17] != "---":
+        tumorImproperIDs = F[17].split(';')
     else:
         tumorImproperIDs = []
 
@@ -81,7 +78,7 @@ for line in hIN:
     # normal junction read pair count
     tabixErrorFlag = 0
     try:
-        records = normalJunction_tb.query(F[0], int(F[1]) - 5, int(F[2]) + 5)
+        records = normalJunction_tb.query(F[0], int(F[1]) - margin, int(F[2]) + margin)
     except Exception as inst:
         print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
         print >> sys.stderr, '\t'.join(F)
@@ -90,13 +87,25 @@ for line in hIN:
     normalJunctionIDs = [];
     if tabixErrorFlag == 0:
         for record in records:
-            # if "\t".join(F[0:6]) == "\t".join(record[0:6]):
-            # this is a temporary procedure, ideally, we should consider the length of inserted bases and perform comparison in a single base pair resolution
-            if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9] and int(record[2]) - 5 <= int(F[2]) <= int(record[2]) + 5 and int(record[5]) - 5 <= int(F[5]) <= int(record[5]) + 5:
-                normalJunctionIDs_temp1 = record[6].split(';')
-                normalJunctionIDs_temp2 = map(lambda x: re.sub(r'/\d$', '', x), normalJunctionIDs_temp1)
-                if len(normalJunctionIDs_temp2) > len(normalJunctionIDs):
-                    normalJunctionIDs = normalJunctionIDs_temp2
+
+            if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9]:
+    
+                normalInseqSize = (0 if record[7] == "---" else len(record[7]))
+                flag = 0
+                # detailed check on the junction position considering inserted sequences
+                if F[8] == "+":
+                    expectedDiffSize = (int(F[2]) - int(record[2])) + (inseqSize - normalInseqSize)
+                    if (F[9] == "+" and int(F[5]) == int(record[5]) - int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) + int(expectedDiffSize)):
+                        flag = 1
+                else:
+                    expectedDiffSize = (int(F[2]) - int(record[2])) + (normalInseqSize - inseqSize)
+                    if (F[9] == "+" and int(F[5]) == int(record[5]) + int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) - int(expectedDiffSize)):
+                        flag = 1
+
+               # if position relationship including inserted sequences matches
+                if flag == 1:
+                    normalJunctionIDs_temp1 = record[6].split(';')
+                    normalJunctionIDs = map(lambda x: re.sub(r'/\d$', '', x), normalJunctionIDs_temp1)
 
 
     # normal improper read pair count
@@ -139,7 +148,7 @@ for line in hIN:
     if pvalue < 1e-100:
         pvalue = 1e-100
 
-    print '\t'.join(F[0:6]) + '\t' + "genomonSV_" + str(SVNum) + '\t' + "0" + '\t' + F[8] + '\t' + F[9] + '\t' + \
+    print '\t'.join(F[0:6]) + '\t' + "genomonSV_" + str(SVNum) + '\t' + F[7] + '\t' + F[8] + '\t' + F[9] + '\t' + \
           '\t'.join([str(len(tumorJunctionIDs)), str(len(tumorImproperIDs)), str(len(tumorJunctionImproperIDs)), str(len(tumorProperNum)), \
                      str(len(normalJunctionIDs)), str(len(normalImproperIDs)), str(len(normalJunctionImproperIDs)), str(len(normalProperNum))]) + '\t' + \
           str(- math.log(pvalue, 10))

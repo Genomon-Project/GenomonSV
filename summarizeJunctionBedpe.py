@@ -38,7 +38,8 @@ for line in hIN:
             btstart1 = str(int(btend1) - 1)
             btstart2 = str(int(btend2) - 1)
 
-            print '\t'.join([btchr1, tstart1, btend1, btchr2, tstart2, btend2, \
+
+            print '\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
                              tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
                              tmqs2, talns2, tpinds, tcinds]) + '\t' +  \
                   mergedJunction[key]
@@ -55,7 +56,7 @@ for line in hIN:
                 flag = 0
                 # detailed check on the junction position considering inserted sequences
                 if F[8] == "+":
-                    expectedDiffSize = (int(F[2]) - int(tend1)) + (len(F[11]) - int(inseqSize))
+                    expectedDiffSize = (int(F[2]) - int(tend1)) + (len(F[7]) - int(inseqSize))
                     if (F[9] == "+" and int(F[5]) == int(tend2) - int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(tend2) + int(expectedDiffSize)):
                         flag = 1
                 else:
@@ -103,4 +104,23 @@ for line in hIN:
         mergedJunction[newKey] = ','.join([F[0], F[2], F[8], F[3], F[5], F[9], tinseq])
 
 hIN.close()
+
+
+# last treatment
+for key in sorted(mergedBedpeInfo):
+
+    tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2, inseqSize = key.split('\t')
+    tids, tinseqs, tmqs1, talns1, tmqs2, talns2, tpinds, tcinds = mergedBedpeInfo[key].split('\t')
+
+    # obtain the most frequent junction
+    junc_counter = Counter(mergedJunction[key].split(';'))
+    best_junc = junc_counter.most_common(1)[0][0]
+    btchr1, btend1, btdir1, btchr2, btend2, btdir2, btinseq = best_junc.split(',')
+    btstart1 = str(int(btend1) - 1)
+    btstart2 = str(int(btend2) - 1)
+
+    print '\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
+                     tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
+                     tmqs2, talns2, tpinds, tcinds]) + '\t' +  \
+          mergedJunction[key]
 
