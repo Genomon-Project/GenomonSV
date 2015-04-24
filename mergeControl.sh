@@ -13,7 +13,7 @@ source ./config.sh
 CONTROLLIST=$1
 OUTPUT=$2
 
-:<<_COMMENT_OUT_
+# :<<_COMMENT_OUT_
 
 IFS=$'\t'
 echo -n > ${OUTPUT}.temp
@@ -35,7 +35,7 @@ echo "sort -k1,1 -k2,2n -k4,4 -k5,5n ${OUTPUT}.temp > ${OUTPUT}.temp.sort"
 sort -k1,1 -k2,2n -k4,4 -k5,5n ${OUTPUT}.temp > ${OUTPUT}.temp.sort
 check_error $?
 
-_COMMENT_OUT_
+# _COMMENT_OUT_
 
 echo "python organizeControl.py ${OUTPUT}.temp.sort | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUT}"
 python organizeControl.py ${OUTPUT}.temp.sort | sort -k1,1 -k2,2n -k4,4 -k5,5n - > ${OUTPUT}
