@@ -10,11 +10,14 @@
 # 4. summarized the aligned read pairs
 ##########
 
-INPUT=$1
+SUFFIX=`sh getSuffix.sh ${SGE_TASK_ID}`
+
+INPUT=$1.${SUFFIX}
 TUMORBAM=$2
 NORMALBAM=$3
-OUTPUT=$4
-REF=$5
+OUTPUT=$4.${SUFFIX}
+
+source ./config.sh
 
 echo -n > ${OUTPUT}
 while read LINE; do 
@@ -32,30 +35,37 @@ while read LINE; do
     if [ $? -eq  27 ]; then
         continue
     fi
+    check_error $?
 
     echo "python extractSVReadPairs.py ${NORMALBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.normal.fa"
     python extractSVReadPairs.py ${NORMALBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.normal.fa
     if [ $? -eq  27 ]; then
         continue
     fi
+    check_error $?
 
 
-    echo "python getRefAltForSV.py ${REF} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} ${juncSeq} > ${OUTPUT}.temp.refalt.fa"
-    python getRefAltForSV.py ${REF} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} ${juncSeq} > ${OUTPUT}.temp.refalt.fa
+    echo "python getRefAltForSV.py ${REFERENCE} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} ${juncSeq} > ${OUTPUT}.temp.refalt.fa"
+    python getRefAltForSV.py ${REFERENCE} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} ${juncSeq} > ${OUTPUT}.temp.refalt.fa
+    check_error $?
 
-    wc ${OUTPUT}.temp.tumor.fa
+    # wc ${OUTPUT}.temp.tumor.fa
     echo "blat -stepSize=5 -repMatch=2253 ${OUTPUT}.temp.refalt.fa ${OUTPUT}.temp.tumor.fa ${OUTPUT}.temp.tumor.psl"
     blat -stepSize=5 -repMatch=2253 ${OUTPUT}.temp.refalt.fa ${OUTPUT}.temp.tumor.fa ${OUTPUT}.temp.tumor.psl
+    check_error $?
 
-    wc ${OUTPUT}.temp.normal.fa
+    # wc ${OUTPUT}.temp.normal.fa
     echo "blat -stepSize=5 -repMatch=2253 ${OUTPUT}.temp.refalt.fa ${OUTPUT}.temp.normal.fa ${OUTPUT}.temp.normal.psl"
     blat -stepSize=5 -repMatch=2253 ${OUTPUT}.temp.refalt.fa ${OUTPUT}.temp.normal.fa ${OUTPUT}.temp.normal.psl
+    check_error $?
 
     echo "python procPslFisher.py ${OUTPUT}.temp.tumor.psl ${OUTPUT}.temp.normal.psl > ${OUTPUT}.temp.fisher.txt"
     python procPslFisher.py ${OUTPUT}.temp.tumor.psl ${OUTPUT}.temp.normal.psl > ${OUTPUT}.temp.fisher.txt
+    check_error $?
 
     echo -ne "${chr1}\t${pos1}\t${dir1}\t${chr2}\t${pos2}\t${dir2}\t${juncSeq}\t" >> ${OUTPUT}
     cat ${OUTPUT}.temp.fisher.txt >> ${OUTPUT}
+    check_error $?
 
 done < ${INPUT}
 
