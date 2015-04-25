@@ -2,34 +2,50 @@
 #$ -S /bin/sh
 #$ -cwd
 #$ -e log/ -o log/
-#$ -q mjobs.q
 
-source ./config.sh
 
 TUMORDIR=$1
-NORMALDIR=$2
-TUMORBAM=$3
-NORMALBAM=$4
-CONTROL=$5
-MATCHEDNORMAL=$6
+TUMORBAM=$2
+NORMALBAM=$3
+CONTROL=$4
+MATCHEDNORMAL=$5
 
-echo "python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 10 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe"
-python filterLengthNum.py ${TUMORDIR}/merge.junction.summarized.bedpe.gz 1 10 > ${TUMORDIR}/merge.junction.summarized.filt1.bedpe
-check_error $?
+# check whether the input files exist or not
+if [ ! -f ${TUMORDIR}/merge.junction.summarized.bedpe.gz ]
+then
+    echo "${TUMORDIR}/merge.junction.summarized.bedpe.gz does not exist!"
+    exit
+fi
 
-echo "python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe"
-python filterNonMatchControl.py ${TUMORDIR}/merge.junction.summarized.filt1.bedpe ${CONTROL} ${MATCHEDNORMAL} 1 > ${TUMORDIR}/merge.junction.summarized.filt2.bedpe 
-check_error $?
+if [ ! -f ${TUMORBAM} ]
+then
+    echo "${TUMORBAM} does not exist!"
+    exit
+fi
 
-echo "python addImproperInfo.py ${TUMORDIR}/merge.junction.summarized.filt2.bedpe ${TUMORDIR}/merge.improperPair.summarized.bedpe.gz > ${TUMORDIR}/merge.junction.summarized.filt3.bedpe"
-python addImproperInfo.py ${TUMORDIR}/merge.junction.summarized.filt2.bedpe ${TUMORDIR}/merge.improperPair.summarized.bedpe.gz > ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 
-check_error $?
+if [ ! -f ${NORMALBAM} ]
+then 
+    echo "${NORMALBAM} does not exist!"
+    exit
+fi  
 
-echo "python filterMergedJunc.py ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 3 40 100 > ${TUMORDIR}/merge.junction.summarized.filt4.bedpe"
-python filterMergedJunc.py ${TUMORDIR}/merge.junction.summarized.filt3.bedpe 3 40 100 > ${TUMORDIR}/merge.junction.summarized.filt4.bedpe 
-check_error $?
+if [ ! -f ${CONTROL} ]
+then
+    echo "${CONTROL} does not exist!"
+    exit
+fi
 
-echo "python filterFisher.py ${TUMORDIR}/merge.junction.summarized.filt4.bedpe ${NORMALDIR}/merge.junction.summarized.bedpe.gz ${NORMALDIR}/merge.improperPair.summarized.bedpe.gz ${TUMORBAM} ${NORMALBAM} > ${TUMORDIR}/merge.junction.summarized.filt5.bedpe"
-python filterFisher.py ${TUMORDIR}/merge.junction.summarized.filt4.bedpe ${NORMALDIR}/merge.junction.summarized.bedpe.gz ${NORMALDIR}/merge.improperPair.summarized.bedpe.gz ${TUMORBAM} ${NORMALBAM} > ${TUMORDIR}/merge.junction.summarized.filt5.bedpe
-check_error $?
+
+# generate somatic SV candidate 
+job_filterCandidate=filterCandidate.$(date +%s%N)
+echo "qsub -sync y -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}"
+qsub -sync y -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}
+ 
+job_master_validate=master_validate.$(date +%s%N)
+echo "qsub -sync y -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}"
+qsub -sync y -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}
+
+job_anno=annotAndFilter.$(date +%s%N)
+echo "qsub -sync y -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}"
+qsub -sync y e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}
 

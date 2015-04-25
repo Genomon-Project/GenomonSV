@@ -10,7 +10,7 @@ for line in hIN:
 
     chr = F[2]
     start = F[4]
-    end = F[7]
+    end = F[5]
     strand = F[3]
     symbol = F[12]
 

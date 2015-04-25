@@ -8,6 +8,9 @@ export PATH=${PYTHONHOME}/bin:${PATH}
 # export LD_LIBRARY_PATH=${PYTHONHOME}/lib:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH=~/local/lib:${PYTHONHOME}/lib:${LD_LIBRARY_PATH}
 
+# reference
+REFERENCE=/home/ogawaprj/ngs/ref/GRCh37-lite_PCAWG_AB513134_bwa-0.7.10/GRCh37-lite_PCAWG_AB513134.fa
+
 check_error()
 {
 

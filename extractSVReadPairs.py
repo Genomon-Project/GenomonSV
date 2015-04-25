@@ -23,8 +23,8 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
 
     bamfile = pysam.Samfile(bamFilePath, 'rb')
     depthFlag = 0
-    if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= 10000: depthFlag = 1
-    if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= 10000: depthFlag = 1
+    if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= 1000: depthFlag = 1
+    if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= 1000: depthFlag = 1
     if depthFlag == 1: 
         sys.exit(27)
 

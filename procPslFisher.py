@@ -4,6 +4,22 @@ import sys, numpy, math
 from scipy import stats
 
 
+def checkScore(align):
+
+    tempScore = 100
+    if len(align) >= 2:
+        for i1 in range(0, len(align) - 1):
+            for i2 in range(i1 + 1, len(align)):
+
+                if align[i1][1] <= align[i2][1] and align[i1][2] == "+" and align[i2][2] == "-":
+                    tempScore = min(tempScore, align[i1][0] + align[i2][0])
+
+                if align[i2][1] <= align[i1][1] and align[i2][2] == "+" and align[i1][2] == "-":
+                    tempScore = min(tempScore, align[i1][0] + align[i2][0])
+
+    return(tempScore)
+
+
 def summarizeRefAlt(inputFile):
  
     hIN = open(inputFile, 'r')
@@ -11,6 +27,10 @@ def summarizeRefAlt(inputFile):
     numOther = 0
     numAlt = 0
     numRef = 0
+
+    # ref_ID = []
+    # alt_ID = []
+    # other_ID = []
 
     tempID = ""
     tempAlt = []
@@ -25,30 +45,21 @@ def summarizeRefAlt(inputFile):
         if tempID != F[9]:
             if tempID != "":
 
-                tempAltNM = 100
-                if len(tempAlt) == 2:
-                    if (tempAlt[0][1] <= tempAlt[1][1] and tempAlt[0][2] == "+" and tempAlt[1][2] == "-") or (tempAlt[0][1] >= tempAlt[1][1] and tempAlt[0][2] == "-" and tempAlt[1][2] == "+"): 
-                        tempAltNM = tempAlt[0][0] + tempAlt[1][0]
+                if tempID == "HWI-ST1021:128:C1K77ACXX:6:2303:6851:109312":
+                    pass
 
-                tempRefNM = 100
-                if len(tempRef1) == 2:
-                    if (tempRef1[0][1] <= tempRef1[1][1] and tempRef1[0][2] == "+" and tempRef1[1][2] == "-") or (tempRef1[0][1] >= tempRef1[1][1] and tempRef1[0][2] == "-" and tempRef1[1][2] == "+"): 
-                        tempRefNM = min(tempRefNM, tempRef1[0][0] + tempRef1[1][0])
-
-                if len(tempRef2) == 2:
-                    if (tempRef2[0][1] <= tempRef2[1][1] and tempRef2[0][2] == "+" and tempRef2[1][2] == "-") or (tempRef2[0][1] >= tempRef2[1][1] and tempRef2[0][2] == "-" and tempRef2[1][2] == "+"): 
-                        tempRefNM = min(tempRefNM, tempRef2[0][0] + tempRef2[1][0])
-
-                if len(tempRef) == 2:
-                    if (tempRef[0][1] <= tempRef[1][1] and tempRef[0][2] == "+" and tempRef[1][2] == "-") or (tempRef[0][1] >= tempRef[1][1] and tempRef[0][2] == "-" and tempRef[1][2] == "+"): 
-                        tempRefNM = min(tempRefNM, tempRef[0][0] + tempRef[1][0])
+                tempAltNM = checkScore(tempAlt)
+                tempRefNM = min(checkScore(tempRef1), checkScore(tempRef2), checkScore(tempRef))
 
                 if tempAltNM >= 30 and tempRefNM >= 30:
                     numOther = numOther + 1
-                elif tempAltNM < tempRefNM:
+                    # other_ID.append(tempID)
+                elif tempAltNM < tempRefNM - 5:
                     numAlt = numAlt + 1
-                else:
+                    # alt_ID.append(tempID)
+                elif tempRefNM < tempAltNM - 5:
                     numRef = numRef + 1
+                    # ref_ID.append(tempID)
 
 
             tempID = F[9] 
@@ -57,7 +68,7 @@ def summarizeRefAlt(inputFile):
             tempRef2 = []
             tempRef = []
 
-        tNM = int(F[10]) - int(F[0])
+        tNM = int(F[10]) - int(F[0]) + int(F[5]) + int(F[7])
         tpos = int(F[15])
         tdir = F[8]
 
@@ -71,34 +82,29 @@ def summarizeRefAlt(inputFile):
             tempRef.append((tNM, tpos, tdir))
 
 
-    tempAltNM = 100
-    if len(tempAlt) == 2:
-        if (tempAlt[0][1] <= tempAlt[1][1] and tempAlt[0][2] == "+" and tempAlt[1][2] == "-") or (tempAlt[0][1] >= tempAlt[1][1] and tempAlt[0][2] == "-" and tempAlt[1][2] == "+"):
-            tempAltNM = tempAlt[0][0] + tempAlt[1][0]
-
-    tempRefNM = 100
-    if len(tempRef1) == 2:
-        if (tempRef1[0][1] <= tempRef1[1][1] and tempRef1[0][2] == "+" and tempRef1[1][2] == "-") or (tempRef1[0][1] >= tempRef1[1][1] and tempRef1[0][2] == "-" and tempRef1[1][2] == "+"):
-            tempRefNM = min(tempRefNM, tempRef1[0][0] + tempRef1[1][0])
-
-    if len(tempRef2) == 2:
-        if (tempRef2[0][1] <= tempRef2[1][1] and tempRef2[0][2] == "+" and tempRef2[1][2] == "-") or (tempRef2[0][1] >= tempRef2[1][1] and tempRef2[0][2] == "-" and tempRef2[1][2] == "+"):
-            tempRefNM = min(tempRefNM, tempRef2[0][0] + tempRef2[1][0])
-
-    if len(tempRef) == 2:
-        if (tempRef[0][1] <= tempRef[1][1] and tempRef[0][2] == "+" and tempRef[1][2] == "-") or (tempRef[0][1] >= tempRef[1][1] and tempRef[0][2] == "-" and tempRef[1][2] == "+"):
-            tempRefNM = min(tempRefNM, tempRef[0][0] + tempRef[1][0])
-
+    tempAltNM = checkScore(tempAlt)
+    tempRefNM = min(checkScore(tempRef1), checkScore(tempRef2), checkScore(tempRef))
 
     if tempAltNM >= 30 and tempRefNM >= 30:
         numOther = numOther + 1
-    elif tempAltNM < tempRefNM:
+        # other_ID.append(tempID)
+    elif tempAltNM < tempRefNM - 5:
         numAlt = numAlt + 1
-    else:
+        # alt_ID.append(tempID)
+    elif tempRefNM < tempAltNM - 5:
         numRef = numRef + 1
+        # ref_ID.append(tempID)
+
+    """
+    print "ref"
+    print '\n'.join(ref_ID)
+    print "alt"
+    print '\n'.join(alt_ID)
+    print "other"
+    print '\n'.join(other_ID)
+    """
 
     return([numRef, numAlt])
-
 
 tumorPsl = sys.argv[1]
 normalPsl = sys.argv[2]
