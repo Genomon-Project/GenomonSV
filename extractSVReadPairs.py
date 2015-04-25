@@ -18,13 +18,17 @@
 import pysam
 
 
+maxDepth = 1000
 # get the read pairs covering the junction break point
+
 def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, searchLength, margin):
 
     bamfile = pysam.Samfile(bamFilePath, 'rb')
+
+    # if the #sequence read is over the `maxDepth`, then that key is ignored
     depthFlag = 0
-    if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= 1000: depthFlag = 1
-    if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= 1000: depthFlag = 1
+    if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= maxDepth: depthFlag = 1
+    if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= maxDepth: depthFlag = 1
     if depthFlag == 1: 
         sys.exit(27)
 

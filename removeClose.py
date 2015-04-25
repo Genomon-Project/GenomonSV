@@ -14,7 +14,7 @@ for line in hIN:
     skipFlag = 0
     for tkey in key2info:
 
-        tchr1, tstart1, tend1, tchr2, tstart2, tend2, inseqSize, tdir1, tdir2 = tkey.split('\t')
+        tchr1, tstart1, tend1, tchr2, tstart2, tend2, inseq, tdir1, tdir2 = tkey.split('\t')
 
         if F[0] != tchr1 or int(F[1]) > int(tend1) + 25:
 
@@ -23,7 +23,7 @@ for line in hIN:
     
         else:
 
-            if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - len(tend1)) <= 25 and abs(int(F[5]) - len(tend2)) <= 25:
+            if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - int(tend1)) <= 25 and abs(int(F[5]) - int(tend2)) <= 25:
 
                 infos = key2info[tkey].split('\t')
                 if len(F[6].split(';')) < len(infos[6].split(';')) and len(F[6].split(';')) <= 2:

@@ -47,5 +47,5 @@ qsub -sync y -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCan
 
 job_anno=annotAndFilter.$(date +%s%N)
 echo "qsub -sync y -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}"
-qsub -sync y e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}
+qsub -sync y -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}
 
