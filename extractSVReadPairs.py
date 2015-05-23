@@ -18,7 +18,7 @@
 import pysam
 
 
-maxDepth = 1000
+maxDepth = 10000
 # get the read pairs covering the junction break point
 
 def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, searchLength, margin):
@@ -32,7 +32,7 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
     if depthFlag == 1: 
         sys.exit(27)
 
-    readIDs = []    
+    readID2exist = {}    
     for read in bamfile.fetch(juncChr1, int(juncPos1) - searchLength, int(juncPos1) + searchLength):
 
         # get the flag information
@@ -56,11 +56,11 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
 
         # the read (with margin) contains break point
         if pos_current - margin <= juncPos1 <= (read.aend - 1) + margin:
-            readIDs.append(read.qname)
+            readID2exist[read.qname] = 1
     
         # the read pair covers break point
         if chr_pair == juncChr1 and pos_current <= juncPos1 <= pos_pair and dir_current == "+" and dir_pair == "-":
-            readIDs.append(read.qname)
+            readID2exist[read.qname] = 1
 
         # the read pair covers break point
         if chr_pair == juncChr2:
@@ -71,7 +71,7 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
             if juncDir1 == "-" and juncDir2 == "-" and pos_current >= juncPos1 and pos_pair >= juncPos2: juncFlag = 1
 
             if juncFlag == 1:  
-               readIDs.append(read.qname)
+                readID2exist[read.qname] = 1
 
 
     for read in bamfile.fetch(juncChr2, int(juncPos2) - searchLength, int(juncPos2) + searchLength):
@@ -100,11 +100,11 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
         
         # the read (with margin) contains break point
         if pos_current - margin <= juncPos2 <= (read.aend - 1) + margin:
-            readIDs.append(read.qname)
+            readID2exist[read.qname] = 1
                 
         # the read pair covers break point
         if chr_pair == juncChr2 and pos_current <= juncPos2 <= pos_pair and dir_current == "+" and dir_pair == "-":
-            readIDs.append(read.qname)
+            readID2exist[read.qname] = 1
                 
         # the read pair covers break point
         if chr_pair == juncChr1:
@@ -115,7 +115,7 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
             if juncDir2 == "-" and juncDir1 == "-" and pos_current >= juncPos2 and pos_pair >= juncPos1: juncFlag = 1
              
             if juncFlag == 1:
-               readIDs.append(read.qname)
+                readID2exist[read.qname] = 1
 
 
     readID2seq1 = {}
@@ -123,7 +123,7 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
     for read in bamfile.fetch(juncChr1, int(juncPos1) - searchLength, int(juncPos1) + searchLength):
 
-        if read.qname in readIDs:
+        if read.qname in readID2exist:
         
             # get the flag information
             flags = format(int(read.flag), "#014b")[:1:-1]
@@ -149,10 +149,10 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
             else:
                 readID2seq2[read.qname] = tempSeq
 
-                 
+
     for read in bamfile.fetch(juncChr2, int(juncPos2) - searchLength, int(juncPos2) + searchLength):
 
-        if read.qname in readIDs:
+        if read.qname in readID2exist:
 
             # get the flag information
             flags = format(int(read.flag), "#014b")[:1:-1]
