@@ -33,6 +33,7 @@ while read LINE; do
     echo "python extractSVReadPairs.py ${TUMORBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.tumor.fa"
     python extractSVReadPairs.py ${TUMORBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.tumor.fa
     if [ $? -eq  27 ]; then
+        echo -e "${chr1}\t${pos1}\t${dir1}\t${chr2}\t${pos2}\t${dir2}\t${juncSeq}\t*\t*\t*\t*\t*\t*" >> ${OUTPUT}
         continue
     fi
     check_error $?
@@ -40,6 +41,7 @@ while read LINE; do
     echo "python extractSVReadPairs.py ${NORMALBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.normal.fa"
     python extractSVReadPairs.py ${NORMALBAM} ${chr1} ${pos1} ${dir1} ${chr2} ${pos2} ${dir2} 1000 5 > ${OUTPUT}.temp.normal.fa
     if [ $? -eq  27 ]; then
+        echo -e "${chr1}\t${pos1}\t${dir1}\t${chr2}\t${pos2}\t${dir2}\t${juncSeq}\t*\t*\t*\t*\t*\t*" >> ${OUTPUT}
         continue
     fi
     check_error $?
@@ -68,8 +70,5 @@ while read LINE; do
     check_error $?
 
 done < ${INPUT}
-
-
-
 
 

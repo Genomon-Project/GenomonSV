@@ -14,16 +14,19 @@ hIN = gzip.open(inputFile, 'r')
 for line in hIN:
     F = line.rstrip('\n').split('\t')
 
+    # if F[2] == "28608276":
+    #     pass
+
     ##########
     # for now only consider long ranged SV??
     if F[0] == F[3] and abs(int(F[2]) - int(F[5])) < int(minSize): continue 
     ##########
 
 
-    MQs = F[7].split(';')
+    IDs = F[6].split(';')
 
     # enumerate support read number
-    juncSupport = int(len(MQs))
+    juncSupport = int(len(IDs))
 
     # skip if the number of suppor read is below the minSupReadNum 
     if juncSupport < int(minJuncNum): continue

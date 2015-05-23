@@ -38,14 +38,14 @@ fi
 
 # generate somatic SV candidate 
 job_filterCandidate=filterCandidate.$(date +%s%N)
-echo "qsub -sync y -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}"
-qsub -sync y -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}
- 
-job_master_validate=master_validate.$(date +%s%N)
-echo "qsub -sync y -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}"
-qsub -sync y -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}
+echo "qsub -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}"
+qsub -e log/ -o log/ -N ${job_filterCandidate} filterCandidate.sh ${TUMORDIR} ${CONTROL} ${MATCHEDNORMAL}
 
-job_anno=annotAndFilter.$(date +%s%N)
-echo "qsub -sync y -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}"
-qsub -sync y -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}
+job_master_validate=master_validate.$(date +%s%N)
+echo "qsub -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}"
+qsub -e log/ -o log/ -N ${job_master_validate} -hold_jid ${job_filterCandidate} master_validateByRealignment.sh ${TUMORDIR} ${TUMORBAM} ${NORMALBAM}
+
+# job_anno=annotAndFilter.$(date +%s%N)
+# echo "qsub -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}"
+# qsub -e log/ -o log/ -N ${job_anno} catCandSV.sh ${TUMORDIR}
 

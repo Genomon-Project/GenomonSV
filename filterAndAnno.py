@@ -20,7 +20,7 @@ for line in hIN:
 
     if int(F[8]) < 3: continue
     if tumorAF < 0.05: continue
-    if normalAF > 0.05: continue
+    if normalAF > 0.2: continue
     if float(F[11]) < 1: continue
      
     ##########
@@ -104,7 +104,7 @@ for line in hIN:
     elif F[2] == "+" and F[5] == "-":
         SVtype = "deletion"
     elif F[2] == "-" and F[5] == "+":
-        SVtype = "tandem duplication"
+        SVtype = "tandem_duplication"
     else:
         SVtype = "inversion"
 
