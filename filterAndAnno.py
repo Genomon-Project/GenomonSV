@@ -13,14 +13,16 @@ exon_tb = tabix.open(exonFile)
 for line in hIN:
     F = line.rstrip('\n').split('\t')
 
+    if F[7] == "*" or F[8] == "*" or F[9] == "*" or F[10] == "*" or F[11] == "*": continue
+
     tumorAF = 0
     if float(F[7]) + float(F[8]) > 0: tumorAF = float(F[8]) / (float(F[7]) + float(F[8]))     
     normalAF = 0
     if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
-
+    
     if int(F[8]) < 3: continue
-    if tumorAF < 0.05: continue
-    if normalAF > 0.2: continue
+    if tumorAF < 0.01: continue
+    if normalAF > 0.1: continue
     if float(F[11]) < 1: continue
      
     ##########

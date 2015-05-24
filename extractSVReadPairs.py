@@ -18,7 +18,7 @@
 import pysam
 
 
-maxDepth = 10000
+maxDepth = 50000
 # get the read pairs covering the junction break point
 
 def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, searchLength, margin):

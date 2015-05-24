@@ -32,7 +32,7 @@ def checkScore(align):
     return(tempScore)
 
 
-def summarizeRefAlt(inputFile):
+def summarizeRefAlt(inputFile, ITDFlag):
  
     hIN = open(inputFile, 'r')
 
@@ -53,6 +53,7 @@ def summarizeRefAlt(inputFile):
         F = line.rstrip('\n').split('\t')
         if F[0].isdigit() == False: continue
 
+        # remove the read pair num info ("/1", "/2") 
         F[9] = F[9][0:-2]
         if tempID != F[9]:
             if tempID != "":
@@ -69,8 +70,9 @@ def summarizeRefAlt(inputFile):
                 elif tempAltNM < tempRefNM - 5:
                     numAlt = numAlt + 1
                     # alt_ID.append(tempID)
-                elif tempRefNM < tempAltNM - 5:
+                elif ITDFlag == 0 and tempRefNM < tempAltNM - 5 or ITDFlag == 1 and tempRefNM <= tempAltNM:
                     numRef = numRef + 1
+                    # print tempID
                     # ref_ID.append(tempID)
 
 
@@ -103,7 +105,7 @@ def summarizeRefAlt(inputFile):
     elif tempAltNM < tempRefNM - 5:
         numAlt = numAlt + 1
         # alt_ID.append(tempID)
-    elif tempRefNM < tempAltNM - 5:
+    elif ITDFlag == 0 and tempRefNM < tempAltNM - 5 or ITDFlag == 1 and tempRefNM <= tempAltNM:
         numRef = numRef + 1
         # ref_ID.append(tempID)
 
@@ -120,9 +122,10 @@ def summarizeRefAlt(inputFile):
 
 tumorPsl = sys.argv[1]
 normalPsl = sys.argv[2]
+ITDFlag = int(sys.argv[3])
 
-tumorRef, tumorAlt = summarizeRefAlt(tumorPsl)
-normalRef, normalAlt = summarizeRefAlt(normalPsl)
+tumorRef, tumorAlt = summarizeRefAlt(tumorPsl, ITDFlag)
+normalRef, normalAlt = summarizeRefAlt(normalPsl, ITDFlag)
 
 # fisher test
 oddsratio, pvalue = stats.fisher_exact([[tumorRef, tumorAlt], [normalRef, normalAlt]], 'less')
