@@ -64,7 +64,7 @@ def summarizeRefAlt(inputFile, ITDFlag):
                 tempAltNM = checkScore(tempAlt)
                 tempRefNM = min(checkScore(tempRef1), checkScore(tempRef2), checkScore(tempRef))
 
-                if tempAltNM >= 30 and tempRefNM >= 30:
+                if tempAltNM >= 10 and tempRefNM >= 10:
                     numOther = numOther + 1
                     # other_ID.append(tempID)
                 elif tempAltNM < tempRefNM - 5:
@@ -99,7 +99,7 @@ def summarizeRefAlt(inputFile, ITDFlag):
     tempAltNM = checkScore(tempAlt)
     tempRefNM = min(checkScore(tempRef1), checkScore(tempRef2), checkScore(tempRef))
 
-    if tempAltNM >= 30 and tempRefNM >= 30:
+    if tempAltNM >= 10 and tempRefNM >= 10:
         numOther = numOther + 1
         # other_ID.append(tempID)
     elif tempAltNM < tempRefNM - 5:

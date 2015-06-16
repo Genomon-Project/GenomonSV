@@ -3,7 +3,7 @@ export PATH=/home/yshira/bin/tabix-0.2.6:$PATH
 
 # python
 export PYTHONHOME=/usr/local/package/python2.7/2.7.8
-export PYTHONPATH=~/local/lib/python2.7/site-packages
+export PYTHONPATH=${PYTHONHOME}/lib/python2.7/site-packages:~/local/lib/python2.7/site-packages
 export PATH=${PYTHONHOME}/bin:${PATH}
 # export LD_LIBRARY_PATH=${PYTHONHOME}/lib:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH=~/local/lib:${PYTHONHOME}/lib:${LD_LIBRARY_PATH}

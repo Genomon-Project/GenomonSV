@@ -21,7 +21,7 @@ for line in hIN:
     if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
     
     if int(F[8]) < 3: continue
-    if tumorAF < 0.01: continue
+    # if tumorAF < 0.01: continue
     if normalAF > 0.1: continue
     if float(F[11]) < 1: continue
      

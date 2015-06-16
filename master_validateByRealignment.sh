@@ -18,5 +18,8 @@ then
     echo "qsub -e log/ -o log/ -N ${job_anno} -hold_jid ${job_validateByRealignment} catCandSV.sh ${TUMORDIR}"
     qsub -e log/ -o log/ -N ${job_anno} -hold_jid ${job_validateByRealignment} catCandSV.sh ${TUMORDIR}
 
+else
+    echo "echo -n > ${TUMORDIR}/genomonSV.result.txt"
+    echo -n > ${TUMORDIR}/genomonSV.result.txt
 fi
 

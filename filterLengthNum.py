@@ -19,7 +19,9 @@ for line in hIN:
 
     ##########
     # for now only consider long ranged SV??
-    if F[0] == F[3] and abs(int(F[2]) - int(F[5])) < int(minSize): continue 
+    svLen = abs(int(F[2]) - int(F[5]))
+    if F[7] != "---": svLen = svLen + len(F[7])
+    if F[0] == F[3] and svLen < int(minSize): continue 
     ##########
 
 

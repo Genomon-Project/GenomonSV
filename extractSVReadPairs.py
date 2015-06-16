@@ -186,7 +186,7 @@ def extractSVReadPairs(bamFilePath, juncChr1, juncPos1, juncDir1, juncChr2, junc
             print '>' + readID + '/2'
             print readID2seq2[readID]
 
-
+    # bamfile.close()
 
 if __name__ == "__main__":
     import sys, pysam
