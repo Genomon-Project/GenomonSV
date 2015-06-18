@@ -22,7 +22,7 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
         seq = ""
         for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1 - 1000) + "-" + str(juncPos2 + 1000)):
             if item[0] == ">": continue
-            seq = seq + item.rstrip('\n')
+            seq = seq + item.rstrip('\n').upper()
 
         print '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref"
         print seq
@@ -33,13 +33,13 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
             seq = ""
             for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1 - 1000) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
-                seq = seq + item.rstrip('\n')
+                seq = seq + item.rstrip('\n').upper()
 
             seq = seq + juncSeq
 
             for item in pysam.faidx(reference, juncChr2 + ":" + str(juncPos2) + "-" + str(juncPos2 + 1000)):
                 if item[0] == ">": continue
-                seq = seq + item.rstrip('\n')
+                seq = seq + item.rstrip('\n').upper()
 
             print '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
             print seq
@@ -49,13 +49,13 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
             seq = "" 
             for item in pysam.faidx(reference, juncChr2 + ":" + str(juncPos2 - 1000) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
-                seq = seq + item.rstrip('\n')
+                seq = seq + item.rstrip('\n').upper()
             
             seq = seq + juncSeq
 
             for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1) + "-" + str(juncPos1 + 1000)):
                 if item[0] == ">": continue
-                seq = seq + item.rstrip('\n')
+                seq = seq + item.rstrip('\n').upper()
             
             print '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
             print seq
@@ -67,7 +67,7 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
         seq = ""
         for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1 - 1000) + "-" + str(juncPos1 + 1000)):
             if item[0] == ">": continue
-            seq = seq + item.rstrip('\n')
+            seq = seq + item.rstrip('\n').upper()
 
         print '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref1"
         print seq
@@ -75,7 +75,7 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
         seq = ""
         for item in pysam.faidx(reference, juncChr2 + ":" + str(juncPos2 - 1000) + "-" + str(juncPos2 + 1000)):
             if item[0] == ">": continue
-            seq = seq + item.rstrip('\n')
+            seq = seq + item.rstrip('\n').upper()
             
         print '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref2"
         print seq
@@ -87,12 +87,12 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
             tseq = ""
             for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1 - 1000) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
-                tseq = tseq + item.rstrip('\n')
+                tseq = tseq + item.rstrip('\n').upper()
         else:
             tseq = ""
             for item in pysam.faidx(reference, juncChr1 + ":" + str(juncPos1) + "-" + str(juncPos1 + 1000)):
                 if item[0] == ">": continue
-                tseq = tseq + item.rstrip('\n')
+                tseq = tseq + item.rstrip('\n').upper()
             tseq = "".join(complement.get(base) for base in reversed(tseq))
 
         seq = tseq + juncSeq
@@ -101,12 +101,12 @@ def getRefAltForSV(reference, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, 
             tseq = "" 
             for item in pysam.faidx(reference, juncChr2 + ":" + str(juncPos2) + "-" + str(juncPos2 + 1000)):
                 if item[0] == ">": continue
-                tseq = tseq + item.rstrip('\n')
+                tseq = tseq + item.rstrip('\n').upper()
         else:
             tseq = ""
             for item in pysam.faidx(reference, juncChr2 + ":" + str(juncPos2 - 1000) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
-                tseq = tseq + item.rstrip('\n')
+                tseq = tseq + item.rstrip('\n').upper()
             tseq = "".join(complement.get(base) for base in reversed(tseq))
 
         seq = seq + tseq
