@@ -388,17 +388,10 @@ def makePairStartBed(inputFilePath, outputFilePath, Param):
     ####################
 
 
-    ####################
-    # compress by bgzip
-    hOUT = open(outputFilePath + ".gz", "w")
-    subprocess.call(["bgzip", "-f", outputFilePath], stdout = hOUT)
-    hOUT.close()
-    ####################
-
 
     ####################
-    # index by tabix
-    subprocess.call(["tabix", "-p", "bed", outputFilePath + ".gz"])
+    # compress by bgzip and index by tabix
+    compress_index_bed(outputFilePath, outputFile + ".gz", bgzip_cmd, tabix_cmd)
     ####################
 
 
@@ -408,9 +401,162 @@ def makePairStartBed(inputFilePath, outputFilePath, Param):
 
 
 
-# def makeImproperBedpe(inputFilePath, outputFilePath, Param):
+def makeImproperBedpe(inputFilePath, outputFilePath, Param):
+
+    ####################
+    # sort according to the read ID for the later processing
+    hOUT = open(outputFilePath + ".tmp1", "w")
+    subprocess.call(["sort", "-k1", inputFilePath], stdout = hOUT)
+    hOUT.close()
+    ####################
+
+
+    ####################
+    # convert each improper read pair to bedpe records (with margins)
+    junction_dist_margin = Param["junction_dist_margin"]
+    clipping_margin = Param["clipping_margin"]
+
+    hIN = open(outputFilePath + ".tmp1", "r")
+    hOUT = open(outputFilePath + ".tmp2", "w")
+
+    tempID, tempPairNum, tempChr, tempStart, tempEnd, tempDir, tempMapQ = "", "", "", "", "", "", ""
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+
+        pairNum = F[0][-1:]
+        F[0] = F[0][0:-2]
+
+        if F[0] == tempID and tempPairNum == "1" and pairNum == "2":
+            
+            chr1, dir1, start1, end1, mapQ1, align1 = tempChr, tempDir, 0, 0, tempMapQ, tempChr + ":" + str(tempStart) + "-" + str(tempEnd) 
+            if dir1 == "+":
+                start1 = tempEnd - clipping_margin
+                end1 = tempEnd + junction_dist_margin
+            else:
+                start1 = tempStart - junction_dist_margin
+                end1 = tempStart + clipping_margin
+
+            chr2, dir2, start2, end2, mapQ2, align2 = F[1], F[4], 0, 0, F[5], F[1] + ":" + F[2] + "-" + F[3]
+            if dir2 == "+":
+                start2 = int(F[3]) - clipping_margin
+                end2 = int(F[3]) + junction_dist_margin
+            else:
+                start2 = int(F[2]) - junction_dist_margin
+                end2 = int(F[2]) + clipping_margin
+     
+            if chr1 < chr2:
+                print >> hOUT, '\t'.join([chr1, str(start1), str(end1), chr2, str(start2), str(end2), tempID, mapQ1 + "," + mapQ2, dir1, dir2, align1 + "," + align2])
+            elif chr1 > chr2:
+                print >> hOUT, '\t'.join([chr2, str(start2), str(end2), chr1, str(start1), str(end1), tempID, mapQ2 + "," + mapQ1, dir2, dir1, align2 + "," + align1])
+            else:
+                if start1 <= start2:
+                    print >> hOUT, '\t'.join([chr1, str(start1), str(end1), chr2, str(start2), str(end2), tempID, mapQ1 + "," + mapQ2, dir1, dir2, align1 + "," + align2])
+                else:
+                    print >> hOUT, '\t'.join([chr2, str(start2), str(end2), chr1, str(start1), str(end1), tempID, mapQ2 + "," + mapQ1, dir2, dir1, align2 + "," + align1])
+
+
+        tempID, tempPairNum, tempChr, tempStart, tempEnd, tempDir, tempMapQ = F[0], pairNum, F[1], int(F[2]), int(F[3]), F[4], F[5]
+
+    hIN.close()
+    hOUT.close()
+    ####################
+
+
+    ####################
+    # sort according to the chromosome coordinates
+    hOUT = open(outputFilePath, "w")
+    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", outputFilePath + ".tmp2"], stdoutput = hOUT)
+    hOUT.close()
+    ####################
+
+
+    ####################
+    # delete intermediate file
+    subprocess.call(["rm", outputFilePath + '.tmp1'])
+    subprocess.call(["rm", outputFilePath + '.tmp2'])
+    ####################
 
 
 
+def clusterImproperBedpe(inputFilePath, outputFilePath, Param):
+   
+    ####################
+    # cluster and summarize improper read pair bed file
+    hIN = open(inputFilePath, "r")
+    hOUT = open(outputFilePath + ".tmp", "w")
+
+    check_margin_size = Param["check_margin_size"]
+    mergedBedpe = {}
+    for line in hIN:
+
+        F = line.rstrip('\n').split('\t')
+
+        match = 0
+        delList = []
+        for key in sorted(mergedBedpe):
+
+            tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2 = key.split('\t')
+            tids, tmqs, talns = mergedBedpe[key].split('\t')
+
+            if F[0] != tchr1 or int(F[1]) > int(tend1) + checkMarginSize:
+                talns_a = talns.split(';')
+                talns_a_uniq = list(set(talns_a))
+
+                if len(talns_a_uniq) >= 1:
+                    
+                    print '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
+                                     tids, tmqs, tdir1, tdir2, talns])
+                    delList.append(key)
+                    continue
+
+            else:
+                
+                if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2:
+                    if int(F[2]) > int(tstart1) and int(F[1]) <= int(tend1) and int(F[5]) > int(tstart2) and int(F[4]) <= int(tend2):
+
+                        match = 1
+                        newStart1 = str(max(int(tstart1), int(F[1])))  
+                        newEnd1 = str(min(int(tend1), int(F[2])))
+                        newStart2 = str(max(int(tstart2), int(F[4])))
+                        newEnd2 = str(min(int(tend2), int(F[5])))
+
+                        newKey = '\t'.join([tchr1, newStart1, newEnd1, tchr2, newStart2, newEnd2, tdir1, tdir2])
+                        newIds = tids + ';' + F[6]
+                        newMqs = tmqs + ';' + F[7]
+                        newAlns = talns + ';' + F[10]
+        
+                        if newKey != key:    
+                            delList.append(key)
+
+                        mergedBedpe[newKey] = newIds + '\t' + newMqs + '\t' + newAlns
+                        break
+
+        for item in delList:
+            del mergedBedpe[item]
+
+        if match == 0:
+            newKey = '\t'.join([F[0], F[1], F[2], F[3], F[4], F[5], F[8], F[9]])
+            mergedBedpe[newKey] = F[6] + '\t' + F[7] + '\t' + F[10]
+
+ 
+    for key in sorted(mergedBedpe):
+
+        tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2 = key.split('\t')
+        tids, tmqs, talns = mergedBedpe[key].split('\t')
+
+        talns_a = talns.split(';')
+        talns_a_uniq = list(set(talns_a))
+
+        if len(talns_a_uniq) >= 1:
+
+            print '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
+                             tids, tmqs, tdir1, tdir2, talns])
+
+
+    hIN.close()
+    hOUT.close()
+    ####################
+ 
 
     
