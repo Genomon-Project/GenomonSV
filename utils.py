@@ -33,3 +33,9 @@ def compress_index_bed(inputFile, outputFile, bgzip_cmd, tabix_cmd):
     ####################
 
 
+def sortBedpe(inputFile, outputFile):
+
+    hOUT = open(outputFile, "w")
+    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", inputFile], stdout = hOUT)
+    hOUT.close()
+
