@@ -26,10 +26,9 @@ def compress_index_bed(inputFile, outputFile, bgzip_cmd, tabix_cmd):
     hOUT.close()
     ####################
 
-
     ####################
     # index by tabix
-     subprocess.call([tabix_cmd, "-p", "bed", outputFile])
+    subprocess.call([tabix_cmd, "-p", "bed", outputFile])
     ####################
 
 

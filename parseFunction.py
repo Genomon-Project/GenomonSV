@@ -1,4 +1,4 @@
-#! /usr/local/bin/python
+#! usr/local/bin/python
 
 """
     functions for parsing breakpoint containing read pairs and improperly aligned read pairs
@@ -30,7 +30,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
 
 
     # maybe add the regional extraction of bam files
-    for read in bamfile.fetch()):
+    for read in bamfile.fetch():
 
         # get the flag information
         flags = format(int(read.flag), "#014b")[:1:-1]
@@ -285,7 +285,7 @@ def parseImproperFromBam(inputBam, outputFilePath, Params):
     min_mapping_qual = Params["min_mapping_qual"]
     soft_clip_thres = Params["soft_clip_thres"]
 
-    bamfile = pysam.Samfile(inputBAM, "rb")
+    bamfile = pysam.Samfile(inputBam, "rb")
     hOUT = open(outputFilePath, "w")
 
     for read in bamfile.fetch():
