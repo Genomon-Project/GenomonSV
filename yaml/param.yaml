@@ -1,0 +1,21 @@
+
+parseJunctionCondition:
+    abnormal_insert_size: 1000 # the size of abnormal insert size. used for checking the consistency of paired read of breakpoint containing reads
+    min_major_clip_size: 20 # the minimum base of clipped bases for junction reads
+    max_minor_clip_size: 15 # if the clipped bases of both sides are greater than this value, filter that read
+
+clusterJunctionCondition:
+    checkMarginSizei: 1000 # this value should be at least 1000. but very large value will lead to slow computation..
+
+parseImproperCondition:
+    abnormal_insert_size: 2000 # the size of abnormal insert size used for identifying improper read pairs
+    min_mapping_qual: 30 # the threshould of mapping quality for each read of the improper read pair
+    soft_clip_thres: 5 # the threshould of maximum clipping size of reads of improper read pairs
+
+clusterImproperCondition:
+    junction_dist_margin: 500 # possible junction position margin from the junction direction
+    clipping_margin: 30 # possible junction position in the opposite side
+    check_margin_size: 1500 # This should be sufficiently greater than insert size. But the computational time will increase when too large
+
+
+ 

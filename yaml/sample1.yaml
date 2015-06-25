@@ -1,0 +1,9 @@
+---
+# sample label (typically the name of sample)
+label: sample1
+
+# the path to the bam file you want to parse
+path_to_bam: /home/yshira/genome/data/sequence/sample1.bam
+
+# the path to the output directory where the results will go
+output_dir: /home/yshira/genome/data/SV
