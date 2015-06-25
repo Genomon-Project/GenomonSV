@@ -5,6 +5,7 @@
 """
 
 import pysam, re, subprocess
+import utils
 
 def parseJunctionFromBam(inputBAM, outputFilePath, Params):
 
@@ -465,9 +466,7 @@ def makeImproperBedpe(inputFilePath, outputFilePath, Param):
 
     ####################
     # sort according to the chromosome coordinates
-    hOUT = open(outputFilePath, "w")
-    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", outputFilePath + ".tmp2"], stdoutput = hOUT)
-    hOUT.close()
+    utils.sortBedpe(outputFilePath + ".tmp2", outputFilePath)
     ####################
 
 
@@ -484,7 +483,7 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, Param):
     ####################
     # cluster and summarize improper read pair bed file
     hIN = open(inputFilePath, "r")
-    hOUT = open(outputFilePath + ".tmp", "w")
+    hOUT = open(outputFilePath, "w")
 
     check_margin_size = Param["check_margin_size"]
     mergedBedpe = {}
@@ -499,13 +498,13 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, Param):
             tchr1, tstart1, tend1, tchr2, tstart2, tend2, tdir1, tdir2 = key.split('\t')
             tids, tmqs, talns = mergedBedpe[key].split('\t')
 
-            if F[0] != tchr1 or int(F[1]) > int(tend1) + checkMarginSize:
+            if F[0] != tchr1 or int(F[1]) > int(tend1) + check_margin_size:
                 talns_a = talns.split(';')
                 talns_a_uniq = list(set(talns_a))
 
                 if len(talns_a_uniq) >= 1:
                     
-                    print '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
+                    print >> hOUT, '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
                                      tids, tmqs, tdir1, tdir2, talns])
                     delList.append(key)
                     continue
@@ -550,7 +549,7 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, Param):
 
         if len(talns_a_uniq) >= 1:
 
-            print '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
+            print >> hOUT, '\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
                              tids, tmqs, tdir1, tdir2, talns])
 
 

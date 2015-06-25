@@ -1,3 +1,7 @@
+---
+software:
+    tabix: /home/yshira/bin/tabix-0.2.6/tabix 
+    bgzip: /home/yshira/bin/tabix-0.2.6/bgzip 
 
 parseJunctionCondition:
     abnormal_insert_size: 1000 # the size of abnormal insert size. used for checking the consistency of paired read of breakpoint containing reads
