@@ -40,14 +40,23 @@ def genomonSV_parse():
     utils.make_directory(sampleConf["output_dir"])
     ####################
 
+    outputPrefix = sampleConf["output_dir"] + "/" + sampleConf["label"]
 
     # parse breakpoint containing read pairs from input bam files
     parseFunction.parseJunctionFromBam(sampleConf["path_to_bam"], 
-                                       sampleConf["output_dir"] + "/" + sampleConf["label"] + ".junction.unsort.txt", 
+                                       outputPrefix + ".junction.unsort.txt", 
                                        paramConf["parseJunctionCondition"])
 
-    utils.sortBedpe(sampleConf["output_dir"] + "/" + sampleConf["label"] + ".junction.unsort.txt",
-                    sampleConf["output_dir"] + "/" + sampleConf["label"] + ".junction.sort.txt")
+    utils.sortBedpe(outputPrefix + ".junction.unsort.txt",
+                    outputPrefix + ".junction.sort.txt")
+
+    parseFunction.getPairStartPos(outputPrefix + ".junction.sort.txt",
+                                  outputPrefix + ".junction.pairStart.bed")
+
+    utils.compress_index_bed(outputPrefix + ".junction.pairStart.bed",
+                             outputPrefix + ".junction.pairStart.bed.gz",
+                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+
 
     # sort and compress the parsed breakpoint containing read pairs
     # sortJunction()
@@ -64,21 +73,21 @@ def genomonSV_parse():
 
     # parse potentially improper read pairs from input bam files
     parseFunction.parseImproperFromBam(sampleConf["path_to_bam"],
-                         sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.unsort.txt",
+                         outputPrefix + ".improper.unsort.txt",
                          paramConf["parseImproperCondition"])
 
     # create and organize bedpe file integrating pair information 
-    parseFunction.makeImproperBedpe(sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.unsort.txt",
-                                    sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.bedpe",
+    parseFunction.makeImproperBedpe(outputPrefix + ".improper.unsort.txt",
+                                    outputPrefix + ".improper.bedpe",
                                     paramConf["clusterImproperCondition"])
 
     # cluster read pairs possibly representing the same junction
-    parseFunction.clusterImproperBedpe(sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.bedpe",
-                                       sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.clustered.bedpe",
+    parseFunction.clusterImproperBedpe(outputPrefix + ".improper.bedpe",
+                                       outputPrefix + ".improper.clustered.bedpe",
                                        paramConf["clusterImproperCondition"])
 
-    utils.compress_index_bed(sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.clustered.bedpe",
-                             sampleConf["output_dir"] + "/" + sampleConf["label"] + ".improper.clustered.bedpe.gz",
+    utils.compress_index_bed(outputPrefix + ".improper.clustered.bedpe",
+                             outputPrefix + ".improper.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
     ####################
 

@@ -269,6 +269,58 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
                                      str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
 
 
+def getPairStartPos(inputFilePath, outputFilePath):
+
+    """
+        script for obtaining the position information about the pair read from the junction file 
+
+    """
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath + ".tmp", 'w')
+    num = 1
+
+    reChrPos = re.compile('^(\S+):(\d+)')
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+        ID = F[6]
+        chr = ""
+        pos = ""
+
+        # obtain the information about the start site of the pair read 
+        chrpos = reChrPos.search(F[12])
+        if chrpos is not None:
+            chr = chrpos.group(1)
+            pos = chrpos.group(2)
+        else:
+            print '\t'.join(F)
+            print "the 13th column did not match to (chr):(start) pattern"
+            sys.exit()
+
+        # change the pair read num
+        if ID[-1:] == "1":
+            ID = ID[:-1] + "2"
+        else:
+            ID = ID[:-1] + "1"
+
+        print >> hOUT, chr + '\t' + str(int(pos) - 1) + '\t' + pos + '\t' + ID + '\t' + str(num)
+
+        num = num + 1
+
+    hIN.close()
+    hOUT.close()
+
+
+    hOUT = open(outputFilePath, 'w')
+    subprocess.call(["sort", "-k1,1", "-k3,3n", outputFilePath + ".tmp"], stdout = hOUT)
+    hOUT.close()
+
+
+    ####################
+    # delete intermediate file
+    subprocess.call(["rm", outputFilePath + '.tmp'])
+
+
 
 def parseImproperFromBam(inputBam, outputFilePath, Params):
 
@@ -332,73 +384,6 @@ def parseImproperFromBam(inputBam, outputFilePath, Params):
             seqname = (read.qname + "/1" if read.is_read1 else read.qname + "/2")  
             direction = ("-" if read.is_reverse else "+")
             print >> hOUT, seqname + '\t' + bamfile.getrname(read.tid) + '\t' + str(read.pos + 1) + '\t' + str(read.aend) + '\t' + direction + '\t' + str(read.mapq)
-
-
-def sortJunction(inputFilePath, outputFilePath):
-
-    hOUT = open(outputFile, "w")
-    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", inputFilePath], stdout = hOUT)
-    hOUT.close()
-
-
-def makePairStartBed(inputFilePath, outputFilePath, Param):
-
-    ####################
-    # obtain the position information about the pair read from the junction file
-    hIN = open(inputFilePath, "r")
-    hOUT = open(outputFilePath + '.tmp', "w")
-
-    num = 1
-    reChrPos = re.compile('^(\w+):(\d+)')
-    for line in hIN:
-        F = line.rstrip('\n').split('\t')
-        ID = F[6]
-        chr = ""
-        pos = ""
-
-        # obtain the information about the start site of the pair read 
-        chrpos = reChrPos.search(F[12])
-        if chrpos is not None:
-            chr = chrpos.group(1)
-            pos = chrpos.group(2)
-        else:
-            print '\t'.join(F)
-            print "the 13th column did not match to (chr):(start) pattern"
-            sys.exit()
-
-        # change the pair read num
-        if ID[-1:] == "1":
-            ID = ID[:-1] + "2"
-        else:
-            ID = ID[:-1] + "1"
-
-        print chr + '\t' + str(int(pos) - 1) + '\t' + pos + '\t' + ID + '\t' + str(num)
-
-        num = num + 1
-
-    hIN.close()
-    hOUT.close() 
-    ####################
- 
-
-    ####################
-    # sort the temporary file
-    hOUT = open(outputFilePath, "w")
-    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", inputFilePath], stdout = hOUT)
-    hOUT.close()
-    ####################
-
-
-
-    ####################
-    # compress by bgzip and index by tabix
-    compress_index_bed(outputFilePath, outputFile + ".gz", bgzip_cmd, tabix_cmd)
-    ####################
-
-
-    ####################
-    # delete intermediate file
-    subprocess.call(["rm", outputFilePath + '.tmp'])
 
 
 
