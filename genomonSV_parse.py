@@ -70,6 +70,9 @@ def genomonSV_parse():
                                             outputPrefix + ".junction.pairStart.bed.gz")
 
 
+    parseFunction.addPairCoverRegionFromBam(outputPrefix + ".junction.sort.txt",
+                                            outputPrefix + ".junction.sort.withPair.txt",
+                                            outputPrefix + ".junction.pairCoverage.txt")
 
     """
 
