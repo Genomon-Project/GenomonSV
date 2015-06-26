@@ -4,7 +4,7 @@
     functions for parsing breakpoint containing read pairs and improperly aligned read pairs
 """
 
-import pysam, re, subprocess
+import sys, pysam, re, subprocess
 import utils
 
 def parseJunctionFromBam(inputBAM, outputFilePath, Params):
@@ -268,6 +268,10 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
                                      read.qname + ("/1" if flags[6] == "1" else "/2"), juncSurplus, juncDir_SA, juncDir_current, \
                                      str(read.mapq), coverRegion_current + "," + coverRegion_SA, chr_pair + ":" + str(pos_pair), str(juncType), "2"])
 
+    bamfile.close()
+    hOUT.close()
+
+
 
 def getPairStartPos(inputFilePath, outputFilePath):
 
@@ -319,6 +323,75 @@ def getPairStartPos(inputFilePath, outputFilePath):
     ####################
     # delete intermediate file
     subprocess.call(["rm", outputFilePath + '.tmp'])
+
+
+
+def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
+
+    """
+        script for obtaining pair read information (mainly end position, because it cannot recovered from bam files)
+    """
+    ####################
+    bamfile = pysam.Samfile(inputBam, "rb")
+    tabixfile = pysam.TabixFile(inputTabixFile)
+    hOUT = open(outputFilePath + ".tmp", "w")
+
+    ID2info = {}
+    tempChr = ""
+    tempPos = 0
+    checkPositionMargin = 10000000
+
+    for read in bamfile.fetch():
+
+        # when into new regions, fetch the keys from the tabix indexed file
+        if bamfile.getrname(read.tid) != tempChr or int(read.pos + 1) > tempPos + checkPositionMargin:
+
+            tempChr = bamfile.getrname(read.tid)
+            tempPos = int(read.pos + 1) - 1
+
+            ID2info = {}
+            tabixErrorFlag = 0
+            try:
+                records = tabixfile.fetch(tempChr, tempPos, tempPos + checkPositionMargin)
+            except Exception as inst:
+                print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                tabixErrorFlag = 1
+
+            if tabixErrorFlag == 0:
+                for record in records:
+                    splt_record = record.split('\t')
+                    ID2info[splt_record[3]] = record
+
+
+        flags = format(int(read.flag), '#014b')[:1:-1]
+
+        # skip supplementary alignment
+        if flags[8] == "1" or flags[11] == "1": continue
+
+        # skip one of the pair is unmapped
+        if flags[2] == "1" or flags[3] == "1": continue
+     
+        seqID = (read.qname + "/1" if  flags[6] == "1" else read.qname + "/2")
+
+     
+        if seqID in ID2info:
+            print >> hOUT, ID2info[seqID] + "\t" + bamfile.getrname(read.tid) + ":" + str(read.pos + 1) + "-" + str(read.aend) + "\t" + str(read.mapq)
+
+
+    bamfile.close()
+    tabixfile.close()
+    ####################
+
+    ####################
+    hOUT = open(outputFilePath, 'w')
+    subprocess.call(["sort", "-k5n", outputFilePath + ".tmp"], stdout = hOUT)
+    hOUT.close()
+    ####################
+
+
+    ####################
+    subprocess.call(["rm", outputFilePath + ".tmp"])
+
 
 
 
@@ -384,6 +457,10 @@ def parseImproperFromBam(inputBam, outputFilePath, Params):
             seqname = (read.qname + "/1" if read.is_read1 else read.qname + "/2")  
             direction = ("-" if read.is_reverse else "+")
             print >> hOUT, seqname + '\t' + bamfile.getrname(read.tid) + '\t' + str(read.pos + 1) + '\t' + str(read.aend) + '\t' + direction + '\t' + str(read.mapq)
+
+
+    bamfile.close()
+    hOUT.close()
 
 
 

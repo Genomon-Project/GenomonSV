@@ -40,7 +40,12 @@ def genomonSV_parse():
     utils.make_directory(sampleConf["output_dir"])
     ####################
 
+    
+    ####################
     outputPrefix = sampleConf["output_dir"] + "/" + sampleConf["label"]
+
+    """
+
 
     # parse breakpoint containing read pairs from input bam files
     parseFunction.parseJunctionFromBam(sampleConf["path_to_bam"], 
@@ -58,9 +63,16 @@ def genomonSV_parse():
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
 
-    # sort and compress the parsed breakpoint containing read pairs
-    # sortJunction()
-    
+    """
+
+    parseFunction.getPairCoverRegionFromBam(sampleConf["path_to_bam"], 
+                                            outputPrefix + ".junction.pairCoverage.txt",
+                                            outputPrefix + ".junction.pairStart.bed.gz")
+
+
+
+    """
+
     # merge and cluster parsed improper read pairs from input bam files
     # clusterImproper()
     
@@ -92,7 +104,7 @@ def genomonSV_parse():
     ####################
 
 
-
+    """
 
 
 if __name__ == "__main__":
