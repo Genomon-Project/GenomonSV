@@ -44,9 +44,6 @@ def genomonSV_parse():
     ####################
     outputPrefix = sampleConf["output_dir"] + "/" + sampleConf["label"]
 
-    """
-
-
     # parse breakpoint containing read pairs from input bam files
     parseFunction.parseJunctionFromBam(sampleConf["path_to_bam"], 
                                        outputPrefix + ".junction.unsort.txt", 
@@ -63,7 +60,6 @@ def genomonSV_parse():
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
 
-    """
 
     parseFunction.getPairCoverRegionFromBam(sampleConf["path_to_bam"], 
                                             outputPrefix + ".junction.pairCoverage.txt",
@@ -74,14 +70,15 @@ def genomonSV_parse():
                                             outputPrefix + ".junction.sort.withPair.txt",
                                             outputPrefix + ".junction.pairCoverage.txt")
 
-    """
+    parseFunction.clusterJunction(outputPrefix + ".junction.sort.withPair.txt", 
+                                  outputPrefix + ".junction.clustered.bedpe.unsort",
+                                  paramConf["clusterJunctionCondition"])
 
-    # merge and cluster parsed improper read pairs from input bam files
-    # clusterImproper()
-    
-    # merge and cluster parsed breakpoint containing read pairs
-    # clusterJunction()
+    utils.sortBedpe(outputPrefix + ".junction.clustered.bedpe.unsort", outputPrefix + ".junction.clustered.bedpe")
 
+    utils.compress_index_bed(outputPrefix + ".junction.clustered.bedpe",
+                             outputPrefix + ".junction.clustered.bedpe.gz",
+                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
     ####################
     # improper read pairs
@@ -106,8 +103,6 @@ def genomonSV_parse():
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
     ####################
 
-
-    """
 
 
 if __name__ == "__main__":
