@@ -1,4 +1,4 @@
-#! usr/local/bin/python
+#!/usr/bin/env python
 
 """
     functions for parsing breakpoint containing read pairs and improperly aligned read pairs

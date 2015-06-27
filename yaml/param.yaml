@@ -25,6 +25,7 @@ filterCondition:
     junc_num_thres: 1 # the threshould of supporting junction read pairs
     SV_size_thres: 10 # the threshould of minimum structural variation sizes
     controlPanel_num_thres: 1 # the threshould of supporting junction read pairs for non-matched normal control
+    controlPanel_check_margin: 40 # the positions of junction slip very large (sometimes ove 20bp). I think this value should be at least 30bp, but may be more)  
     min_support_num: 3 # the threshould of supporting read pairs (junction read pairs and improper read pairs)
     min_mapping_qual: 40 # the threshould of mapping quality (if the median of supporting reads is below this value, then filtered out)
     min_cover_size: 100 # the minimum region size which have to be covered by aligned short reads

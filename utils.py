@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, subprocess
 
 def make_directory(inputDir):

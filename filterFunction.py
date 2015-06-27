@@ -1,4 +1,4 @@
-#! /usr/local/bin/python
+#!/usr/bin/env python
 
 """
      functions for filtering candidates of structural variations
