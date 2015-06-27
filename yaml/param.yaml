@@ -9,7 +9,7 @@ parseJunctionCondition:
     max_minor_clip_size: 15 # if the clipped bases of both sides are greater than this value, filter that read
 
 clusterJunctionCondition:
-    checkMarginSizei: 1000 # this value should be at least 1000. but very large value will lead to slow computation..
+    check_margin_size: 1000 # this value should be at least 1000. but very large value will lead to slow computation..
 
 parseImproperCondition:
     abnormal_insert_size: 2000 # the size of abnormal insert size used for identifying improper read pairs
@@ -21,5 +21,14 @@ clusterImproperCondition:
     clipping_margin: 30 # possible junction position in the opposite side
     check_margin_size: 1500 # This should be sufficiently greater than insert size. But the computational time will increase when too large
 
+filterCondition:
+    junc_num_thres: 1 # the threshould of supporting junction read pairs
+    SV_size_thres: 10 # the threshould of minimum structural variation sizes
+    controlPanel_num_thres: 1 # the threshould of supporting junction read pairs for non-matched normal control
+    min_support_num: 3 # the threshould of supporting read pairs (junction read pairs and improper read pairs)
+    min_mapping_qual: 40 # the threshould of mapping quality (if the median of supporting reads is below this value, then filtered out)
+    min_cover_size: 100 # the minimum region size which have to be covered by aligned short reads
 
+validateCondition:
+ 
  
