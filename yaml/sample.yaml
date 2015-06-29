@@ -1,0 +1,33 @@
+---
+target:
+
+    # target sample label (typically the name of the tumor sample)
+    label: s_36T
+
+    # the path to the target bam file you want to parse
+    path_to_bam: /home/yshira/project/yoshiken_target_SV/results/20150616/20150522_036T/out/bam/036T_markdup.bam
+
+    # the path to the output directory where the results will go
+    outputDir: /home/yshira/SV/test/output/036T
+
+
+matchedControl:
+  
+    # whether matched control data is used or not (True or False)
+    use: True
+
+    # the path to the matched control bam file
+    path_to_bam: /home/yshira/SV/data/ATL/Hiseq/ATL23-N/ATL-23N.bam
+
+
+nonMatchedControlPanel:
+
+    # whether non-matched control panel is used or not (True or False)
+    use: True
+
+    # matched control sample label (typically the name of the control sample)
+    matchedControl_label: dummy 
+
+    # the path to the non-matched control panel data
+    data_path: /home/yshira/SV/data/ATL/Hiseq/control/merged.junction.control.bedpe.gz 
+
