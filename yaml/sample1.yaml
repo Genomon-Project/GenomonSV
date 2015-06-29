@@ -1,9 +1,25 @@
 ---
-# sample label (typically the name of sample)
-label: sample1
+# target sample label (typically the name of the tumor sample)
+target_label: sample1_T
 
-# the path to the bam file you want to parse
-path_to_bam: /home/yshira/genome/data/sequence/sample1.bam
+# the path to the target bam file you want to parse
+target_bam: /home/yshira/genome/data/sequence/sample1_T.bam
 
 # the path to the output directory where the results will go
-output_dir: /home/yshira/genome/data/SV
+target_outputDir: /home/yshira/genome/data/SV
+
+# whether matched control data is used or not (True or False)
+use_matchedControl: True
+
+# whether non-matched control panel is used or not (True or False)
+use_nonMatchedControlPanel: True
+
+# matched control sample label (typically the name of the control sample)
+matchedControl_label: sample1_N
+
+# the path to the matched control bam file
+matchedControl_bam: /home/yshira/genome/data/sequence/sample1_N.bam
+
+# the path to the non^matched control panel data
+nonMatchedControlPanel_path: 
+
