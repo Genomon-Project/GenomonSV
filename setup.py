@@ -10,6 +10,7 @@ setup(name='GenomonSV',
       url='https://github.com/friend1ws/genomonSV',
       package_dir = {'': 'lib'},
       packages=['genomonSV'],
+      scripts=['GenomonSV'],
       license='GPL-3'
      )
 
