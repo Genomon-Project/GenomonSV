@@ -14,7 +14,7 @@ target:
 matchedControl:
   
     # whether matched control data is used or not (True or False)
-    use: True
+    use: True 
 
     # the path to the matched control bam file
     path_to_bam: /home/yshira/SV/data/ATL/Hiseq/ATL23-N/ATL-23N.bam
@@ -23,7 +23,7 @@ matchedControl:
 nonMatchedControlPanel:
 
     # whether non-matched control panel is used or not (True or False)
-    use: True
+    use: False 
 
     # matched control sample label (typically the name of the control sample)
     matchedControl_label: dummy 

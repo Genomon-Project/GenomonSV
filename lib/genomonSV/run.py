@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 
-import sys
-import argparse
+import sys, argparse, subprocess
 import config 
 import utils
 import parseFunction
@@ -95,21 +94,6 @@ def genomonSV_parse(args):
 
 def genomonSV_filt(args):
 
-    """
-        Genomon SV filt: extracting candidates of structural variations from clustered breakpoint-containing and improperly aligned read pairs
-    """
-
-    """
-    ####################
-    # parse arguments
-    parser = argparse.ArgumentParser(description = "Parse bam file for breakpoint and improper read pairs")
-    parser.add_argument("sampleInfoFile", metavar = "sample.yaml", type = str,
-                        help = "input sample information file (yaml format)")
-    parser.add_argument("paramInfoFile", metavar = "param.yaml", type = str,
-                        help = "parameter information file (yaml format)")
-    args = parser.parse_args()
-    ####################
-    """
 
     ####################
     # load config files
@@ -132,9 +116,17 @@ def genomonSV_filt(args):
                                         outputPrefix + ".junction.clustered.filt1.bedpe",
                                         paramConf["filterCondition"])
 
-    filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
-                                         outputPrefix + ".junction.clustered.filt2.bedpe",
-                                         controlFile, matchedNormal, Params)
+
+    if sampleConf["nonMatchedControlPanel"]["use"] == True:
+        filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
+                                             outputPrefix + ".junction.clustered.filt2.bedpe",
+                                             sampleConf["nonMatchedControlPanel"]["data_path"],
+                                             sampleConf["nonMatchedControlPanel"]["matchedControl_label"],
+                                             paramConf["filterCondition"])
+    else:
+        subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
+
+        
     ####################
 
 
