@@ -134,6 +134,10 @@ def genomonSV_filt(args):
     filterFunction.filterMergedJunc(outputPrefix + ".junction.clustered.filt3.bedpe",
                                     outputPrefix + ".junction.clustered.filt4.bedpe",
                                     paramConf["filterCondition"])
+
+    filterFunction.removeClose(outputPrefix + ".junction.clustered.filt4.bedpe",
+                               outputPrefix + ".junction.clustered.filt5.bedpe",
+                               paramConf["filterCondition"])
     ####################
 
 

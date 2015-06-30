@@ -164,6 +164,15 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
 
 def filterMergedJunc(inputFilePath, outputFilePath, Params):
 
+    """    
+    script for filtering the inferred break points for structural variation
+
+    as conditions for filtering
+    min_support_num: the number of support reads
+    min_mapping_qual: (e.g., in either type 1 or 2 junction reads, median of mapping quality is at least 40 ??)
+    min_cover_size: the size of alignment covered region (e.g., around the both break points, at least 80 bp sequences have to be covered)
+    """
+
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
@@ -269,4 +278,56 @@ def filterMergedJunc(inputFilePath, outputFilePath, Params):
 
     hIN.close()
     hOUT.close()
+
+
+
+def removeClose(inputFilePath, outputFilePath, Params):
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+
+    close_check_margin = Params["close_check_margin"]
+    close_check_thres= Params["close_check_thres"]
+
+    key2info = {}
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+
+        delList = []
+        skipFlag = 0
+        for tkey in key2info:
+
+            tchr1, tstart1, tend1, tchr2, tstart2, tend2, inseq, tdir1, tdir2 = tkey.split('\t')
+
+            if F[0] != tchr1 or int(F[1]) > int(tend1) + close_check_margin:
+
+                print key2info[tkey]
+                delList.append(tkey)
+        
+            else:
+
+                if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - int(tend1)) <= close_check_margin and abs(int(F[5]) - int(tend2)) <= close_check_margin:
+
+                    infos = key2info[tkey].split('\t')
+                    if len(F[6].split(';')) < len(infos[6].split(';')) and len(F[6].split(';')) <= int(close_check_thres) - 1:
+                        skipFlag = 1
+                    elif len(F[6].split(';')) > len(infos[6].split(';')) and len(infos[6].split(';')) <= int(close_check_thres) - 1:
+                        delList.append(tkey)
+
+
+        for tkey in delList:
+            del key2info[tkey]
+
+        if skipFlag == 0:
+            key2info['\t'.join(F[0:6] + F[7:10])] = '\t'.join(F)
+
+    hIN.close()
+
+
+    for tkey in key2info:
+        print >> hOUT, key2info[tkey]
+
+
+    hOUT.close()
+
 
