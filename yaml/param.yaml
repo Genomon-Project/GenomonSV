@@ -32,6 +32,11 @@ filterCondition:
     close_check_margin: 25
     close_check_thres: 2
 
-validateCondition:
- 
+realignmentValidationCondition:
+    max_depth: 5000
+    search_length: 1000
+    search_margin: 5
+    reference_genome:
+    split_refernece_thres: 1000
+    validate_sequence_length: 1000 
  
