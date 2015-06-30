@@ -23,7 +23,7 @@ matchedControl:
 nonMatchedControlPanel:
 
     # whether non-matched control panel is used or not (True or False)
-    use: False 
+    use: True 
 
     # matched control sample label (typically the name of the control sample)
     matchedControl_label: dummy 

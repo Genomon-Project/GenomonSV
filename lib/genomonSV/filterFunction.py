@@ -4,7 +4,8 @@
      functions for filtering candidates of structural variations
 """
 
-import sys, gzip, pysam
+import sys, gzip, pysam, numpy
+import coveredRegions
 
 def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
      
@@ -159,4 +160,113 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
     hOUT.close()
     tabixfile.close()
 
+
+
+def filterMergedJunc(inputFilePath, outputFilePath, Params):
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+
+    min_support_num = Params["min_support_num"]
+    min_mapping_qual = Params["min_mapping_qual"]
+    min_cover_size = Params["min_cover_size"]
+
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+
+        ##########
+        MQs = F[10].split(';')
+        coveredRegion_primary = F[11].split(';')
+        coveredRegion_pair = F[13].split(';')
+        pairMQs = map(lambda x: int(x), F[12].split(';'))
+        juncPairPos = F[14].split(';')
+        juncReadTypes = F[15].split(';')
+        improperCoveredRegion = ([] if F[19] == "---" else F[19].split(';'))
+
+        # enumerate support read number
+        juncSupport = len(MQs)
+        improperMQs = ([] if F[18] == "---" else F[18].split(';'))
+        improperSupport = len(improperMQs)
+        # skip if the number of suppor read is below the minSupReadNum 
+        if juncSupport + improperSupport < min_support_num:
+            continue
+
+
+        ####################
+        # check for the mapping quality
+        MQs1 = [];
+        MQs2 = [];
+        for i in range(0, len(MQs)):
+            if juncReadTypes[i] == "1":
+                MQs1.append(int(MQs[i]))
+            else:
+                MQs2.append(int(MQs[i]))
+
+        # improper pair
+        IMQs1 = [];
+        IMQs2 = [];
+        for i in range(0, len(improperMQs)):
+            tempMQ = improperMQs[i].split(',')
+            IMQs1.append(int(tempMQ[0]))
+            IMQs2.append(int(tempMQ[1]))
+
+     
+        mapFlag = 0
+        if len(MQs1) > 0 and numpy.median(MQs1) >= min_mapping_qual:
+            mapFlag = 1
+
+        if len(MQs2) > 0 and numpy.median(MQs2) >= min_mapping_qual:
+            mapFlag = 1     
+
+        if len(IMQs1) > 0 and numpy.median(IMQs1) >= min_mapping_qual:
+            mapFlag = 1
+
+        if len(IMQs2) > 0 and numpy.median(IMQs2) >= min_mapping_qual:
+            mapFlag = 1
+
+        if mapFlag == 0:
+            continue
+
+
+        #################### 
+        # check for the covered region
+        region1 = coveredRegions.coveredRegions()
+        region2 = coveredRegions.coveredRegions()
+
+        for i in range(0, len(coveredRegion_primary)):
+            regPair = coveredRegion_primary[i].split(',')
+            if juncReadTypes[i] == "1":
+                region1.addMerge(regPair[0])
+                region2.addMerge(regPair[1])
+            else:
+                region1.addMerge(regPair[1])
+                region2.addMerge(regPair[0])
+
+
+        for i in range(0, len(coveredRegion_pair)):
+            if (juncReadTypes[i] == "1" and juncPairPos[i] == "1") or (juncReadTypes[i] == "2" and juncPairPos[i] == "2"): 
+                region1.addMerge(coveredRegion_pair[i])
+            elif (juncReadTypes[i] == "1" and juncPairPos[i] == "2") or (juncReadTypes[i] == "2" and juncPairPos[i] == "1"):
+                region2.addMerge(coveredRegion_pair[i])
+
+
+        for i in range(0, len(improperCoveredRegion)):
+            regPair = improperCoveredRegion[i].split(',')
+            region1.addMerge(regPair[0])
+            region2.addMerge(regPair[1])
+
+
+        region1.reduceMerge()
+        region2.reduceMerge()
+
+        if region1.regionSize() < min_cover_size or region2.regionSize() < min_cover_size:
+            continue
+
+        # every condition is satisfied
+        print >> hOUT, '\t'.join(F)
+
+
+    hIN.close()
+    hOUT.close()
 

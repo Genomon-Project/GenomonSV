@@ -130,6 +130,10 @@ def genomonSV_filt(args):
     filterFunction.addImproperInfo(outputPrefix + ".junction.clustered.filt2.bedpe",
                                    outputPrefix + ".junction.clustered.filt3.bedpe",
                                    outputPrefix + ".improper.clustered.bedpe.gz")
+
+    filterFunction.filterMergedJunc(outputPrefix + ".junction.clustered.filt3.bedpe",
+                                    outputPrefix + ".junction.clustered.filt4.bedpe",
+                                    paramConf["filterCondition"])
     ####################
 
 
