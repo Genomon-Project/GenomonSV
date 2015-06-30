@@ -126,7 +126,10 @@ def genomonSV_filt(args):
     else:
         subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
 
-        
+       
+    filterFunction.addImproperInfo(outputPrefix + ".junction.clustered.filt2.bedpe",
+                                   outputPrefix + ".junction.clustered.filt3.bedpe",
+                                   outputPrefix + ".improper.clustered.bedpe.gz")
     ####################
 
 

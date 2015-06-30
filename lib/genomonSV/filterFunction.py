@@ -118,3 +118,45 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
 
 
 
+def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
+
+    juncFile = sys.argv[1]
+    improperFile = sys.argv[2]
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+    tabixfile = pysam.TabixFile(improperFilePath)
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+
+        improper_readNames = "---"
+        improper_MQs = "---"
+        improper_coveredRegions = "---"
+
+        # get the records for control junction data for the current position
+        tabixErrorFlag = 0
+        try:
+            records = tabixfile.fetch(F[0], int(F[1]) - -1, int(F[2]) + 1)
+        except Exception as inst:
+            print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+            tabixErrorFlag = 1
+
+
+        if tabixErrorFlag == 0:
+            for record_line in records:
+                FF = record_line.split('\t')
+
+                if F[0] == FF[0] and F[3] == FF[3] and int(F[1]) >= int(FF[1]) and int(F[2]) <= int(FF[2]) and int(F[4]) >= int(FF[4]) and int(F[5]) <= int(FF[5]) and F[8] == FF[8] and F[9] == FF[9]:
+                    improper_readNames = FF[6]
+                    improper_MQs = FF[7]
+                    improper_coveredRegions = FF[10]
+    
+
+        print >> hOUT, "\t".join(F) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions
+
+    hIN.close()
+    hOUT.close()
+    tabixfile.close()
+
+
