@@ -329,17 +329,15 @@ def checkScore(align):
 
 def summarizeRefAlt(inputFile, ITDFlag):
 
-"""
-    note:
-    Now the definition of "reference-prefer" read pair is those align at least 5 base than to alternative sequence. 
-    but current definition generates problem when detecting mid-range tandem duplication on repeat sequences (5,115279667,-,5,115280072 (ATL-15T))
-    because in this case, read pairs that should prefer the reference sequence do not prefer it significantly to alternative base...
-    One remedy for this may be to 
-    1. in advance, we should remove the read pairs whose source (reference or altenative) are unclear
-    2. we define "class 2 reference read pair", and use them with "class 1 reference read pair".
-
-
-"""
+    """
+        note:
+        Now the definition of "reference-prefer" read pair is those align at least 5 base than to alternative sequence. 
+        but current definition generates problem when detecting mid-range tandem duplication on repeat sequences (5,115279667,-,5,115280072 (ATL-15T))
+        because in this case, read pairs that should prefer the reference sequence do not prefer it significantly to alternative base...
+        One remedy for this may be to 
+        1. in advance, we should remove the read pairs whose source (reference or altenative) are unclear
+        2. we define "class 2 reference read pair", and use them with "class 1 reference read pair".
+    """
  
     hIN = open(inputFile, 'r')
 

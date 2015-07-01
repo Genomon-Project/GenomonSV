@@ -6,6 +6,7 @@
 
 import sys, gzip, pysam, numpy
 import coveredRegions
+import realignmentFunction
 
 def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
      
@@ -301,7 +302,7 @@ def removeClose(inputFilePath, outputFilePath, Params):
 
             if F[0] != tchr1 or int(F[1]) > int(tend1) + close_check_margin:
 
-                print key2info[tkey]
+                print >> hOUT, key2info[tkey]
                 delList.append(tkey)
         
             else:
@@ -328,6 +329,25 @@ def removeClose(inputFilePath, outputFilePath, Params):
         print >> hOUT, key2info[tkey]
 
 
+    hOUT.close()
+
+
+
+def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, Params):
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]
+
+        extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+
+
+        extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+
+    hIN.close()
     hOUT.close()
 
 

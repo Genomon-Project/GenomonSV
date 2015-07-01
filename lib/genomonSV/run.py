@@ -68,6 +68,14 @@ def genomonSV_parse(args):
                              outputPrefix + ".junction.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
+    if paramConf["debugMode"] == False:
+        subprocess.call(["rm", outputPrefix + ".junction.unsort.txt"])
+        subprocess.call(["rm", outputPrefix + ".junction.sort.txt"])
+        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed.gz"])
+        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed.gz.tbi"])
+        subprocess.call(["rm", outputPrefix + ".junction.sort.withPair.txt"])
+        subprocess.call(["rm", outputPrefix + ".junction.pairCoverage.txt"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.bedpe.unsort"])
     ####################
     # improper read pairs
 
@@ -83,12 +91,20 @@ def genomonSV_parse(args):
 
     # cluster read pairs possibly representing the same junction
     parseFunction.clusterImproperBedpe(outputPrefix + ".improper.bedpe",
-                                       outputPrefix + ".improper.clustered.bedpe",
+                                       outputPrefix + ".improper.clustered.unsort.bedpe",
                                        paramConf["clusterImproperCondition"])
+
+    utils.sortBedpe(outputPrefix + ".improper.clustered.unsort.bedpe",
+                    outputPrefix + ".improper.clustered.bedpe")
 
     utils.compress_index_bed(outputPrefix + ".improper.clustered.bedpe",
                              outputPrefix + ".improper.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+
+    if paramConf["debugMode"] == False:
+        subprocess.call(["rm", outputPrefix + ".improper.unsort.txt"])
+        subprocess.call(["rm", outputPrefix + ".improper.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".improper.clustered.unsort.bedpe"])
     ####################
 
 
@@ -138,6 +154,7 @@ def genomonSV_filt(args):
     filterFunction.removeClose(outputPrefix + ".junction.clustered.filt4.bedpe",
                                outputPrefix + ".junction.clustered.filt5.bedpe",
                                paramConf["filterCondition"])
+
     ####################
 
 
