@@ -2,22 +2,52 @@
 
 ## Introduction
 
-This is a repoistory for a new structural variation detection program, Genomon SV.
+Genomon SV is a software for detecting somatic structural variations from cancer genome sequencing data.
+Several characteristics of Genomon SV includes but not limited to;
 
-The name ebStruct is still tentative. But I'm considering to use some empirical bayesian framework
-(Like EBCall, we perform some filter with Beta-Binomial artifact distribution from the many non-matched normal samples).
+1. Use both breakpoint-containing junction read pairs and improperly aligned read pairs for maximizing sensitivity
+2. Various types of filters (e.g., use of non-matched normal control panels) are implemented for higher accuracy
+3. Detection of short tandem duplications and mid-range deletions (10bp ~ 300bp) as well as larger structural variations such as translocations
 
+## Dependency
+
+### Python
+Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy`, `pyyaml`, `Biopython` packages
+
+### Software
+tabix, bgzip, blat
+
+## Install
+
+```
+python setup.py build
+python setup.py install
+```
+## Preparation
+
+First, Genomon SV accept bam file aligned by `bwa mem` with -T0 option.
+We do not guarantee the results for other cases.
+
+Then, two types of configuration files (in yaml format) should be prepared.
+
+1. sample.yaml
+2. param.yaml
+
+See sample files for description of each parameters.
 
 ## Commands
 
-## genomonSV_parse.sh
+1. Parsing breakpoint-containing and improperly aligned read pairs
 
-List up candidate SVs and their breakpoints (with improper read pairs).
+```
+GenomonSV parse sample.yaml param.yaml
+```
 
-## genomonSV_filt.sh
+2. Filtering and annotating candidate somatic structural variations
 
-Perform various filters to reduce false positives.
-
+```
+GenomonSV filt sample.yaml param.yaml
+```
 
 ## Results
 
