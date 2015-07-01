@@ -161,6 +161,11 @@ def genomonSV_filt(args):
                     sampleConf["matchedControl"]["path_to_bam"],
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
                     paramConf["realignmentValidationCondition"])
+
+    filterFunction.filterNumAFFis(outputPrefix + ".junction.clustered.filt6.bedpe", 
+                                  outputPrefix + ".junction.clustered.filt7.bedpe",
+                                  paramConf["realignmentValidationCondition"])
+
     ####################
 
 

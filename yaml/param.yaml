@@ -44,5 +44,14 @@ realignmentValidationCondition:
     split_refernece_thres: 1000
     validate_sequence_length: 1000 
     STD_thres: 500 # threshould for short tandem duplication length
+    min_tumor_read_pair: 3
+    min_tumor_alleleFreq: 0.01
+    max_control_read_pair: 1
+    max_control_allele_freq: 0.1
+    max_fisher_pvalue: 0.1
+
+annotation:
+    gene_bed: /home/yshira/SV/genomonSV/db/refGene.bed.gz
+    exon_bed: /home/yshira/SV/genomonSV/db/refExon.bed.gz
 
  

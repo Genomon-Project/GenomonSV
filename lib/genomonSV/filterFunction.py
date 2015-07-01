@@ -395,3 +395,39 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     hOUT.close()
 
 
+
+def filterNumAFFis(inputFilePath, outputFilePath, Params):
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+   
+    min_tumor_alleleFreq = Params["min_tumor_alleleFreq"]
+    min_tumor_read_pair = Params["min_tumor_read_pair"]
+    max_control_read_pair = Params["max_control_read_pair"]
+    max_control_allele_freq = Params["max_control_allele_freq"]
+    max_fisher_pvalue = Params["max_fisher_pvalue"]
+
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+
+        tumorAF = 0
+        if float(F[7]) + float(F[8]) > 0: tumorAF = float(F[8]) / (float(F[7]) + float(F[8]))     
+
+        normalAF = 0
+        if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
+    
+        if int(F[8]) < min_tumor_read_pair: continue
+        if tumorAF < min_tumor_alleleFreq: continue
+
+        if int(F[10]) > max_control_read_pair: continue
+        if normalAF > max_control_allele_freq: continue
+        if 10**(-float(F[11])) < max_fisher_pvalue: continue
+
+        print '\t'.join(F)
+
+    hIN.close()
+    hOUT.close()
+
+
+ 
