@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys, pysam
 
 def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2):
 
@@ -26,8 +27,9 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     depthFlag = 0
     if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= max_depth: depthFlag = 1
     if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= max_depth: depthFlag = 1
-    if depthFlag == 1: 
-        sys.exit(27)
+    if depthFlag == 1:
+        print >> sys.stderr, "sequence depth exceeds the threshould for" + ','.join([juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2]) 
+        return 1 
 
     hOUT = open(outputFilePath, 'w')
 
@@ -54,20 +56,20 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
         dir_pair = ("-" if flags[5] == "1" else "+")
 
         # the read (with margin) contains break point
-        if pos_current - search_margin <= juncPos1 <= (read.aend - 1) + search_margin:
+        if pos_current - search_margin <= int(juncPos1) <= (read.aend - 1) + search_margin:
             readID2exist[read.qname] = 1
     
         # the read pair covers break point
-        if chr_pair == juncChr1 and pos_current <= juncPos1 <= pos_pair and dir_current == "+" and dir_pair == "-":
+        if chr_pair == juncChr1 and pos_current <= int(juncPos1) <= pos_pair and dir_current == "+" and dir_pair == "-":
             readID2exist[read.qname] = 1
 
         # the read pair covers break point
         if chr_pair == juncChr2:
             juncFlag = 0
-            if juncDir1 == "+" and juncDir2 == "+" and pos_current <= juncPos1 and pos_pair <= juncPos2: juncFlag = 1
-            if juncDir1 == "+" and juncDir2 == "-" and pos_current <= juncPos1 and pos_pair >= juncPos2: juncFlag = 1
-            if juncDir1 == "-" and juncDir2 == "+" and pos_current >= juncPos1 and pos_pair <= juncPos2: juncFlag = 1
-            if juncDir1 == "-" and juncDir2 == "-" and pos_current >= juncPos1 and pos_pair >= juncPos2: juncFlag = 1
+            if juncDir1 == "+" and juncDir2 == "+" and pos_current <= int(juncPos1) and pos_pair <= int(juncPos2): juncFlag = 1
+            if juncDir1 == "+" and juncDir2 == "-" and pos_current <= int(juncPos1) and pos_pair >= int(juncPos2): juncFlag = 1
+            if juncDir1 == "-" and juncDir2 == "+" and pos_current >= int(juncPos1) and pos_pair <= int(juncPos2): juncFlag = 1
+            if juncDir1 == "-" and juncDir2 == "-" and pos_current >= int(juncPos1) and pos_pair >= int(juncPos2): juncFlag = 1
 
             if juncFlag == 1:  
                 readID2exist[read.qname] = 1
@@ -98,20 +100,20 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
         dir_pair = ("-" if flags[5] == "1" else "+")
 
         # the read (with margin) contains break point
-        if pos_current - search_margin <= juncPos2 <= (read.aend - 1) + search_margin:
+        if pos_current - search_margin <= int(juncPos2) <= (read.aend - 1) + search_margin:
             readID2exist[read.qname] = 1
                 
         # the read pair covers break point
-        if chr_pair == juncChr2 and pos_current <= juncPos2 <= pos_pair and dir_current == "+" and dir_pair == "-":
+        if chr_pair == juncChr2 and pos_current <= int(juncPos2) <= pos_pair and dir_current == "+" and dir_pair == "-":
             readID2exist[read.qname] = 1
                 
         # the read pair covers break point
         if chr_pair == juncChr1:
             juncFlag = 0
-            if juncDir2 == "+" and juncDir1 == "+" and pos_current <= juncPos2 and pos_pair <= juncPos1: juncFlag = 1
-            if juncDir2 == "+" and juncDir1 == "-" and pos_current <= juncPos2 and pos_pair >= juncPos1: juncFlag = 1
-            if juncDir2 == "-" and juncDir1 == "+" and pos_current >= juncPos2 and pos_pair <= juncPos1: juncFlag = 1
-            if juncDir2 == "-" and juncDir1 == "-" and pos_current >= juncPos2 and pos_pair >= juncPos1: juncFlag = 1
+            if juncDir2 == "+" and juncDir1 == "+" and pos_current <= int(juncPos2) and pos_pair <= int(juncPos1): juncFlag = 1
+            if juncDir2 == "+" and juncDir1 == "-" and pos_current <= int(juncPos2) and pos_pair >= int(juncPos1): juncFlag = 1
+            if juncDir2 == "-" and juncDir1 == "+" and pos_current >= int(juncPos2) and pos_pair <= int(juncPos1): juncFlag = 1
+            if juncDir2 == "-" and juncDir1 == "-" and pos_current >= int(juncPos2) and pos_pair >= int(juncPos1): juncFlag = 1
              
             if juncFlag == 1:
                 readID2exist[read.qname] = 1
@@ -188,6 +190,8 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     bamfile.close()
     hOUT.close()
 
+    return 0
+
 
 def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, juncSeq):
 
@@ -204,16 +208,16 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
     split_refernece_thres = Params["split_refernece_thres"]
     validate_sequence_length = Params["validate_sequence_length"]
 
-    hOUT = open(outputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
 
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
     if juncSeq == "---": juncSeq = ""
 
     # for mid-range deletion or tandem duplication
-    if juncChr1 == juncChr2 and abs(juncPos1 - juncPos2) <= split_refernece_thres and juncDir1 != juncDir2:
+    if juncChr1 == juncChr2 and abs(int(juncPos1) - int(juncPos2)) <= split_refernece_thres and juncDir1 != juncDir2:
 
         seq = ""
-        for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1 - validate_sequence_length) + "-" + str(juncPos2 + validate_sequence_length)):
+        for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
 
@@ -224,13 +228,13 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
         if juncDir1 == "+" and juncDir2 == "-":
 
             seq = ""
-            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1 - validate_sequence_length) + "-" + str(juncPos1)):
+            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
                 seq = seq + item.rstrip('\n').upper()
 
             seq = seq + juncSeq
 
-            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2) + "-" + str(juncPos2 + validate_sequence_length)):
+            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length)):
                 if item[0] == ">": continue
                 seq = seq + item.rstrip('\n').upper()
 
@@ -240,13 +244,13 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
         # for mid-range tandem duplication
         else:
             seq = "" 
-            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2 - validate_sequence_length) + "-" + str(juncPos2)):
+            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
                 seq = seq + item.rstrip('\n').upper()
             
             seq = seq + juncSeq
 
-            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(juncPos1 + validate_sequence_length)):
+            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length)):
                 if item[0] == ">": continue
                 seq = seq + item.rstrip('\n').upper()
             
@@ -257,7 +261,7 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
     else:
 
         seq = ""
-        for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1 - validate_sequence_length) + "-" + str(juncPos1 + validate_sequence_length)):
+        for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos1) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
 
@@ -265,7 +269,7 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
         print >> hOUT, seq
 
         seq = ""
-        for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2 - validate_sequence_length) + "-" + str(juncPos2 + validate_sequence_length)):
+        for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
             
@@ -276,12 +280,12 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
         seq = ""
         if juncDir1 == "+":
             tseq = ""
-            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1 - validate_sequence_length) + "-" + str(juncPos1)):
+            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
         else:
             tseq = ""
-            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(juncPos1 + validate_sequence_length)):
+            for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = "".join(complement.get(base) for base in reversed(tseq))
@@ -290,12 +294,12 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
 
         if juncDir2 == "-":
             tseq = "" 
-            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2) + "-" + str(juncPos2 + validate_sequence_length)):
+            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
         else:
             tseq = ""
-            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2 - validate_sequence_length) + "-" + str(juncPos2)):
+            for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = "".join(complement.get(base) for base in reversed(tseq))

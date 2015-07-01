@@ -155,6 +155,12 @@ def genomonSV_filt(args):
                                outputPrefix + ".junction.clustered.filt5.bedpe",
                                paramConf["filterCondition"])
 
+    filterFunction.validateByRealignment(outputPrefix + ".junction.clustered.filt5.bedpe",
+                    outputPrefix + ".junction.clustered.filt6.bedpe",
+                    sampleConf["target"]["path_to_bam"],
+                    sampleConf["matchedControl"]["path_to_bam"],
+                    paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
+                    paramConf["realignmentValidationCondition"])
     ####################
 
 

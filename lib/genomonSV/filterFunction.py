@@ -4,9 +4,10 @@
      functions for filtering candidates of structural variations
 """
 
-import sys, gzip, pysam, numpy
+import sys, gzip, subprocess, pysam, numpy, math
 import coveredRegions
 import realignmentFunction
+from scipy import stats
 
 def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
      
@@ -333,19 +334,62 @@ def removeClose(inputFilePath, outputFilePath, Params):
 
 
 
-def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, Params):
+def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, blat_cmd, Params):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
+    blat_cmds = blat_cmd.split(' ')
 
+    num = 1
     for line in hIN:
         F = line.rstrip('\n').split('\t')
         chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]
 
-        extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+        STDFlag = 0
+        if chr1 == chr2 and int(pos2) - int(pos1) < Params["STD_thres"] and dir1 == "-" and dir2 == "+": STDFlag = 1
 
+        ####################
+        # extract short reads from tumor sequence data around the candidate
+        fRet = realignmentFunction.extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+        if fRet == 1: continue
 
-        extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+        # extract short reads from matched-control sequence data around the candidate
+        realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+        if fRet == 1: continue
+        ####################
+        
+        ####################
+        # generate reference sequence and sequence containing the presumed variants
+        realignmentFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2, juncSeq)
+
+        ####################
+        # alignment tumor short reads to the reference and alternative sequences
+        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"])
+
+        ####################
+        # alignment normal short reads to the reference and alternative sequences
+        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"])
+
+        ####################
+        # summarize alignment results
+        tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
+        normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
+
+        # fisher test
+        oddsratio, pvalue = stats.fisher_exact([[tumorRef, tumorAlt], [normalRef, normalAlt]], 'less')
+        if pvalue < 1e-100: pvalue = 1e-100
+        lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
+
+        print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue)])
+
+        print >> sys.stderr, str(num)
+        num = num + 1
+
+    subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
+    subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
+    subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
+    subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+    subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
 
     hIN.close()
     hOUT.close()
