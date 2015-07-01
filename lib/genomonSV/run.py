@@ -6,6 +6,7 @@ import config
 import utils
 import parseFunction
 import filterFunction
+import annotationFunction
 
 def genomonSV_parse(args):
 
@@ -165,6 +166,19 @@ def genomonSV_filt(args):
     filterFunction.filterNumAFFis(outputPrefix + ".junction.clustered.filt6.bedpe", 
                                   outputPrefix + ".junction.clustered.filt7.bedpe",
                                   paramConf["realignmentValidationCondition"])
+
+    annotationFunction.addAnnotation(outputPrefix + ".junction.clustered.filt7.bedpe",
+                                     outputPrefix + ".genomonSV.result.txt",
+                                     paramConf["annotation"])
+
+    if paramConf["debugMode"] == False:
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt1.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt2.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt3.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt4.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt5.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt6.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.filt7.bedpe"])
 
     ####################
 

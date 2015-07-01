@@ -422,9 +422,9 @@ def filterNumAFFis(inputFilePath, outputFilePath, Params):
 
         if int(F[10]) > max_control_read_pair: continue
         if normalAF > max_control_allele_freq: continue
-        if 10**(-float(F[11])) < max_fisher_pvalue: continue
+        if 10**(-float(F[11])) > max_fisher_pvalue: continue
 
-        print '\t'.join(F)
+        print >> hOUT, '\t'.join(F)
 
     hIN.close()
     hOUT.close()
