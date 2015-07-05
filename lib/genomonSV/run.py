@@ -142,12 +142,14 @@ def genomonSV_filt(args):
     ####################
     outputPrefix = sampleConf["target"]["outputDir"] + "/" + sampleConf["target"]["label"]
 
+    utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(outputPrefix + ".junction.clustered.bedpe.gz",
                                         outputPrefix + ".junction.clustered.filt1.bedpe",
                                         paramConf["filterCondition"])
 
 
     if sampleConf["nonMatchedControlPanel"]["use"] == True:
+        utils.processingMessage("filtering by nonmatched control panel")
         filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
                                              outputPrefix + ".junction.clustered.filt2.bedpe",
                                              sampleConf["nonMatchedControlPanel"]["data_path"],
@@ -156,19 +158,22 @@ def genomonSV_filt(args):
     else:
         subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
 
-       
+    utils.processingMessage("incorporating improperly alinged read pair infomation")
     filterFunction.addImproperInfo(outputPrefix + ".junction.clustered.filt2.bedpe",
                                    outputPrefix + ".junction.clustered.filt3.bedpe",
                                    outputPrefix + ".improper.clustered.bedpe.gz")
 
+    utils.processingMessage("filtering by sizes of covered regions, mapping quality and # of support read pairs")
     filterFunction.filterMergedJunc(outputPrefix + ".junction.clustered.filt3.bedpe",
                                     outputPrefix + ".junction.clustered.filt4.bedpe",
                                     paramConf["filterCondition"])
 
+    utils.processingMessage("filtering too close candidates")
     filterFunction.removeClose(outputPrefix + ".junction.clustered.filt4.bedpe",
                                outputPrefix + ".junction.clustered.filt5.bedpe",
                                paramConf["filterCondition"])
 
+    utils.processingMessage("performing realignments")
     filterFunction.validateByRealignment(outputPrefix + ".junction.clustered.filt5.bedpe",
                     outputPrefix + ".junction.clustered.filt6.bedpe",
                     sampleConf["target"]["path_to_bam"],
@@ -176,10 +181,12 @@ def genomonSV_filt(args):
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
                     paramConf["realignmentValidationCondition"])
 
+    utils.processingMessage("filtering allele frequencies, Fisher's exact test p-values and # of support read pairs")
     filterFunction.filterNumAFFis(outputPrefix + ".junction.clustered.filt6.bedpe", 
                                   outputPrefix + ".junction.clustered.filt7.bedpe",
                                   paramConf["realignmentValidationCondition"])
 
+    utils.processingMessage("adding annotation")
     annotationFunction.addAnnotation(outputPrefix + ".junction.clustered.filt7.bedpe",
                                      outputPrefix + ".genomonSV.result.txt",
                                      paramConf["annotation"])
@@ -218,19 +225,23 @@ def genomonSV_merge(args):
         os.remove(outputFilePath + ".temp")
 
     for label in controlConf:
+        utils.processingMessage("extracting information of " + controlConf[label])
         mergeFunction.simplifyJunc(controlConf[label], outputFilePath + ".temp", label)
 
-
+    utils.processingMessage("sorting the aggregated junction file")
     utils.sortBedpe(outputFilePath + ".temp",
                     outputFilePath + ".temp.sort")
 
+    utils.processingMessage("merging the same junction in the aggregated junction file")
     mergeFunction.organizeControl(outputFilePath + ".temp.sort",
                                   outputFilePath + ".temp.merged",
                                   paramConf["controlMergeCondition"])
 
+    utils.processingMessage("sorting the merged junction file")
     utils.sortBedpe(outputFilePath + ".temp.merged",
                     outputFilePath + ".temp.merged.sort")
 
+    utils.processingMessage("compressing the merged junction file")
     utils.compress_index_bed(outputFilePath + ".temp.merged.sort",
                              outputFilePath,
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
