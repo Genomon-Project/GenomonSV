@@ -224,7 +224,7 @@ def genomonSV_merge(args):
         print >> sys.stderr, "Remove existing intermediate file " + outputFilePath + ".temp"
         os.remove(outputFilePath + ".temp")
 
-    for label in controlConf:
+    for label in sorted(controlConf):
         utils.processingMessage("extracting information of " + controlConf[label])
         mergeFunction.simplifyJunc(controlConf[label], outputFilePath + ".temp", label)
 
