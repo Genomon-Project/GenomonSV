@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 
-import sys, argparse, subprocess
+import sys, argparse, subprocess, os
 import config 
 import utils
 import parseFunction
 import filterFunction
+import mergeFunction
 import annotationFunction
 
 def genomonSV_parse(args):
@@ -181,5 +182,50 @@ def genomonSV_filt(args):
         subprocess.call(["rm", outputPrefix + ".junction.clustered.filt7.bedpe"])
 
     ####################
+
+
+def genomonSV_merge(args):
+
+    """
+    script for merging clustered junction data for creating nonmatched normal control data
+    the first input the path for the individual junction list file to be merged.
+    """
+
+    ####################
+    # load config files
+    controlConf = config.control_yaml_config_parse(args.junctionFilePath)
+
+    outputFilePath = args.outputFilePath
+
+    paramConf = config.param_yaml_contig_parse(args.paramInfoFile)
+    ####################
+
+    
+    if os.path.exists(outputFilePath + ".temp"):
+        print >> sys.stderr, "Remove existing intermediate file " + outputFilePath + ".temp"
+        os.remove(outputFilePath + ".temp")
+
+    for label in controlConf:
+        mergeFunction.simplifyJunc(controlConf[label], outputFilePath + ".temp", label)
+
+
+    utils.sortBedpe(outputFilePath + ".temp",
+                    outputFilePath + ".temp.sort")
+
+    mergeFunction.organizeControl(outputFilePath + ".temp.sort",
+                                  outputFilePath + ".temp.merged",
+                                  paramConf["controlMergeCondition"])
+
+    utils.sortBedpe(outputFilePath + ".temp.merged",
+                    outputFilePath + ".temp.merged.sort")
+
+    utils.compress_index_bed(outputFilePath + ".temp.merged.sort",
+                             outputFilePath,
+                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+
+    if paramConf["debugMode"] == False:
+        subprocess.call(["rm", outputFilePath + ".temp"])
+        subprocess.call(["rm", outputFilePath + ".temp.sort"])
+        subprocess.call(["rm", outputFilePath + ".temp.merged"])
 
 

@@ -50,6 +50,9 @@ realignmentValidationCondition:
     max_control_allele_freq: 0.1
     max_fisher_pvalue: 0.1
 
+controlMergeCondition:
+    check_margin_size: 100 # this value should be at least 50 (more than the length of possible inserted sequence between break points)
+   
 annotation:
     gene_bed: /home/yshira/SV/genomonSV/db/refGene.bed.gz
     exon_bed: /home/yshira/SV/genomonSV/db/refExon.bed.gz

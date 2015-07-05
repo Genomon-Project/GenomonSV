@@ -43,6 +43,25 @@ filt_parser.add_argument("paramInfoFile", metavar = "param.yaml", type = str,
 filt_parser.set_defaults(func = genomonSV_filt)
 ####################
 
+
+####################
+# GenomonSV filt
+filt_parser = subparsers.add_parser("merge",
+                                     help = "Merge clustered junction files for filtering")
+
+filt_parser.add_argument("junctionFilePath", metavar = "clusterJunction.txt", type = str,
+                          help = "the pathes for clustered junction files")
+
+filt_parser.add_argument("outputFilePath", metavar = "mergedControl.bedpe.gz", type = str,
+                          help = "the pathes for merged control junction files")
+
+filt_parser.add_argument("paramInfoFile", metavar = "param.yaml", type = str,
+                          help = "parameter information file (yaml format)")
+ 
+filt_parser.set_defaults(func = genomonSV_merge)
+####################
+
+
 args = parser.parse_args()
 
 args.func(args)          

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import yaml
+import yaml, os
 
 def sample_yaml_config_parse(filePath):
 
@@ -29,4 +29,23 @@ def param_yaml_contig_parse(filePath):
     #
     #
     return paramConf
+
+
+
+def control_yaml_config_parse(filePath):
+
+    try:
+        with open(filePath, 'r') as fIN:
+            controlConf = yaml.load(fIN)
+    except yaml.YAMLError, exc:
+        print "Error in sample information file:", exc
+
+    for label in controlConf:
+        
+        # check the exisitence of files
+        if os.path.exists(controlConf[label]) == False:
+            sys.exit(controlConf[label] + " in " + filePath + "does not exists!")
+
+    return controlConf
+
 
