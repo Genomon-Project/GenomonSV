@@ -35,37 +35,44 @@ def genomonSV_parse(args):
     outputPrefix = sampleConf["target"]["outputDir"] + "/" + sampleConf["target"]["label"]
 
     # parse breakpoint containing read pairs from input bam files
+    utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
     parseFunction.parseJunctionFromBam(sampleConf["target"]["path_to_bam"], 
                                        outputPrefix + ".junction.unsort.txt", 
                                        paramConf["parseJunctionCondition"])
 
+    utils.processingMessage("sorting parsed breakpoint containing read pairs")
     utils.sortBedpe(outputPrefix + ".junction.unsort.txt",
                     outputPrefix + ".junction.sort.txt")
 
+    utils.processingMessage("getting start positions of paired-end reads")
     parseFunction.getPairStartPos(outputPrefix + ".junction.sort.txt",
                                   outputPrefix + ".junction.pairStart.bed")
 
+    utils.processingMessage("compressing start position infomation file")
     utils.compress_index_bed(outputPrefix + ".junction.pairStart.bed",
                              outputPrefix + ".junction.pairStart.bed.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
 
-
+    utils.processingMessage("getting covered regions of paired-end reads from bam file")
     parseFunction.getPairCoverRegionFromBam(sampleConf["target"]["path_to_bam"], 
                                             outputPrefix + ".junction.pairCoverage.txt",
                                             outputPrefix + ".junction.pairStart.bed.gz")
 
-
+    utils.processingMessage("adding information of covered regions of paired-end reads")
     parseFunction.addPairCoverRegionFromBam(outputPrefix + ".junction.sort.txt",
                                             outputPrefix + ".junction.sort.withPair.txt",
                                             outputPrefix + ".junction.pairCoverage.txt")
 
+    utils.processingMessage("clustering breakpoint containing read pairs")
     parseFunction.clusterJunction(outputPrefix + ".junction.sort.withPair.txt", 
                                   outputPrefix + ".junction.clustered.bedpe.unsort",
                                   paramConf["clusterJunctionCondition"])
 
+    utils.processingMessage("sorting clustered breakpoint containing read pairs")
     utils.sortBedpe(outputPrefix + ".junction.clustered.bedpe.unsort", outputPrefix + ".junction.clustered.bedpe")
 
+    utils.processingMessage("compressing clustered breakpoint containing read pairs")
     utils.compress_index_bed(outputPrefix + ".junction.clustered.bedpe",
                              outputPrefix + ".junction.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
@@ -82,23 +89,28 @@ def genomonSV_parse(args):
     # improper read pairs
 
     # parse potentially improper read pairs from input bam files
+    utils.processingMessage("parsing improperly aligned read pairs from bam file")
     parseFunction.parseImproperFromBam(sampleConf["target"]["path_to_bam"],
                          outputPrefix + ".improper.unsort.txt",
                          paramConf["parseImproperCondition"])
 
-    # create and organize bedpe file integrating pair information 
+    # create and organize bedpe file integrating pair information
+    utils.processingMessage("sorting improperly aligned read pairs") 
     parseFunction.makeImproperBedpe(outputPrefix + ".improper.unsort.txt",
                                     outputPrefix + ".improper.bedpe",
                                     paramConf["clusterImproperCondition"])
 
     # cluster read pairs possibly representing the same junction
+    utils.processingMessage("clustering improperly aligned read pairs")
     parseFunction.clusterImproperBedpe(outputPrefix + ".improper.bedpe",
                                        outputPrefix + ".improper.clustered.unsort.bedpe",
                                        paramConf["clusterImproperCondition"])
 
+    utils.processingMessage("sorting clustered improperly aligned read pairs")
     utils.sortBedpe(outputPrefix + ".improper.clustered.unsort.bedpe",
                     outputPrefix + ".improper.clustered.bedpe")
 
+    utils.processingMessage("compressing clustered improperly aligned read pairs")
     utils.compress_index_bed(outputPrefix + ".improper.clustered.bedpe",
                              outputPrefix + ".improper.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])

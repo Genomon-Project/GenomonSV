@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, subprocess
+import os, subprocess, logging
 
 def make_directory(inputDir):
     """
@@ -39,4 +39,13 @@ def sortBedpe(inputFile, outputFile):
     hOUT = open(outputFile, "w")
     subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", inputFile], stdout = hOUT)
     hOUT.close()
+
+
+def processingMessage(message):
+
+    FORMAT = '%(asctime)s: %(message)s'
+    logging.basicConfig(format=FORMAT, datefmt='%m/%d/%Y %H:%M:%S', level = logging.INFO)
+    logger = logging.getLogger('genomonSV_log')
+    logger.info(message)
+
 
