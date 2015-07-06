@@ -28,7 +28,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= max_depth: depthFlag = 1
     if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= max_depth: depthFlag = 1
     if depthFlag == 1:
-        print >> sys.stderr, "sequence depth exceeds the threshould for" + ','.join([juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2]) 
+        print >> sys.stderr, "sequence depth exceeds the threshould for: " + ','.join([juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2]) 
         return 1 
 
     hOUT = open(outputFilePath, 'w')

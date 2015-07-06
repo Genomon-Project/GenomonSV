@@ -4,7 +4,7 @@
      functions for filtering candidates of structural variations
 """
 
-import sys, gzip, subprocess, pysam, numpy, math
+import sys, gzip, subprocess, pysam, numpy, math, os
 import coveredRegions
 import realignmentFunction
 from scipy import stats
@@ -364,12 +364,15 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
 
         ####################
         # alignment tumor short reads to the reference and alternative sequences
-        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"])
+        FNULL = open(os.devnull, 'w')
+        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"], 
+                        stdout = FNULL, stderr = subprocess.STDOUT)
 
         ####################
         # alignment normal short reads to the reference and alternative sequences
-        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"])
-
+        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
+                        stdout = FNULL, stderr = subprocess.STDOUT)
+        FNULL.close()
         ####################
         # summarize alignment results
         tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
@@ -382,7 +385,8 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
 
         print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue)])
 
-        print >> sys.stderr, str(num)
+        if num % 100 == 0:        
+            print >> sys.stderr, "finished checking " + str(num) + " candidates"
         num = num + 1
 
     subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
