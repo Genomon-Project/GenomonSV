@@ -27,12 +27,12 @@ def genomonSV_parse(args):
 
     ####################
     # make output directories
-    utils.make_directory(sampleConf["target"]["outputDir"])
+    utils.make_directory(sampleConf["target"]["path_to_output_dir"])
     ####################
 
     
     ####################
-    outputPrefix = sampleConf["target"]["outputDir"] + "/" + sampleConf["target"]["label"]
+    outputPrefix = sampleConf["target"]["path_to_output_dir"] + "/" + sampleConf["target"]["label"]
 
     # parse breakpoint containing read pairs from input bam files
     utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
@@ -140,8 +140,8 @@ def genomonSV_filt(args):
 
  
     ####################
-    outputPrefix = sampleConf["target"]["outputDir"] + "/" + sampleConf["target"]["label"]
-    matchedControlFlag = sampleConf["matchedControl"]["use"]
+    outputPrefix = sampleConf["target"]["path_to_output_dir"] + "/" + sampleConf["target"]["label"]
+    matchedControlFlag = sampleConf["matched_control"]["use"]
 
 
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
@@ -150,12 +150,12 @@ def genomonSV_filt(args):
                                         paramConf["filterCondition"])
 
 
-    if sampleConf["nonMatchedControlPanel"]["use"] == True:
+    if sampleConf["non_matched_control_panel"]["use"] == True:
         utils.processingMessage("filtering by nonmatched control panel")
         filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
                                              outputPrefix + ".junction.clustered.filt2.bedpe",
-                                             sampleConf["nonMatchedControlPanel"]["data_path"],
-                                             sampleConf["nonMatchedControlPanel"]["matchedControl_label"],
+                                             sampleConf["non_matched_control_panel"]["data_path"],
+                                             sampleConf["non_matched_control_panel"]["matched_control_label"],
                                              paramConf["filterCondition"])
     else:
         subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
@@ -179,7 +179,7 @@ def genomonSV_filt(args):
     filterFunction.validateByRealignment(outputPrefix + ".junction.clustered.filt5.bedpe",
                     outputPrefix + ".junction.clustered.filt6.bedpe",
                     sampleConf["target"]["path_to_bam"],
-                    sampleConf["matchedControl"]["path_to_bam"],
+                    sampleConf["matched_control"]["path_to_bam"],
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
                     matchedControlFlag,
                     paramConf["realignmentValidationCondition"])

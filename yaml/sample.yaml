@@ -8,10 +8,10 @@ target:
     path_to_bam: /home/yshira/project/yoshiken_target_SV/results/20150616/20150522_050T/out/bam/050T_markdup.bam
 
     # the path to the output directory where the results will go
-    outputDir: /home/yshira/SV/test/output/050T
+    path_to_output_dir: /home/yshira/SV/test/output/050T
 
 
-matchedControl:
+matched_control:
   
     # whether matched control data is used or not (True or False)
     use: False 
@@ -20,13 +20,13 @@ matchedControl:
     path_to_bam: /home/yshira/SV/data/ATL/Hiseq/ATL23-N/ATL-23N.bam
 
 
-nonMatchedControlPanel:
+non_matched_control_panel:
 
     # whether non-matched control panel is used or not (True or False)
     use: True 
 
     # matched control sample label (typically the name of the control sample)
-    matchedControl_label: dummy 
+    matched_control_label: dummy 
 
     # the path to the non-matched control panel data
     data_path: /home/yshira/SV/data/ATL/Hiseq/control/merged.junction.control.bedpe.gz 
