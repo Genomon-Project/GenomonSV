@@ -141,6 +141,8 @@ def genomonSV_filt(args):
  
     ####################
     outputPrefix = sampleConf["target"]["outputDir"] + "/" + sampleConf["target"]["label"]
+    matchedControlFlag = sampleConf["matchedControl"]["use"]
+
 
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(outputPrefix + ".junction.clustered.bedpe.gz",
@@ -179,11 +181,13 @@ def genomonSV_filt(args):
                     sampleConf["target"]["path_to_bam"],
                     sampleConf["matchedControl"]["path_to_bam"],
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
+                    matchedControlFlag,
                     paramConf["realignmentValidationCondition"])
 
     utils.processingMessage("filtering allele frequencies, Fisher's exact test p-values and # of support read pairs")
     filterFunction.filterNumAFFis(outputPrefix + ".junction.clustered.filt6.bedpe", 
                                   outputPrefix + ".junction.clustered.filt7.bedpe",
+                                  matchedControlFlag,
                                   paramConf["realignmentValidationCondition"])
 
     utils.processingMessage("adding annotation")

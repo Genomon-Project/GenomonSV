@@ -346,7 +346,7 @@ def removeClose(inputFilePath, outputFilePath, Params):
 
 
 
-def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, blat_cmd, Params):
+def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, blat_cmd, matchedControlFlag, Params):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -365,9 +365,10 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         fRet = realignmentFunction.extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
         if fRet == 1: continue
 
-        # extract short reads from matched-control sequence data around the candidate
-        realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
-        if fRet == 1: continue
+        if matchedControlFlag == True:
+            # extract short reads from matched-control sequence data around the candidate
+            fRet = realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+            if fRet == 1: continue
         ####################
         
         ####################
@@ -379,21 +380,29 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         FNULL = open(os.devnull, 'w')
         subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"], 
                         stdout = FNULL, stderr = subprocess.STDOUT)
-
+        
         ####################
         # alignment normal short reads to the reference and alternative sequences
-        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
-                        stdout = FNULL, stderr = subprocess.STDOUT)
+        if matchedControlFlag == True:
+            subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
+                            stdout = FNULL, stderr = subprocess.STDOUT)
+
         FNULL.close()
         ####################
         # summarize alignment results
         tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
-        normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
+
+        normalRef, normalAlt = "---", "---"
+        if matchedControlFlag == True:
+            normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
 
         # fisher test
-        oddsratio, pvalue = stats.fisher_exact([[tumorRef, tumorAlt], [normalRef, normalAlt]], 'less')
-        if pvalue < 1e-100: pvalue = 1e-100
-        lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
+        lpvalue = "---"
+        if matchedControlFlag == True:
+            oddsratio, pvalue = stats.fisher_exact([[tumorRef, tumorAlt], [normalRef, normalAlt]], 'less')
+            if pvalue < 1e-100: pvalue = 1e-100
+            lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
+            lpvalue = str(round(lpvalue, 4)) 
 
         print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue)])
 
@@ -402,17 +411,19 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         num = num + 1
 
     subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
-    subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
     subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
     subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
-    subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+
+    if matchedControlFlag == True:
+        subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
+        subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
 
     hIN.close()
     hOUT.close()
 
 
 
-def filterNumAFFis(inputFilePath, outputFilePath, Params):
+def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -427,20 +438,25 @@ def filterNumAFFis(inputFilePath, outputFilePath, Params):
     for line in hIN:
         F = line.rstrip('\n').split('\t')
 
-        tumorAF = 0
+        tumorAF = 0 
         if float(F[7]) + float(F[8]) > 0: tumorAF = float(F[8]) / (float(F[7]) + float(F[8]))     
+        tumorAF = str(round(tumorAF, 4))
 
-        normalAF = 0
-        if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
-    
+        normalAF = "---"
+        if matchedControlFlag == True:
+            normalAF = 0
+            if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
+            normalAF = str(round(normalAF, 4))
+
         if int(F[8]) < min_tumor_read_pair: continue
-        if tumorAF < min_tumor_alleleFreq: continue
+        if float(tumorAF) < min_tumor_alleleFreq: continue
 
-        if int(F[10]) > max_control_read_pair: continue
-        if normalAF > max_control_allele_freq: continue
-        if 10**(-float(F[11])) > max_fisher_pvalue: continue
+        if matchedControlFlag == True:
+            if int(F[10]) > max_control_read_pair: continue
+            if float(normalAF) > max_control_allele_freq: continue
+            if 10**(-float(F[11])) > max_fisher_pvalue: continue
 
-        print >> hOUT, '\t'.join(F)
+        print >> hOUT, '\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + F[11]
 
     hIN.close()
     hOUT.close()

@@ -5,7 +5,7 @@ software:
     blat: /usr/local/bin/blat
     blat_option: -stepSize=5 -repMatch=2253
 
-debugMode: False
+debugMode: False 
 
 parseJunctionCondition:
     abnormal_insert_size: 1000 # the size of abnormal insert size. used for checking the consistency of paired read of breakpoint containing reads

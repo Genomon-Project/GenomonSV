@@ -17,10 +17,10 @@ def addAnnotation(inputFilePath, outputFilePath, Params):
 
         F = line.rstrip('\n').split('\t')
 
-        tumorAF = 0
-        if float(F[7]) + float(F[8]) > 0: tumorAF = float(F[8]) / (float(F[7]) + float(F[8]))
-        normalAF = 0
-        if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
+        # tumorAF = 0
+        # if float(F[7]) + float(F[8]) > 0: tumorAF = float(F[8]) / (float(F[7]) + float(F[8]))
+        # normalAF = 0
+        # if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
 
         ##########
         # check gene annotation for the side 1  
@@ -108,7 +108,9 @@ def addAnnotation(inputFilePath, outputFilePath, Params):
             SVtype = "inversion"
 
         print >> hOUT, '\t'.join(F[0:7]) + '\t' + SVtype + '\t' + ';'.join(gene1) + '\t' + ';'.join(gene2) + '\t' + ';'.join(exon1) + '\t' + ';'.join(exon2) + '\t' + \
-              '\t'.join(F[7:11]) + '\t' + str(round(tumorAF, 4)) + '\t' + str(round(normalAF, 4)) + '\t' + str(round(float(F[11]), 4))
+                       '\t'.join(F[7:]) 
+#               '\t'.join(F[7:11]) + '\t' + str(round(tumorAF, 4)) + '\t' + str(round(normalAF, 4)) + '\t' + str(round(float(F[11]), 4))
+
 
 
     hIN.close()
