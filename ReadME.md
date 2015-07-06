@@ -20,6 +20,8 @@ tabix, bgzip, blat
 ## Install
 
 ```
+git clone https://github.com/friend1ws/genomonSV.git
+cd genomonSV
 python setup.py build
 python setup.py install
 ```
@@ -32,6 +34,7 @@ Then, two types of configuration files (in yaml format) should be prepared.
 
 1. sample.yaml
 2. param.yaml
+3. control.yaml
 
 See sample files for description of each parameters.
 
@@ -43,7 +46,14 @@ See sample files for description of each parameters.
 GenomonSV parse sample.yaml param.yaml
 ```
 
-2. Filtering and annotating candidate somatic structural variations
+2. Merging non-matched control panel breakpoint-containing read pairs
+(for later filtering).
+
+```
+GenomonSV merge control.yaml mergedControl.bedpe.gz param.yaml                                        
+```
+
+3. Filtering and annotating candidate somatic structural variations
 
 ```
 GenomonSV filt sample.yaml param.yaml

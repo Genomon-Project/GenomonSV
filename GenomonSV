@@ -49,7 +49,7 @@ filt_parser.set_defaults(func = genomonSV_filt)
 filt_parser = subparsers.add_parser("merge",
                                      help = "Merge clustered junction files for filtering")
 
-filt_parser.add_argument("junctionFilePath", metavar = "clusterJunction.txt", type = str,
+filt_parser.add_argument("controlPathInfoFile", metavar = "control.yaml", type = str,
                           help = "the pathes for clustered junction files")
 
 filt_parser.add_argument("outputFilePath", metavar = "mergedControl.bedpe.gz", type = str,
