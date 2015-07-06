@@ -14,7 +14,7 @@ target:
 matched_control:
   
     # whether matched control data is used or not (True or False)
-    use: False 
+    use: True 
 
     # the path to the matched control bam file
     path_to_bam: /home/yshira/SV/data/ATL/Hiseq/ATL23-N/ATL-23N.bam

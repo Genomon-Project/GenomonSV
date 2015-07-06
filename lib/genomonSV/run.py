@@ -38,7 +38,7 @@ def genomonSV_parse(args):
     utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
     parseFunction.parseJunctionFromBam(sampleConf["target"]["path_to_bam"], 
                                        outputPrefix + ".junction.unsort.txt", 
-                                       paramConf["parseJunctionCondition"])
+                                       paramConf["parse_junction_condition"])
 
     utils.processingMessage("sorting parsed breakpoint containing read pairs")
     utils.sortBedpe(outputPrefix + ".junction.unsort.txt",
@@ -67,7 +67,7 @@ def genomonSV_parse(args):
     utils.processingMessage("clustering breakpoint containing read pairs")
     parseFunction.clusterJunction(outputPrefix + ".junction.sort.withPair.txt", 
                                   outputPrefix + ".junction.clustered.bedpe.unsort",
-                                  paramConf["clusterJunctionCondition"])
+                                  paramConf["cluster_junction_condition"])
 
     utils.processingMessage("sorting clustered breakpoint containing read pairs")
     utils.sortBedpe(outputPrefix + ".junction.clustered.bedpe.unsort", outputPrefix + ".junction.clustered.bedpe")
@@ -77,7 +77,7 @@ def genomonSV_parse(args):
                              outputPrefix + ".junction.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
-    if paramConf["debugMode"] == False:
+    if paramConf["debug_mode"] == False:
         subprocess.call(["rm", outputPrefix + ".junction.unsort.txt"])
         subprocess.call(["rm", outputPrefix + ".junction.sort.txt"])
         subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed.gz"])
@@ -92,19 +92,19 @@ def genomonSV_parse(args):
     utils.processingMessage("parsing improperly aligned read pairs from bam file")
     parseFunction.parseImproperFromBam(sampleConf["target"]["path_to_bam"],
                          outputPrefix + ".improper.unsort.txt",
-                         paramConf["parseImproperCondition"])
+                         paramConf["parse_improper_condition"])
 
     # create and organize bedpe file integrating pair information
     utils.processingMessage("sorting improperly aligned read pairs") 
     parseFunction.makeImproperBedpe(outputPrefix + ".improper.unsort.txt",
                                     outputPrefix + ".improper.bedpe",
-                                    paramConf["clusterImproperCondition"])
+                                    paramConf["cluster_improper_condition"])
 
     # cluster read pairs possibly representing the same junction
     utils.processingMessage("clustering improperly aligned read pairs")
     parseFunction.clusterImproperBedpe(outputPrefix + ".improper.bedpe",
                                        outputPrefix + ".improper.clustered.unsort.bedpe",
-                                       paramConf["clusterImproperCondition"])
+                                       paramConf["cluster_improper_condition"])
 
     utils.processingMessage("sorting clustered improperly aligned read pairs")
     utils.sortBedpe(outputPrefix + ".improper.clustered.unsort.bedpe",
@@ -115,7 +115,7 @@ def genomonSV_parse(args):
                              outputPrefix + ".improper.clustered.bedpe.gz",
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
-    if paramConf["debugMode"] == False:
+    if paramConf["debug_mode"] == False:
         subprocess.call(["rm", outputPrefix + ".improper.unsort.txt"])
         subprocess.call(["rm", outputPrefix + ".improper.bedpe"])
         subprocess.call(["rm", outputPrefix + ".improper.clustered.unsort.bedpe"])
@@ -147,7 +147,7 @@ def genomonSV_filt(args):
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(outputPrefix + ".junction.clustered.bedpe.gz",
                                         outputPrefix + ".junction.clustered.filt1.bedpe",
-                                        paramConf["filterCondition"])
+                                        paramConf["filter_condition"])
 
 
     if sampleConf["non_matched_control_panel"]["use"] == True:
@@ -156,7 +156,7 @@ def genomonSV_filt(args):
                                              outputPrefix + ".junction.clustered.filt2.bedpe",
                                              sampleConf["non_matched_control_panel"]["data_path"],
                                              sampleConf["non_matched_control_panel"]["matched_control_label"],
-                                             paramConf["filterCondition"])
+                                             paramConf["filter_condition"])
     else:
         subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
 
@@ -168,12 +168,12 @@ def genomonSV_filt(args):
     utils.processingMessage("filtering by sizes of covered regions, mapping quality and # of support read pairs")
     filterFunction.filterMergedJunc(outputPrefix + ".junction.clustered.filt3.bedpe",
                                     outputPrefix + ".junction.clustered.filt4.bedpe",
-                                    paramConf["filterCondition"])
+                                    paramConf["filter_condition"])
 
     utils.processingMessage("filtering too close candidates")
     filterFunction.removeClose(outputPrefix + ".junction.clustered.filt4.bedpe",
                                outputPrefix + ".junction.clustered.filt5.bedpe",
-                               paramConf["filterCondition"])
+                               paramConf["filter_condition"])
 
     utils.processingMessage("performing realignments")
     filterFunction.validateByRealignment(outputPrefix + ".junction.clustered.filt5.bedpe",
@@ -182,20 +182,20 @@ def genomonSV_filt(args):
                     sampleConf["matched_control"]["path_to_bam"],
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
                     matchedControlFlag,
-                    paramConf["realignmentValidationCondition"])
+                    paramConf["realignment_validation_condition"])
 
     utils.processingMessage("filtering allele frequencies, Fisher's exact test p-values and # of support read pairs")
     filterFunction.filterNumAFFis(outputPrefix + ".junction.clustered.filt6.bedpe", 
                                   outputPrefix + ".junction.clustered.filt7.bedpe",
                                   matchedControlFlag,
-                                  paramConf["realignmentValidationCondition"])
+                                  paramConf["realignment_validation_condition"])
 
     utils.processingMessage("adding annotation")
     annotationFunction.addAnnotation(outputPrefix + ".junction.clustered.filt7.bedpe",
                                      outputPrefix + ".genomonSV.result.txt",
                                      paramConf["annotation"])
 
-    if paramConf["debugMode"] == False:
+    if paramConf["debug_mode"] == False:
         subprocess.call(["rm", outputPrefix + ".junction.clustered.filt1.bedpe"])
         subprocess.call(["rm", outputPrefix + ".junction.clustered.filt2.bedpe"])
         subprocess.call(["rm", outputPrefix + ".junction.clustered.filt3.bedpe"])
@@ -239,7 +239,7 @@ def genomonSV_merge(args):
     utils.processingMessage("merging the same junction in the aggregated junction file")
     mergeFunction.organizeControl(outputFilePath + ".temp.sort",
                                   outputFilePath + ".temp.merged",
-                                  paramConf["controlMergeCondition"])
+                                  paramConf["control_merge_condition"])
 
     utils.processingMessage("sorting the merged junction file")
     utils.sortBedpe(outputFilePath + ".temp.merged",
@@ -250,7 +250,7 @@ def genomonSV_merge(args):
                              outputFilePath,
                              paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
 
-    if paramConf["debugMode"] == False:
+    if paramConf["debug_mode"] == False:
         subprocess.call(["rm", outputFilePath + ".temp"])
         subprocess.call(["rm", outputFilePath + ".temp.sort"])
         subprocess.call(["rm", outputFilePath + ".temp.merged"])

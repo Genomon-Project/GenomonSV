@@ -5,27 +5,27 @@ software:
     blat: /usr/local/bin/blat
     blat_option: -stepSize=5 -repMatch=2253
 
-debugMode: False 
+debug_mode: False 
 
-parseJunctionCondition:
+parse_junction_condition:
     abnormal_insert_size: 1000 # the size of abnormal insert size. used for checking the consistency of paired read of breakpoint containing reads
     min_major_clip_size: 20 # the minimum base of clipped bases for junction reads
     max_minor_clip_size: 15 # if the clipped bases of both sides are greater than this value, filter that read
 
-clusterJunctionCondition:
+cluster_junction_condition:
     check_margin_size: 1000 # this value should be at least 1000. but very large value will lead to slow computation..
 
-parseImproperCondition:
+parse_improper_condition:
     abnormal_insert_size: 2000 # the size of abnormal insert size used for identifying improper read pairs
     min_mapping_qual: 30 # the threshould of mapping quality for each read of the improper read pair
     soft_clip_thres: 5 # the threshould of maximum clipping size of reads of improper read pairs
 
-clusterImproperCondition:
+cluster_improper_condition:
     junction_dist_margin: 500 # possible junction position margin from the junction direction
     clipping_margin: 30 # possible junction position in the opposite side
     check_margin_size: 1500 # This should be sufficiently greater than insert size. But the computational time will increase when too large
 
-filterCondition:
+filter_condition:
     junc_num_thres: 3 # the threshould of supporting junction read pairs
     SV_size_thres: 10 # the threshould of minimum structural variation sizes
     controlPanel_num_thres: 3 # the threshould of supporting junction read pairs for non-matched normal control
@@ -36,7 +36,7 @@ filterCondition:
     close_check_margin: 25
     close_check_thres: 2
 
-realignmentValidationCondition:
+realignment_validation_condition:
     max_depth: 5000
     search_length: 1000
     search_margin: 5
@@ -50,7 +50,7 @@ realignmentValidationCondition:
     max_control_allele_freq: 0.1
     max_fisher_pvalue: 0.1
 
-controlMergeCondition:
+control_merge_condition:
     check_margin_size: 100 # this value should be at least 50 (more than the length of possible inserted sequence between break points)
    
 annotation:
