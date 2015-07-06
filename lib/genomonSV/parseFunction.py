@@ -341,6 +341,7 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
     tempPos = 0
     checkPositionMargin = 10000000
 
+    tabixErrorMsg = ""
     for read in bamfile.fetch():
 
         # when into new regions, fetch the keys from the tabix indexed file
@@ -354,7 +355,8 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
             try:
                 records = tabixfile.fetch(tempChr, tempPos, tempPos + checkPositionMargin)
             except Exception as inst:
-                print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                tabixErrorMsg = inst.args 
                 tabixErrorFlag = 1
 
             if tabixErrorFlag == 0:
@@ -377,6 +379,9 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
         if seqID in ID2info:
             print >> hOUT, ID2info[seqID] + "\t" + bamfile.getrname(read.tid) + ":" + str(read.pos + 1) + "-" + str(read.aend) + "\t" + str(read.mapq)
 
+
+    if tabixErrorMsg != "":
+        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + str(tabixErrorMsg))
 
     bamfile.close()
     tabixfile.close()

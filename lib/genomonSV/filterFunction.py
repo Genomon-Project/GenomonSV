@@ -7,6 +7,7 @@
 import sys, gzip, subprocess, pysam, numpy, math, os
 import coveredRegions
 import realignmentFunction
+import utils
 from scipy import stats
 
 def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
@@ -64,7 +65,8 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
     controlPanel_num_thres = Params["controlPanel_num_thres"]
     controlPanel_check_margin = Params["controlPanel_check_margin"]
 
-    
+   
+    tabixErrorMsg = "" 
     for line in hIN:
         F = line.rstrip('\n').split('\t')
 
@@ -78,7 +80,8 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
         try:
             records = tabixfile.fetch(F[0], int(F[1]) - controlPanel_check_margin, int(F[2]) + controlPanel_check_margin)
         except Exception as inst:
-            print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+            # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+            tabixErrorMsg = inst.args
             tabixErrorFlag = 1
         ####################
 
@@ -115,6 +118,9 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
         if controlFlag == 0:
             print >> hOUT, "\t".join(F)
 
+    if tabixErrorMsg != "":
+        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
+
     hIN.close()
     hOUT.close()
     tabixfile.close()
@@ -130,6 +136,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
     hOUT = open(outputFilePath, 'w')
     tabixfile = pysam.TabixFile(improperFilePath)
 
+    tabixErrorMsg = ""
     for line in hIN:
         F = line.rstrip('\n').split('\t')
 
@@ -142,7 +149,8 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
         try:
             records = tabixfile.fetch(F[0], int(F[1]) - -1, int(F[2]) + 1)
         except Exception as inst:
-            print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+            # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+            tabixErrorMsg = inst.args
             tabixErrorFlag = 1
 
 
@@ -157,6 +165,10 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
     
 
         print >> hOUT, "\t".join(F) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions
+
+    if tabixErrorMsg != "":
+        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + str(tabixErrorMsg))
+
 
     hIN.close()
     hOUT.close()

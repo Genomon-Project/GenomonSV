@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, subprocess, logging
+import sys, os, subprocess, logging
 
 def make_directory(inputDir):
     """
@@ -49,3 +49,8 @@ def processingMessage(message):
     logger.info(message)
 
 
+def warningMessage(message):
+
+    # logger = logging.getLogger('genomonSV_log')
+    # logger.warning(message)
+    print >> sys.stderr, message
