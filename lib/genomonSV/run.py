@@ -18,10 +18,10 @@ def genomonSV_parse(args):
     ####################
     # load config files
     global sampleConf
-    sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile)
+    sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile, "parse")
 
     global paramConf
-    paramConf = config.param_yaml_contig_parse(args.paramInfoFile)
+    paramConf = config.param_yaml_contig_parse(args.paramInfoFile, "parse")
     ####################
 
 
@@ -128,10 +128,10 @@ def genomonSV_filt(args):
     ####################
     # load config files
     global sampleConf
-    sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile)
+    sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile, "filt")
 
     global paramConf
-    paramConf = config.param_yaml_contig_parse(args.paramInfoFile)
+    paramConf = config.param_yaml_contig_parse(args.paramInfoFile, "filt")
     ####################
 
 
@@ -220,7 +220,7 @@ def genomonSV_merge(args):
 
     outputFilePath = args.outputFilePath
 
-    paramConf = config.param_yaml_contig_parse(args.paramInfoFile)
+    paramConf = config.param_yaml_contig_parse(args.paramInfoFile, "merge")
     ####################
 
     

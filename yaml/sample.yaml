@@ -5,7 +5,7 @@ target:
     label: 050T
 
     # the path to the target bam file you want to parse
-    path_to_bam: home/yshira/project/yoshiken_target_SV/results/20150616/20150522_050T/out/bam/050T_markdup.bam
+    path_to_bam: /home/yshira/project/yoshiken_target_SV/results/20150616/20150522_050T/out/bam/050T_markdup.bam
 
     # the path to the output directory where the results will go
     path_to_output_dir: /home/yshira/SV/test/output/050T
