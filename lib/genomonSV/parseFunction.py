@@ -356,7 +356,7 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
                 records = tabixfile.fetch(tempChr, tempPos, tempPos + checkPositionMargin)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
-                tabixErrorMsg = inst.args 
+                tabixErrorMsg = str(inst.args) 
                 tabixErrorFlag = 1
 
             if tabixErrorFlag == 0:
@@ -381,7 +381,7 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
 
 
     if tabixErrorMsg != "":
-        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + str(tabixErrorMsg))
+        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
 
     bamfile.close()
     tabixfile.close()

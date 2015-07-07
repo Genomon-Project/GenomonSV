@@ -34,7 +34,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     hOUT = open(outputFilePath, 'w')
 
     readID2exist = {}    
-    for read in bamfile.fetch(juncChr1, int(juncPos1) - search_length, int(juncPos1) + search_length):
+    for read in bamfile.fetch(juncChr1, max(0, int(juncPos1) - search_length), int(juncPos1) + search_length):
 
         # get the flag information
         flags = format(int(read.flag), "#014b")[:1:-1]
@@ -75,7 +75,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
                 readID2exist[read.qname] = 1
 
 
-    for read in bamfile.fetch(juncChr2, int(juncPos2) - search_length, int(juncPos2) + search_length):
+    for read in bamfile.fetch(juncChr2, max(0, int(juncPos2) - search_length), int(juncPos2) + search_length):
         
         if read.qname == "ST-E00104:162:H03UUALXX:5:1222:21168:16006":
             pass
@@ -122,7 +122,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     readID2seq1 = {}
     readID2seq2 = {}
     complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
-    for read in bamfile.fetch(juncChr1, int(juncPos1) - search_length, int(juncPos1) + search_length):
+    for read in bamfile.fetch(juncChr1, max(0, int(juncPos1) - search_length), int(juncPos1) + search_length):
 
         if read.qname in readID2exist:
         
@@ -151,7 +151,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
                 readID2seq2[read.qname] = tempSeq
 
 
-    for read in bamfile.fetch(juncChr2, int(juncPos2) - search_length, int(juncPos2) + search_length):
+    for read in bamfile.fetch(juncChr2, max(0, int(juncPos2) - search_length), int(juncPos2) + search_length):
 
         if read.qname in readID2exist:
 

@@ -81,7 +81,7 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
             records = tabixfile.fetch(F[0], int(F[1]) - controlPanel_check_margin, int(F[2]) + controlPanel_check_margin)
         except Exception as inst:
             # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
-            tabixErrorMsg = inst.args
+            tabixErrorMsg = str(inst.args)
             tabixErrorFlag = 1
         ####################
 
@@ -150,7 +150,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
             records = tabixfile.fetch(F[0], int(F[1]) - -1, int(F[2]) + 1)
         except Exception as inst:
             # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
-            tabixErrorMsg = inst.args
+            tabixErrorMsg = str(inst.args)
             tabixErrorFlag = 1
 
 
@@ -167,7 +167,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
         print >> hOUT, "\t".join(F) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions
 
     if tabixErrorMsg != "":
-        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + str(tabixErrorMsg))
+        utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
 
 
     hIN.close()
@@ -410,13 +410,15 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
             print >> sys.stderr, "finished checking " + str(num) + " candidates"
         num = num + 1
 
-    subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
-    subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
-    subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+    
+    if num > 1:
+        subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
+        subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
+        subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
 
-    if matchedControlFlag == True:
-        subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
-        subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+        if matchedControlFlag == True:
+            subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
+            subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
 
     hIN.close()
     hOUT.close()
@@ -448,13 +450,13 @@ def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
             if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
             normalAF = str(round(normalAF, 4))
 
-        if int(F[8]) < min_tumor_read_pair: continue
-        if float(tumorAF) < min_tumor_alleleFreq: continue
+        if int(F[8]) < int(min_tumor_read_pair): continue
+        if float(tumorAF) < float(min_tumor_alleleFreq): continue
 
         if matchedControlFlag == True:
-            if int(F[10]) > max_control_read_pair: continue
-            if float(normalAF) > max_control_allele_freq: continue
-            if 10**(-float(F[11])) > max_fisher_pvalue: continue
+            if int(F[10]) > int(max_control_read_pair): continue
+            if float(normalAF) > float(max_control_allele_freq): continue
+            if 10**(-float(F[11])) > float(max_fisher_pvalue): continue
 
         print >> hOUT, '\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + F[11]
 
