@@ -216,7 +216,7 @@ def genomonSV_merge(args):
 
     ####################
     # load config files
-    controlConf = config.control_yaml_config_parse(args.junctionFilePath)
+    controlConf = config.control_yaml_config_parse(args.controlPathInfoFile)
 
     outputFilePath = args.outputFilePath
 
