@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import pysam
+import sys, pysam
 
 def addAnnotation(inputFilePath, outputFilePath, Params):
 
