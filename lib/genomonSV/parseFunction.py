@@ -23,7 +23,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
     bamfile = pysam.Samfile(inputBAM, "rb")
     hOUT = open(outputFilePath, "w")
  
-    SAre = re.compile('(\w+),(\d+),([\-\+]),(\w+),(\d+)')
+    SAre = re.compile('(\S+),(\d+),([\-\+]),(\w+),(\d+)')
     cigarMDRe = re.compile('(\d+)([MD])')
     cigarHIMSRe = re.compile('(\d+)([HIMS])')
     cigarHSRe_right = re.compile('(\d+)([HS])$')

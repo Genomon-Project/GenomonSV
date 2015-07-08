@@ -2,7 +2,7 @@
 
 import re
 
-regionRe = re.compile('(\w+):(\d+)\-(\d+)')
+regionRe = re.compile('(\S+):(\d+)\-(\d+)')
 
 
 class coveredRegions(object):
