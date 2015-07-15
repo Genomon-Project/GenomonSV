@@ -16,7 +16,7 @@ software:
 
 
 # debug_mode is boolean key (True or False). When True, many intermediate files are remained for debugging.
-debug_mode: False 
+debug_mode: True 
 
 
 # parse_junction_condition is the parent key for parameters used for parsing breakpoint containing read pairs from bam files
@@ -128,7 +128,7 @@ realignment_validation_condition:
     min_tumor_alleleFreq: 0.01
 
     # the maximum allowed number of read pairs in normal sample
-    max_control_read_pair: 
+    max_control_read_pair: 1 
 
     # the maximum allowed allele frequency of normal sample
     max_control_allele_freq: 0.1

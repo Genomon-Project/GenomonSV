@@ -23,7 +23,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
     bamfile = pysam.Samfile(inputBAM, "rb")
     hOUT = open(outputFilePath, "w")
  
-    SAre = re.compile('(\S+),(\d+),([\-\+]),(\w+),(\d+)')
+    SAre = re.compile('([^ \t\n\r\f\v,]+),(\d+),([\-\+]),(\w+),(\d+),(\d+);')
     cigarMDRe = re.compile('(\d+)([MD])')
     cigarHIMSRe = re.compile('(\d+)([HIMS])')
     cigarHSRe_right = re.compile('(\d+)([HS])$')
@@ -284,7 +284,7 @@ def getPairStartPos(inputFilePath, outputFilePath):
     hOUT = open(outputFilePath + ".tmp", 'w')
     num = 1
 
-    reChrPos = re.compile('^(\S+):(\d+)')
+    reChrPos = re.compile('^([^ \t\n\r\f\v,]+):(\d+)')
     for line in hIN:
         F = line.rstrip('\n').split('\t')
         ID = F[6]
