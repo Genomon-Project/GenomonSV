@@ -16,7 +16,7 @@ software:
 
 
 # debug_mode is boolean key (True or False). When True, many intermediate files are remained for debugging.
-debug_mode: True 
+debug_mode: False 
 
 
 # parse_junction_condition is the parent key for parameters used for parsing breakpoint containing read pairs from bam files

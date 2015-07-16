@@ -85,6 +85,9 @@ def genomonSV_parse(args):
         subprocess.call(["rm", outputPrefix + ".junction.sort.withPair.txt"])
         subprocess.call(["rm", outputPrefix + ".junction.pairCoverage.txt"])
         subprocess.call(["rm", outputPrefix + ".junction.clustered.bedpe.unsort"])
+        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed"])
+        subprocess.call(["rm", outputPrefix + ".junction.clustered.bedpe"])
+ 
     ####################
     # improper read pairs
 
@@ -119,6 +122,8 @@ def genomonSV_parse(args):
         subprocess.call(["rm", outputPrefix + ".improper.unsort.txt"])
         subprocess.call(["rm", outputPrefix + ".improper.bedpe"])
         subprocess.call(["rm", outputPrefix + ".improper.clustered.unsort.bedpe"])
+        subprocess.call(["rm", outputPrefix + ".improper.clustered.bedpe"])
+
     ####################
 
 
