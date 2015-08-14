@@ -56,7 +56,7 @@ def sample_yaml_config_parse(filePath, method):
         if not isinstance(sampleConf["non_matched_control_panel"]["use"], bool):
             raise ValueError('The key non_matched_control_panel->use should be boolean (True or False). Please confirm sample.yaml config file.')
 
-        if sampleConf["matched_control"]["use"] == True:
+        if sampleConf["non_matched_control_panel"]["use"] == True:
             if not "matched_control_label" in sampleConf["non_matched_control_panel"]:
                 raise ValueError('No key: non_matched_control_panel->data_path. Please confirm sample.yaml config file.')
 
