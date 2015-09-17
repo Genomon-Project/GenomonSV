@@ -4,7 +4,7 @@
     functions for parsing breakpoint containing read pairs and improperly aligned read pairs
 """
 
-import sys, pysam, re, subprocess, collections, Bio.Seq
+import sys, pysam, re, subprocess, collections
 import utils
 
 def parseJunctionFromBam(inputBAM, outputFilePath, Params):
@@ -515,7 +515,8 @@ def clusterJunction(inputFilePath, outputFilePath, Params):
                         # check whether the inserted sequence should be reverse-complemented 
                         tinseq = F[7]
                         if F[7] != "---" and F[8] == F[9] and F[15] == "2":
-                            tinseq = str(Bio.Seq.Seq(F[7]).reverse_complement())
+                            # tinseq = str(Bio.Seq.Seq(F[7]).reverse_complement())
+                            tinseq = utils.reverseComplement(F[7])
 
                         mergedJunction[key] = mergedJunction[key] + ";" + ','.join([F[0], F[2], F[8], F[3], F[5], F[9], tinseq])
 
@@ -531,7 +532,8 @@ def clusterJunction(inputFilePath, outputFilePath, Params):
             # check whether the inserted sequence should be reverse-complemented
             tinseq = F[7] 
             if F[7] != "---" and F[8] == F[9] and F[15] == "2":
-                tinseq = str(Bio.Seq.Seq(F[7]).reverse_complement())
+                # tinseq = str(Bio.Seq.Seq(F[7]).reverse_complement())
+                tinseq = utils.reverseComplement(F[7])
 
             mergedJunction[newKey] = ','.join([F[0], F[2], F[8], F[3], F[5], F[9], tinseq])
 

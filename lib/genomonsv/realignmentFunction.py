@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys, pysam
+import utils
 
 def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2):
 
@@ -140,7 +141,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
 
             tempSeq = ""
             if flags[4] == "1":
-                tempSeq = "".join(complement.get(base) for base in reversed(str(read.seq)))
+                tempSeq = utils.reverseComplement(str(read.seq))
             else:
                 tempSeq = read.seq
  
@@ -169,7 +170,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
 
             tempSeq = ""
             if flags[4] == "1":
-                tempSeq = "".join(complement.get(base) for base in reversed(str(read.seq)))
+                tempSeq = utils.reverseComplement(str(read.seq))
             else:
                 tempSeq = read.seq
 
@@ -210,7 +211,6 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
 
     hOUT = open(outputFilePath, 'w')
 
-    complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N'}
     if juncSeq == "---": juncSeq = ""
 
     # for mid-range deletion or tandem duplication
@@ -288,7 +288,7 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
             for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
-            tseq = "".join(complement.get(base) for base in reversed(tseq))
+            tseq = utils.reverseComplement(tseq)
 
         seq = tseq + juncSeq
 
@@ -302,7 +302,7 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
             for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
-            tseq = "".join(complement.get(base) for base in reversed(tseq))
+            tseq = utils.reverseComplement(tseq)
 
         seq = seq + tseq
 
