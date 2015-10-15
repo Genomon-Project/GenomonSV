@@ -147,7 +147,7 @@ def genomonSV_filt(args):
     ####################
     outputPrefix = sampleConf["target"]["path_to_output_dir"] + "/" + sampleConf["target"]["label"]
     matchedControlFlag = sampleConf["matched_control"]["use"]
-
+    matchedControlBam = sampleConf["matched_control"]["path_to_bam"] if matchedControlFlag == True else None
 
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(outputPrefix + ".junction.clustered.bedpe.gz",
@@ -184,7 +184,7 @@ def genomonSV_filt(args):
     filterFunction.validateByRealignment(outputPrefix + ".junction.clustered.filt5.bedpe",
                     outputPrefix + ".junction.clustered.filt6.bedpe",
                     sampleConf["target"]["path_to_bam"],
-                    sampleConf["matched_control"]["path_to_bam"],
+                    matchedControlBam,
                     paramConf["software"]["blat"] + " " + paramConf["software"]["blat_option"],
                     matchedControlFlag,
                     paramConf["realignment_validation_condition"])
@@ -259,5 +259,5 @@ def genomonSV_merge(args):
         subprocess.call(["rm", outputFilePath + ".temp"])
         subprocess.call(["rm", outputFilePath + ".temp.sort"])
         subprocess.call(["rm", outputFilePath + ".temp.merged"])
-
+        subprocess.call(["rm", outputFilePath + ".temp.merged.sort"])
 
