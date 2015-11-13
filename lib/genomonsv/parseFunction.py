@@ -411,10 +411,15 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
 
     line1 = hOriginalFile.readline().rstrip('\n')
     line2 = hPairInfoFile.readline().rstrip('\n')
+    tempID2 = ""
     for line2 in hPairInfoFile:
         F2 = line2.rstrip('\n').split('\t')
         ID2 = F2[3]
         ID2 = re.sub(r'/\d$', '', ID2)
+
+        # treatment for the case of duplicated fastq ID (2015/11/13)
+        if ID2 == tempID2: continue
+        tempID2 = ID2
 
         line1 = hOriginalFile.readline()
         F1 = line1.rstrip('\n').split('\t')
