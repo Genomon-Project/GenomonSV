@@ -75,9 +75,9 @@ GenomonSV filt sample.yaml param.yaml
 1. exon overlapping the 2nd breakpoint
 1. #read_pairs not supporting the variant (reference read pairs) for the tumor sample
 1. #read_pairs supporting the variant (variant read paris) for the tumor sample
+1. frequency of variant read pairs for the tumor sample 
 1. #read_pairs not supporting the variant for the matched control sample
 1. #read_pairs supporting the variant for the matched control sample
-1. frequency of variant read pairs for the tumor sample 
 1. frequency of variant read pairs for the matched control sample 
 1. p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
 
