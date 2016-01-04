@@ -410,8 +410,13 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
     hOUT = open(outputFilePath, 'w')
 
     line1 = hOriginalFile.readline().rstrip('\n')
-    line2 = hPairInfoFile.readline().rstrip('\n')
+    F1 = line1.rstrip('\n').split('\t')
+    ID1 = F1[6]
+    ID1 = re.sub(r'/\d$', '', ID1)
+    tempID1 = ID1
+
     tempID2 = ""
+    endFlag = 0
     for line2 in hPairInfoFile:
         F2 = line2.rstrip('\n').split('\t')
         ID2 = F2[3]
@@ -421,18 +426,24 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
         if ID2 == tempID2: continue
         tempID2 = ID2
 
-        line1 = hOriginalFile.readline()
-        F1 = line1.rstrip('\n').split('\t')
-        ID1 = F1[6]
-        ID1 = re.sub(r'/\d$', '', ID1)
-        
         while ID1 != ID2:
-            print >> sys.stderr, "No pair information for %s" % ID1
+
             line1 = hOriginalFile.readline()
+            if line1  == '':
+                endFlag = 1
+                break
+
             F1 = line1.rstrip('\n').split('\t')
             ID1 = F1[6]
             ID1 = re.sub(r'/\d$', '', ID1)
-        
+            if tempID1 != "" and ID1 == tempID1: continue
+            tempID1 = ID1
+
+            if ID1 != ID2:
+                print >> sys.stderr, "No pair information for %s" % ID1
+
+        if endFlag == 1: break
+ 
         print >> hOUT, '\t'.join(F1[0:12]) + '\t' + F2[6] + '\t' + F2[5] + '\t' + F1[13] + '\t' + F1[14]
 
     hOriginalFile.close()
