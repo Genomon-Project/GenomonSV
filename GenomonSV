@@ -7,7 +7,7 @@ import argparse
 # top level parser
 parser = argparse.ArgumentParser(prog = "GenomonSV")
 
-parser.add_argument("--version", action = "version", version = "GenomonSV-0.1.1")
+parser.add_argument("--version", action = "version", version = "GenomonSV-0.1.2")
 
 subparsers = parser.add_subparsers()
 
