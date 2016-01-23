@@ -410,6 +410,14 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
     hOUT = open(outputFilePath, 'w')
 
     line1 = hOriginalFile.readline().rstrip('\n')
+    # if no line in the input file
+    if line1  == '':
+        hOriginalFile.close()
+        hPairInfoFile.close()
+        hOUT.close()
+        return
+
+
     F1 = line1.rstrip('\n').split('\t')
     ID1 = F1[6]
     ID1 = re.sub(r'/\d$', '', ID1)
