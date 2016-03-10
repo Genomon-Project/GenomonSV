@@ -18,6 +18,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
 
     junc_num_thres = Params["junc_num_thres"]
     SV_size_thres = Params["SV_size_thres"]
+    inversion_size_thres = Params["min_inversion_size"]
 
     hIN = gzip.open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -29,7 +30,11 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
         # for now only consider long ranged SV??
         svLen = abs(int(F[2]) - int(F[5]))
         if F[7] != "---": svLen = svLen + len(F[7])
-        if F[0] == F[3] and svLen < int(SV_size_thres): continue
+        if F[0] == F[3]:
+            # for inversion, use other threshould 
+            if F[8] == F[9] and svLen < int(inversion_size_thres):
+                continue
+            if svLen < int(SV_size_thres): continue
         ########## 
     
         ##########
@@ -88,6 +93,8 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
 
         ####################
         # for each record in control junction extracted, check the consistency with the current junction
+        max_control_sample = "---"
+        max_control_num = 0 
         if tabixErrorFlag == 0:
             for record_line in records:
                 record = record_line.split('\t')
@@ -113,10 +120,15 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
                             if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(controlPanel_num_thres):
                             # if controlSamples[i] != matchedNormal and int(controlNums[i]) >= int(supportReadThres):
                                 controlFlag = 1
+                                if int(controlNums[i]) > max_control_num:
+                                    max_control_sample = controlSamples[i]
+                                    max_control_num = int(controlNums[i]) 
+                          
         ####################
                     
         if controlFlag == 0:
-            print >> hOUT, "\t".join(F)
+            print >> hOUT, "\t".join(F) + '\t' + max_control_sample + '\t' + str(max_control_num)
+
 
     if tabixErrorMsg != "":
         utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
@@ -163,8 +175,8 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
                     improper_MQs = FF[7]
                     improper_coveredRegions = FF[10]
     
-
-        print >> hOUT, "\t".join(F) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions
+        # last two columns are about pooled control information
+        print >> hOUT, "\t".join(F[:-2]) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions + '\t' + '\t'.join(F[-2:])
 
     if tabixErrorMsg != "":
         utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
@@ -287,7 +299,7 @@ def filterMergedJunc(inputFilePath, outputFilePath, Params):
             continue
 
         # every condition is satisfied
-        print >> hOUT, '\t'.join(F)
+        print >> hOUT, '\t'.join(F) + '\t' + str(region1.regionSize()) + '\t' + str(region2.regionSize())
 
 
     hIN.close()
@@ -355,7 +367,7 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     num = 1
     for line in hIN:
         F = line.rstrip('\n').split('\t')
-        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]
+        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[20], F[21], F[22], F[23]
 
         STDFlag = 0
         if chr1 == chr2 and int(pos2) - int(pos1) < Params["STD_thres"] and dir1 == "-" and dir2 == "+": STDFlag = 1
@@ -404,7 +416,9 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
             lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
             lpvalue = str(round(lpvalue, 4)) 
 
-        print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue)])
+        print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, \
+                                  str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue), \
+                                  max_control_sample, max_control_num, overhang1, overhang2])
 
         if num % 100 == 0:        
             print >> sys.stderr, "finished checking " + str(num) + " candidates"
@@ -458,7 +472,7 @@ def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
             if float(normalAF) > float(max_control_allele_freq): continue
             if 10**(-float(F[11])) > float(max_fisher_pvalue): continue
 
-        print >> hOUT, '\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + F[11]
+        print >> hOUT, '\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + '\t'.join(F[11:])
 
     hIN.close()
     hOUT.close()

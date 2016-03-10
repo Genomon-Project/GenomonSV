@@ -89,6 +89,9 @@ filter_condition:
     # the minimum region size which have to be covered by aligned short reads
     min_cover_size: 50 
 
+    # the minimum inversion size 
+    min_inversion_size: 300
+
     # the check size for removing duplicated candidates (produced by alignment artifacts). The author believes 25 should be enough
     close_check_margin: 25
 
