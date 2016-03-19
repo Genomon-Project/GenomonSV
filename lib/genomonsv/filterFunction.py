@@ -55,7 +55,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
 
 
 
-def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNormal, Params):
+def filterNonMatchControl(inputFilePath, outputFilePath, use_control, controlFile, matchedNormal, Params):
 
     """
         script for removing candidate in which 
@@ -65,7 +65,7 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
-    tabixfile = pysam.TabixFile(controlFile)
+    if use_control == True: tabixfile = pysam.TabixFile(controlFile)
 
     controlPanel_num_thres = Params["controlPanel_num_thres"]
     controlPanel_check_margin = Params["controlPanel_check_margin"]
@@ -75,57 +75,62 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
     for line in hIN:
         F = line.rstrip('\n').split('\t')
 
-        inseqSize = (0 if F[7] == "---" else len(F[7]))
 
         controlFlag = 0
-
-        ####################
-        # get the records for control junction data for the current position
-        tabixErrorFlag = 0
-        try:
-            records = tabixfile.fetch(F[0], int(F[1]) - controlPanel_check_margin, int(F[2]) + controlPanel_check_margin)
-        except Exception as inst:
-            # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
-            tabixErrorMsg = str(inst.args)
-            tabixErrorFlag = 1
-        ####################
-
-
-        ####################
-        # for each record in control junction extracted, check the consistency with the current junction
         max_control_sample = "---"
-        max_control_num = 0 
-        if tabixErrorFlag == 0:
-            for record_line in records:
-                record = record_line.split('\t')
+        max_control_num = 0
 
-                if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9]:
+        if use_control == True:
 
-                    flag = 0
-                    # detailed check on the junction position considering inserted sequences
-                    if F[8] == "+":
-                        expectedDiffSize = (int(F[2]) - int(record[2])) + (inseqSize - int(record[7]))
-                        if (F[9] == "+" and int(F[5]) == int(record[5]) - int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) + int(expectedDiffSize)):
-                            flag = 1
-                    else:
-                        expectedDiffSize = (int(F[2]) - int(record[2])) + (int(record[7]) - inseqSize)
-                        if (F[9] == "+" and int(F[5]) == int(record[5]) + int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) - int(expectedDiffSize)):
-                            flag = 1
+            inseqSize = (0 if F[7] == "---" else len(F[7]))
 
-                    # if position relationship including inserted sequences matches
-                    if flag == 1:
-                        controlSamples = record[10].split(';')
-                        controlNums = record[11].split(';')
-                        for i in range(0, len(controlSamples)):
-                            if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(controlPanel_num_thres):
-                            # if controlSamples[i] != matchedNormal and int(controlNums[i]) >= int(supportReadThres):
-                                controlFlag = 1
-                                if int(controlNums[i]) > max_control_num:
-                                    max_control_sample = controlSamples[i]
-                                    max_control_num = int(controlNums[i]) 
-                          
-        ####################
-                    
+            ####################
+            # get the records for control junction data for the current position
+            tabixErrorFlag = 0
+            try:
+                records = tabixfile.fetch(F[0], int(F[1]) - controlPanel_check_margin, int(F[2]) + controlPanel_check_margin)
+            except Exception as inst:
+                # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                tabixErrorMsg = str(inst.args)
+                tabixErrorFlag = 1
+            ####################
+
+
+            ####################
+            # for each record in control junction extracted, check the consistency with the current junction
+            max_control_sample = "---"
+            max_control_num = 0 
+            if tabixErrorFlag == 0:
+                for record_line in records:
+                    record = record_line.split('\t')
+
+                    if F[0] == record[0] and F[3] == record[3] and F[8] == record[8] and F[9] == record[9]:
+
+                        flag = 0
+                        # detailed check on the junction position considering inserted sequences
+                        if F[8] == "+":
+                            expectedDiffSize = (int(F[2]) - int(record[2])) + (inseqSize - int(record[7]))
+                            if (F[9] == "+" and int(F[5]) == int(record[5]) - int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) + int(expectedDiffSize)):
+                                flag = 1
+                        else:
+                            expectedDiffSize = (int(F[2]) - int(record[2])) + (int(record[7]) - inseqSize)
+                            if (F[9] == "+" and int(F[5]) == int(record[5]) + int(expectedDiffSize)) or (F[9] == "-" and int(F[5]) == int(record[5]) - int(expectedDiffSize)):
+                                flag = 1
+
+                        # if position relationship including inserted sequences matches
+                        if flag == 1:
+                            controlSamples = record[10].split(';')
+                            controlNums = record[11].split(';')
+                            for i in range(0, len(controlSamples)):
+                                if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(controlPanel_num_thres):
+                                # if controlSamples[i] != matchedNormal and int(controlNums[i]) >= int(supportReadThres):
+                                    controlFlag = 1
+                                    if int(controlNums[i]) > max_control_num:
+                                        max_control_sample = controlSamples[i]
+                                        max_control_num = int(controlNums[i]) 
+                              
+            ####################
+                        
         if controlFlag == 0:
             print >> hOUT, "\t".join(F) + '\t' + max_control_sample + '\t' + str(max_control_num)
 
@@ -135,7 +140,7 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
 
     hIN.close()
     hOUT.close()
-    tabixfile.close()
+    if use_control == True: tabixfile.close()
 
 
 
@@ -367,7 +372,11 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     num = 1
     for line in hIN:
         F = line.rstrip('\n').split('\t')
-        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[20], F[21], F[22], F[23]
+        if len(F) > 24:
+            chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[20], F[21], F[22], F[23]
+        else:
+            chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]
+            max_control_sample, max_control_num, overhang1, overhang2 = "---", "---", "---", "---"
 
         STDFlag = 0
         if chr1 == chr2 and int(pos2) - int(pos1) < Params["STD_thres"] and dir1 == "-" and dir2 == "+": STDFlag = 1

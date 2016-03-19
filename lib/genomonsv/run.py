@@ -148,6 +148,10 @@ def genomonSV_filt(args):
     outputPrefix = sampleConf["target"]["path_to_output_dir"] + "/" + sampleConf["target"]["label"]
     matchedControlFlag = sampleConf["matched_control"]["use"]
     matchedControlBam = sampleConf["matched_control"]["path_to_bam"] if matchedControlFlag == True else None
+    
+    use_non_matched_control_panel = sampleConf["non_matched_control_panel"]["use"]
+    data_path_non_matched_control_panel = sampleConf["non_matched_control_panel"]["data_path"] if use_non_matched_control_panel == True else "---"
+    matched_control_label_non_matched_control_panel = sampleConf["non_matched_control_panel"]["matched_control_label"] if use_non_matched_control_panel == True else "---"
 
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(outputPrefix + ".junction.clustered.bedpe.gz",
@@ -155,15 +159,14 @@ def genomonSV_filt(args):
                                         paramConf["filter_condition"])
 
 
-    if sampleConf["non_matched_control_panel"]["use"] == True:
-        utils.processingMessage("filtering by nonmatched control panel")
-        filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
-                                             outputPrefix + ".junction.clustered.filt2.bedpe",
-                                             sampleConf["non_matched_control_panel"]["data_path"],
-                                             sampleConf["non_matched_control_panel"]["matched_control_label"],
-                                             paramConf["filter_condition"])
-    else:
-        subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
+    utils.processingMessage("filtering by nonmatched control panel")
+    filterFunction.filterNonMatchControl(outputPrefix + ".junction.clustered.filt1.bedpe",
+                                         outputPrefix + ".junction.clustered.filt2.bedpe",
+                                         use_non_matched_control_panel,
+                                         data_path_non_matched_control_panel,
+                                         matched_control_label_non_matched_control_panel,
+                                         paramConf["filter_condition"])
+    # subprocess.call(["cp", outputPrefix + ".junction.clustered.filt1.bedpe", outputPrefix + ".junction.clustered.filt2.bedpe"])
 
     utils.processingMessage("incorporating improperly alinged read pair infomation")
     filterFunction.addImproperInfo(outputPrefix + ".junction.clustered.filt2.bedpe",
