@@ -62,7 +62,7 @@ GenomonSV filt sample.yaml param.yaml
 ## Results
 
 
-* chromosome for the 1st breakpoint
+* **chr1**: chromosome for the 1st breakpoint
 * coordinate for the 1st breakpoint
 * direction of the 1st breakpoint
 * chromosome for the 2nd breakpoint
