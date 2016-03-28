@@ -63,23 +63,27 @@ GenomonSV filt sample.yaml param.yaml
 
 
 * **chr1**: chromosome for the 1st breakpoint
-* coordinate for the 1st breakpoint
-* direction of the 1st breakpoint
-* chromosome for the 2nd breakpoint
-* coordinate for the 2nd breakpoint
-* direction of the 2nd breakpoint
-* inserted nucleotides within the breakpoints
-* type of the structural variation
-* gene overlapping the 1st breakpoint
-* gene overlapping the 2nd breakpoint
-* exon overlapping the 1st breakpoint
-* exon overlapping the 2nd breakpoint
-* #read_pairs not supporting the variant (reference read pairs) for the tumor sample
-* #read_pairs supporting the variant (variant read paris) for the tumor sample
-* frequency of variant read pairs for the tumor sample 
-* #read_pairs not supporting the variant for the matched control sample
-* #read_pairs supporting the variant for the matched control sample
-* frequency of variant read pairs for the matched control sample 
-* p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
+* **pos1**: coordinate for the 1st breakpoint
+* **dir1**: direction of the 1st breakpoint
+* **chr2**: chromosome for the 2nd breakpoint
+* **pos2**: coordinate for the 2nd breakpoint
+* **dir2**: direction of the 2nd breakpoint
+* **inserted_seq**: inserted nucleotides within the breakpoints
+* **variant_type**: type of the structural variation
+* **gene1**: gene overlapping the 1st breakpoint
+* **gene2**: gene overlapping the 2nd breakpoint
+* **exon1**: exon overlapping the 1st breakpoint
+* **exon2**: exon overlapping the 2nd breakpoint
+* **#tumor_ref_read_pair**: #read_pairs not supporting the variant (reference read pairs) for the tumor sample
+* **#tumor_var_read_pair**: #read_pairs supporting the variant (variant read paris) for the tumor sample
+* **tumor_vaf**: frequency of variant read pairs for the tumor sample 
+* **#control_ref_read_pair**: #read_pairs not supporting the variant for the matched control sample
+* **#control_var_read_pair**: #read_pairs supporting the variant for the matched control sample
+* **control_vaf**: frequency of variant read pairs for the matched control sample 
+* **-log(Fisher P-value)**: minus common logarithm of p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
+* **non_matched_control_sample_with_max_junction**: sample name with the maximum number of junction read pairs
+* **#max_non-matched_control_junction**: the maximum number of junction read pairs among non-matched control samples
+* **max_over_hang1**: maximum overlang size of supporting read pairs from the 1st breakpoint
+* **max_over_hang2**: maximum overlang size of supporting read pairs from the 2nd breakpoint
 
  
