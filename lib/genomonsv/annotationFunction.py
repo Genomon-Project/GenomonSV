@@ -13,6 +13,12 @@ def addAnnotation(inputFilePath, outputFilePath, Params):
     gene_tb = pysam.TabixFile(gene_bed)
     exon_tb = pysam.TabixFile(exon_bed)
 
+    print >> hOUT, '\t'.join(["chr1", "pos1", "dir1", "chr2", "pos2", "dir2", "inserted_seq", "variant_type", \
+                             "gene1", "gene2", "exon1", "exon2", "#tumor_ref_read_pair", "#tumor_var_read_pair", \
+                             "tumor_vaf", "#control_ref_read_pair", "#control_var_read_pair", "control_vaf", \
+                             "-log(Fisher P-value)", "non_matched_control_sample_with_max_junction", "#max_non-matched_control_junction", \
+                             "max_over_hang1", "max_over_hang2"])
+ 
     for line in hIN:
 
         F = line.rstrip('\n').split('\t')
