@@ -40,20 +40,20 @@ See sample files for description of each parameters.
 
 ## Commands
 
-1. Parsing breakpoint-containing and improperly aligned read pairs
+* Parsing breakpoint-containing and improperly aligned read pairs
 
 ```
 GenomonSV parse sample.yaml param.yaml
 ```
 
-2. Merging non-matched control panel breakpoint-containing read pairs
+* Merging non-matched control panel breakpoint-containing read pairs
 (for later filtering).
 
 ```
 GenomonSV merge control.yaml mergedControl.bedpe.gz param.yaml                                        
 ```
 
-3. Filtering and annotating candidate somatic structural variations
+* Filtering and annotating candidate somatic structural variations
 
 ```
 GenomonSV filt sample.yaml param.yaml
