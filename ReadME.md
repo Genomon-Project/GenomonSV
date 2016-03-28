@@ -61,24 +61,25 @@ GenomonSV filt sample.yaml param.yaml
 
 ## Results
 
-1. chromosome for the 1st breakpoint
-1. coordinate for the 1st breakpoint
-1. direction of the 1st breakpoint
-1. chromosome for the 2nd breakpoint
-1. coordinate for the 2nd breakpoint
-1. direction of the 2nd breakpoint
-1. inserted nucleotides within the breakpoints
-1. type of the structural variation
-1. gene overlapping the 1st breakpoint
-1. gene overlapping the 2nd breakpoint
-1. exon overlapping the 1st breakpoint
-1. exon overlapping the 2nd breakpoint
-1. #read_pairs not supporting the variant (reference read pairs) for the tumor sample
-1. #read_pairs supporting the variant (variant read paris) for the tumor sample
-1. frequency of variant read pairs for the tumor sample 
-1. #read_pairs not supporting the variant for the matched control sample
-1. #read_pairs supporting the variant for the matched control sample
-1. frequency of variant read pairs for the matched control sample 
-1. p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
+
+* chromosome for the 1st breakpoint
+* coordinate for the 1st breakpoint
+* direction of the 1st breakpoint
+* chromosome for the 2nd breakpoint
+* coordinate for the 2nd breakpoint
+* direction of the 2nd breakpoint
+* inserted nucleotides within the breakpoints
+* type of the structural variation
+* gene overlapping the 1st breakpoint
+* gene overlapping the 2nd breakpoint
+* exon overlapping the 1st breakpoint
+* exon overlapping the 2nd breakpoint
+* #read_pairs not supporting the variant (reference read pairs) for the tumor sample
+* #read_pairs supporting the variant (variant read paris) for the tumor sample
+* frequency of variant read pairs for the tumor sample 
+* #read_pairs not supporting the variant for the matched control sample
+* #read_pairs supporting the variant for the matched control sample
+* frequency of variant read pairs for the matched control sample 
+* p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
 
  
