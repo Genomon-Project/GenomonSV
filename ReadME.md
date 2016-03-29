@@ -74,15 +74,15 @@ GenomonSV filt sample.yaml param.yaml
 * **Gene_2**: gene overlapping the 2nd breakpoint
 * **Exon_1**: exon overlapping the 1st breakpoint
 * **Exon_2**: exon overlapping the 2nd breakpoint
-* **#Tumor_Ref_Read_Pair**: #read_pairs not supporting the variant (reference read pairs) for the tumor sample
-* **#Tumor_Var_Read_Pair**: #read_pairs supporting the variant (variant read paris) for the tumor sample
+* **Num_Tumor_Ref_Read_Pair**: #read_pairs not supporting the variant (reference read pairs) for the tumor sample
+* **Num_Tumor_Var_Read_Pair**: #read_pairs supporting the variant (variant read paris) for the tumor sample
 * **Tumor_VAF**: frequency of variant read pairs for the tumor sample 
-* **#Control_Ref_Read_Pair**: #read_pairs not supporting the variant for the matched control sample
-* **#Control_Var_Read_Pair**: #read_pairs supporting the variant for the matched control sample
+* **Num_Control_Ref_Read_Pair**: #read_pairs not supporting the variant for the matched control sample
+* **Num_Control_Var_Read_Pair**: #read_pairs supporting the variant for the matched control sample
 * **Control_VAF**: frequency of variant read pairs for the matched control sample 
 * **Minus_Log_Fisher_P_value**: minus common logarithm of p-value for the Fisher's exact text (on contingency table of (tumor v.s. matched control) and (reference v.s. variant read pairs)
 * **Non-Matched_Control_Sample_With_Max_Junction**: sample name with the maximum number of junction read pairs
-* **#Max_Non-Matched_Control_Junction**: the maximum number of junction read pairs among non-matched control samples
+* **Num_Max_Non-Matched_Control_Junction**: the maximum number of junction read pairs among non-matched control samples
 * **Max_Over_Hang_1**: maximum overlang size of supporting read pairs from the 1st breakpoint
 * **Max_Over_Hang_2**: maximum overlang size of supporting read pairs from the 2nd breakpoint
 
