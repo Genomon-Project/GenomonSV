@@ -14,9 +14,9 @@ def addAnnotation(inputFilePath, outputFilePath, Params):
     exon_tb = pysam.TabixFile(exon_bed)
 
     print >> hOUT, '\t'.join(["Chr_1", "Pos_1", "Dir_1", "Chr_2", "Pos_2", "Dir_2", "Inserted_Seq", "Variant_Type", \
-                             "Gene_1", "Gene_2", "Exon_1", "Exon_2", "#Tumor_Ref_Read_Pair", "#Tumor_Var_Read_Pair", \
-                             "Tumor_VAF", "#Control_Ref_Read_Pair", "#Control_Var_Read_Pair", "Control_VAF", \
-                             "Minus_Log_Fisher_P_value", "Non-Matched_Control_Sample_With_Max_Junction", "#Max_Non-Matched_Control_Junction", \
+                             "Gene_1", "Gene_2", "Exon_1", "Exon_2", "Num_Tumor_Ref_Read_Pair", "Num_Tumor_Var_Read_Pair", \
+                             "Tumor_VAF", "Num_Control_Ref_Read_Pair", "Num_Control_Var_Read_Pair", "Control_VAF", \
+                             "Minus_Log_Fisher_P_value", "Non-Matched_Control_Sample_With_Max_Junction", "Num_Max_Non-Matched_Control_Junction", \
                              "Max_Over_Hang_1", "Max_Over_Hang_2"])
  
     for line in hIN:
