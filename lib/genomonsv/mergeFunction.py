@@ -29,13 +29,11 @@ def simplifyJunc(inputFilePath, outputFilePath, label):
 
         
 
-def organizeControl(inputFilePath, outputFilePath, Params):
+def organizeControl(inputFilePath, outputFilePath, check_margin_size):
 
     """
         script for organizing control junction information
     """
-
-    check_margin_size = Params["check_margin_size"]
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')

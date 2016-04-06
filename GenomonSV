@@ -9,8 +9,6 @@ parser = argparse.ArgumentParser(prog = "GenomonSV", formatter_class=argparse.Ar
 
 parser.add_argument("--version", action = "version", version = "GenomonSV-0.4.0beta")
 
-parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
-
 subparsers = parser.add_subparsers()
 
 ####################
@@ -25,9 +23,10 @@ parse_parser = subparsers.add_parser("parse",
 parse_parser.add_argument("bam_file", metavar = "input.bam", type = str,
                           help = "path to input bam file")
 
-parse_parser.add_argument("output_prefix", metavar = "output_prefix", type = str,
+parse_parser.add_argument("parse_output_prefix", metavar = "parse_output_prefix", type = str,
                           help = "prefix of the pathes of output files")
 
+parse_parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
 
 parse_junction_group = parse_parser.add_argument_group("parse_junction_condition",
                                                        "parameters used for parsing breakpoint containing read pairs from bam files")
@@ -95,20 +94,23 @@ filt_parser.set_defaults(func = genomonSV_filt)
 
 
 ####################
-# GenomonSV filt
-filt_parser = subparsers.add_parser("merge",
+# GenomonSV merge 
+merge_parser = subparsers.add_parser("merge",
                                      help = "Merge clustered junction files for filtering")
 
-filt_parser.add_argument("controlPathInfoFile", metavar = "control.yaml", type = str,
-                          help = "the pathes for clustered junction files")
+merge_parser.add_argument("control_info_file", metavar = "control_info.txt", type = str,
+                          help = "tab-delimited file on non-matched control. 1st column: sample labels, 2nd column: output prefix generated at the parse stage")
 
-filt_parser.add_argument("outputFilePath", metavar = "mergedControl.bedpe.gz", type = str,
-                          help = "the pathes for merged control junction files")
+merge_parser.add_argument("merge_output_file", type = str,
+                          help = "the path to the merged junction file")
 
-filt_parser.add_argument("paramInfoFile", metavar = "param.yaml", type = str,
-                          help = "parameter information file (yaml format)")
- 
-filt_parser.set_defaults(func = genomonSV_merge)
+merge_parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
+
+merge_parser.add_argument("--merge_check_margin_size", type = int, default = 100,
+                         help = "this value should be at least 50 (more than the length of possible inserted sequence between break points)")
+
+
+merge_parser.set_defaults(func = genomonSV_merge)
 ####################
 
 
