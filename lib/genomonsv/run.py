@@ -17,115 +17,93 @@ def genomonSV_parse(args):
 
     ####################
     # load config files
-    global sampleConf
-    sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile, "parse")
+    # global sampleConf
+    # sampleConf = config.sample_yaml_config_parse(args.sampleInfoFile, "parse")
 
-    global paramConf
-    paramConf = config.param_yaml_contig_parse(args.paramInfoFile, "parse")
+    # global paramConf
+    # paramConf = config.param_yaml_contig_parse(args.paramInfoFile, "parse")
     ####################
 
 
     ####################
     # make output directories
-    utils.make_directory(sampleConf["target"]["path_to_output_dir"])
+    # utils.make_directory(sampleConf["target"]["path_to_output_dir"])
+    utils.make_directory(args.output_prefix)
     ####################
 
     
     ####################
-    outputPrefix = sampleConf["target"]["path_to_output_dir"] + "/" + sampleConf["target"]["label"]
-
     # parse breakpoint containing read pairs from input bam files
     utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
-    parseFunction.parseJunctionFromBam(sampleConf["target"]["path_to_bam"], 
-                                       outputPrefix + ".junction.unsort.txt", 
-                                       paramConf["parse_junction_condition"])
+    parseFunction.parseJunctionFromBam(args.bam_file, args.output_prefix + ".junction.unsort.txt",
+                                       args.junction_abnormal_insert_size, args.junction_min_major_clipping_size, args.junction_max_minor_clipping_size)
 
     utils.processingMessage("sorting parsed breakpoint containing read pairs")
-    utils.sortBedpe(outputPrefix + ".junction.unsort.txt",
-                    outputPrefix + ".junction.sort.txt")
+    utils.sortBedpe(args.output_prefix + ".junction.unsort.txt", args.output_prefix + ".junction.sort.txt")
 
     utils.processingMessage("getting start positions of paired-end reads")
-    parseFunction.getPairStartPos(outputPrefix + ".junction.sort.txt",
-                                  outputPrefix + ".junction.pairStart.bed")
+    parseFunction.getPairStartPos(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.pairStart.bed")
 
     utils.processingMessage("compressing start position infomation file")
-    utils.compress_index_bed(outputPrefix + ".junction.pairStart.bed",
-                             outputPrefix + ".junction.pairStart.bed.gz",
-                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+    utils.compress_index_bed(args.output_prefix + ".junction.pairStart.bed", args.output_prefix + ".junction.pairStart.bed.gz")
 
 
     utils.processingMessage("getting covered regions of paired-end reads from bam file")
-    parseFunction.getPairCoverRegionFromBam(sampleConf["target"]["path_to_bam"], 
-                                            outputPrefix + ".junction.pairCoverage.txt",
-                                            outputPrefix + ".junction.pairStart.bed.gz")
+    parseFunction.getPairCoverRegionFromBam(args.bam_file, args.output_prefix + ".junction.pairCoverage.txt", args.output_prefix + ".junction.pairStart.bed.gz")
 
     utils.processingMessage("adding information of covered regions of paired-end reads")
-    parseFunction.addPairCoverRegionFromBam(outputPrefix + ".junction.sort.txt",
-                                            outputPrefix + ".junction.sort.withPair.txt",
-                                            outputPrefix + ".junction.pairCoverage.txt")
+    parseFunction.addPairCoverRegionFromBam(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.pairCoverage.txt")
 
     utils.processingMessage("clustering breakpoint containing read pairs")
-    parseFunction.clusterJunction(outputPrefix + ".junction.sort.withPair.txt", 
-                                  outputPrefix + ".junction.clustered.bedpe.unsort",
-                                  paramConf["cluster_junction_condition"])
+    parseFunction.clusterJunction(args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.clustered.bedpe.unsort", args.junction_check_margin_size)
 
     utils.processingMessage("sorting clustered breakpoint containing read pairs")
-    utils.sortBedpe(outputPrefix + ".junction.clustered.bedpe.unsort", outputPrefix + ".junction.clustered.bedpe")
+    utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.bedpe")
 
     utils.processingMessage("compressing clustered breakpoint containing read pairs")
-    utils.compress_index_bed(outputPrefix + ".junction.clustered.bedpe",
-                             outputPrefix + ".junction.clustered.bedpe.gz",
-                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+    utils.compress_index_bed(args.output_prefix + ".junction.clustered.bedpe", args.output_prefix + ".junction.clustered.bedpe.gz")
 
-    if paramConf["debug_mode"] == False:
-        subprocess.call(["rm", outputPrefix + ".junction.unsort.txt"])
-        subprocess.call(["rm", outputPrefix + ".junction.sort.txt"])
-        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed.gz"])
-        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed.gz.tbi"])
-        subprocess.call(["rm", outputPrefix + ".junction.sort.withPair.txt"])
-        subprocess.call(["rm", outputPrefix + ".junction.pairCoverage.txt"])
-        subprocess.call(["rm", outputPrefix + ".junction.clustered.bedpe.unsort"])
-        subprocess.call(["rm", outputPrefix + ".junction.pairStart.bed"])
-        subprocess.call(["rm", outputPrefix + ".junction.clustered.bedpe"])
+    if args.debug == False:
+        subprocess.call(["rm", args.output_prefix + ".junction.unsort.txt"])
+        subprocess.call(["rm", args.output_prefix + ".junction.sort.txt"])
+        subprocess.call(["rm", args.output_prefix + ".junction.pairStart.bed.gz"])
+        subprocess.call(["rm", args.output_prefix + ".junction.pairStart.bed.gz.tbi"])
+        subprocess.call(["rm", args.output_prefix + ".junction.sort.withPair.txt"])
+        subprocess.call(["rm", args.output_prefix + ".junction.pairCoverage.txt"])
+        subprocess.call(["rm", args.output_prefix + ".junction.clustered.bedpe.unsort"])
+        subprocess.call(["rm", args.output_prefix + ".junction.pairStart.bed"])
+        subprocess.call(["rm", args.output_prefix + ".junction.clustered.bedpe"])
  
     ####################
     # improper read pairs
 
     # parse potentially improper read pairs from input bam files
     utils.processingMessage("parsing improperly aligned read pairs from bam file")
-    parseFunction.parseImproperFromBam(sampleConf["target"]["path_to_bam"],
-                         outputPrefix + ".improper.unsort.txt",
-                         paramConf["parse_improper_condition"])
+    parseFunction.parseImproperFromBam(args.bam_file, args.output_prefix + ".improper.unsort.txt",
+                                       args.improper_abnormal_insert_size, args.improper_min_mapping_qual, args.improper_max_clipping_size)
 
     # create and organize bedpe file integrating pair information
     utils.processingMessage("sorting improperly aligned read pairs") 
-    parseFunction.makeImproperBedpe(outputPrefix + ".improper.unsort.txt",
-                                    outputPrefix + ".improper.bedpe",
-                                    paramConf["cluster_improper_condition"])
+    parseFunction.makeImproperBedpe(args.output_prefix + ".improper.unsort.txt", args.output_prefix + ".improper.bedpe", 
+                                    args.junction_dist_margin, args.junction_opposite_dist_margin_margin)
 
     # cluster read pairs possibly representing the same junction
     utils.processingMessage("clustering improperly aligned read pairs")
-    parseFunction.clusterImproperBedpe(outputPrefix + ".improper.bedpe",
-                                       outputPrefix + ".improper.clustered.unsort.bedpe",
-                                       paramConf["cluster_improper_condition"])
+    parseFunction.clusterImproperBedpe(args.output_prefix + ".improper.bedpe", args.output_prefix + ".improper.clustered.unsort.bedpe", args.improper_check_margin_size)
 
     utils.processingMessage("sorting clustered improperly aligned read pairs")
-    utils.sortBedpe(outputPrefix + ".improper.clustered.unsort.bedpe",
-                    outputPrefix + ".improper.clustered.bedpe")
+    utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.bedpe")
 
     utils.processingMessage("compressing clustered improperly aligned read pairs")
-    utils.compress_index_bed(outputPrefix + ".improper.clustered.bedpe",
-                             outputPrefix + ".improper.clustered.bedpe.gz",
-                             paramConf["software"]["bgzip"], paramConf["software"]["tabix"])
+    utils.compress_index_bed(args.output_prefix + ".improper.clustered.bedpe", args.output_prefix + ".improper.clustered.bedpe.gz")
 
-    if paramConf["debug_mode"] == False:
-        subprocess.call(["rm", outputPrefix + ".improper.unsort.txt"])
-        subprocess.call(["rm", outputPrefix + ".improper.bedpe"])
-        subprocess.call(["rm", outputPrefix + ".improper.clustered.unsort.bedpe"])
-        subprocess.call(["rm", outputPrefix + ".improper.clustered.bedpe"])
+    if args.debug == False:
+        subprocess.call(["rm", args.output_prefix + ".improper.unsort.txt"])
+        subprocess.call(["rm", args.output_prefix + ".improper.bedpe"])
+        subprocess.call(["rm", args.output_prefix + ".improper.clustered.unsort.bedpe"])
+        subprocess.call(["rm", args.output_prefix + ".improper.clustered.bedpe"])
 
     ####################
-
 
 def genomonSV_filt(args):
 

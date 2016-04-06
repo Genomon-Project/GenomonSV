@@ -372,7 +372,7 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     num = 1
     for line in hIN:
         F = line.rstrip('\n').split('\t')
-        # if len(F) > 24:
+        # if len(F) >= 24:
         chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[20], F[21], F[22], F[23]
         # else:
         #     chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]

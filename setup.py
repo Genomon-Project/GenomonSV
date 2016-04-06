@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='genomonsv',
-      version='0.3.0beta',
+      version='0.4.0beta',
       description='Python tools for detecting somatic structural variation from cancer genome sequencing data.',
       author='Yuichi Shiraishi',
       author_email='friend1ws@gamil.com',

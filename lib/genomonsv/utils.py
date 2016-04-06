@@ -19,18 +19,18 @@ def make_parent_directory(inputFile):
     make_directory(parentDir_absInputFile)
 
 
-def compress_index_bed(inputFile, outputFile, bgzip_cmd, tabix_cmd):
+def compress_index_bed(inputFile, outputFile):
 
     ####################
     # compress by bgzip
     hOUT = open(outputFile, "w")
-    subprocess.call([bgzip_cmd, "-f", "-c", inputFile], stdout = hOUT)
+    subprocess.call(["bgzip", "-f", "-c", inputFile], stdout = hOUT)
     hOUT.close()
     ####################
 
     ####################
     # index by tabix
-    subprocess.call([tabix_cmd, "-p", "bed", outputFile])
+    subprocess.call(["tabix", "-p", "bed", outputFile])
     ####################
 
 

@@ -7,7 +7,7 @@
 import sys, pysam, re, subprocess, collections
 import utils
 
-def parseJunctionFromBam(inputBAM, outputFilePath, Params):
+def parseJunctionFromBam(inputBAM, outputFilePath, abnormal_insert_size, min_major_clip_size, max_minor_clip_size):
 
     """
     This function utilizes the SA tags (SA:Z:rname, pos, strand, CIGAR, mapQ, number of mismatch).
@@ -15,10 +15,6 @@ def parseJunctionFromBam(inputBAM, outputFilePath, Params):
     Therefore, please not that when the primary alignment is in the reverse direction, the sequence shown in the bam file does not match
     to the SA tags..
     """
-
-    abnormal_insert_size = Params["abnormal_insert_size"]
-    min_major_clip_size = Params["min_major_clip_size"]
-    max_minor_clip_size = Params["max_minor_clip_size"]
 
     bamfile = pysam.Samfile(inputBAM, "rb")
     hOUT = open(outputFilePath, "w")
@@ -460,12 +456,11 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
 
 
 
-def clusterJunction(inputFilePath, outputFilePath, Params):
+def clusterJunction(inputFilePath, outputFilePath, check_margin_size):
 
     """
         script for merging and summarizing junction read pairs
     """
-    check_margin_size = Params["check_margin_size"]
  
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -585,7 +580,7 @@ def clusterJunction(inputFilePath, outputFilePath, Params):
 
 
 
-def parseImproperFromBam(inputBam, outputFilePath, Params):
+def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_mapping_qual, soft_clip_thres):
 
     """
         script for parsing improper read pairs.
@@ -596,10 +591,6 @@ def parseImproperFromBam(inputBam, outputFilePath, Params):
         Now, the script assumes the pysam version 0.7.5. 
         This is a bit old and will be necessary to modify for the newer version of pysam 
     """
-
-    abnormal_insert_size = Params["abnormal_insert_size"]
-    min_mapping_qual = Params["min_mapping_qual"]
-    soft_clip_thres = Params["soft_clip_thres"]
 
     bamfile = pysam.Samfile(inputBam, "rb")
     hOUT = open(outputFilePath, "w")
@@ -654,7 +645,7 @@ def parseImproperFromBam(inputBam, outputFilePath, Params):
 
 
 
-def makeImproperBedpe(inputFilePath, outputFilePath, Param):
+def makeImproperBedpe(inputFilePath, outputFilePath, junction_dist_margin, clipping_margin):
 
     ####################
     # sort according to the read ID for the later processing
@@ -666,9 +657,6 @@ def makeImproperBedpe(inputFilePath, outputFilePath, Param):
 
     ####################
     # convert each improper read pair to bedpe records (with margins)
-    junction_dist_margin = Param["junction_dist_margin"]
-    clipping_margin = Param["clipping_margin"]
-
     hIN = open(outputFilePath + ".tmp1", "r")
     hOUT = open(outputFilePath + ".tmp2", "w")
 
@@ -730,14 +718,13 @@ def makeImproperBedpe(inputFilePath, outputFilePath, Param):
 
 
 
-def clusterImproperBedpe(inputFilePath, outputFilePath, Param):
+def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size):
    
     ####################
     # cluster and summarize improper read pair bed file
     hIN = open(inputFilePath, "r")
     hOUT = open(outputFilePath, "w")
 
-    check_margin_size = Param["check_margin_size"]
     mergedBedpe = {}
     for line in hIN:
 
