@@ -10,15 +10,11 @@ import realignmentFunction
 import utils
 from scipy import stats
 
-def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
+def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_thres, inversion_size_thres):
      
     """
         script for filtering by the length of SV size and support read junctions
     """
-
-    junc_num_thres = Params["junc_num_thres"]
-    SV_size_thres = Params["SV_size_thres"]
-    inversion_size_thres = Params["min_inversion_size"]
 
     hIN = gzip.open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -34,7 +30,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
             # for inversion, use other threshould 
             if F[8] == F[9] and svLen < int(inversion_size_thres):
                 continue
-            if svLen < int(SV_size_thres): continue
+            if svLen < int(sv_size_thres): continue
         ########## 
     
         ##########
@@ -55,7 +51,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, Params):
 
 
 
-def filterNonMatchControl(inputFilePath, outputFilePath, use_control, controlFile, matchedNormal, Params):
+def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNormal, controlPanel_num_thres, controlPanel_check_margin):
 
     """
         script for removing candidate in which 
@@ -65,10 +61,10 @@ def filterNonMatchControl(inputFilePath, outputFilePath, use_control, controlFil
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
-    if use_control == True: tabixfile = pysam.TabixFile(controlFile)
+    print controlFile
+    use_control = True if controlFile != "" else False
 
-    controlPanel_num_thres = Params["controlPanel_num_thres"]
-    controlPanel_check_margin = Params["controlPanel_check_margin"]
+    if use_control == True: tabixfile = pysam.TabixFile(controlFile)
 
    
     tabixErrorMsg = "" 
@@ -193,7 +189,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
 
 
 
-def filterMergedJunc(inputFilePath, outputFilePath, Params):
+def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping_qual, min_cover_size):
 
     """    
     script for filtering the inferred break points for structural variation
@@ -206,10 +202,6 @@ def filterMergedJunc(inputFilePath, outputFilePath, Params):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
-
-    min_support_num = Params["min_support_num"]
-    min_mapping_qual = Params["min_mapping_qual"]
-    min_cover_size = Params["min_cover_size"]
 
 
     for line in hIN:
@@ -312,13 +304,10 @@ def filterMergedJunc(inputFilePath, outputFilePath, Params):
 
 
 
-def removeClose(inputFilePath, outputFilePath, Params):
+def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_thres):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
-
-    close_check_margin = Params["close_check_margin"]
-    close_check_thres= Params["close_check_thres"]
 
     key2info = {}
     for line in hIN:
@@ -363,11 +352,12 @@ def removeClose(inputFilePath, outputFilePath, Params):
 
 
 
-def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, blat_cmd, matchedControlFlag, Params):
+def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, reference_genome, blat_option,
+                          short_tandem_reapeat_thres, max_depth, search_length, search_margin, split_refernece_thres, validate_sequence_length):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
-    blat_cmds = blat_cmd.split(' ')
+    blat_cmds = ("blat " + blat_option).split(' ')
 
     num = 1
     for line in hIN:
@@ -379,22 +369,25 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         #     max_control_sample, max_control_num, overhang1, overhang2 = "---", "---", "---", "---"
 
         STDFlag = 0
-        if chr1 == chr2 and int(pos2) - int(pos1) < Params["STD_thres"] and dir1 == "-" and dir2 == "+": STDFlag = 1
+        if chr1 == chr2 and int(pos2) - int(pos1) < short_tandem_reapeat_thres and dir1 == "-" and dir2 == "+": STDFlag = 1
 
         ####################
         # extract short reads from tumor sequence data around the candidate
-        fRet = realignmentFunction.extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+        fRet = realignmentFunction.extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", chr1, pos1, dir1, chr2, pos2, dir2, 
+                                                      max_depth, search_length, search_margin)
         if fRet == 1: continue
 
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             # extract short reads from matched-control sequence data around the candidate
-            fRet = realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2)
+            fRet = realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", chr1, pos1, dir1, chr2, pos2, dir2,
+                                                          max_depth, search_length, search_margin)
             if fRet == 1: continue
         ####################
         
         ####################
         # generate reference sequence and sequence containing the presumed variants
-        realignmentFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa", Params, chr1, pos1, dir1, chr2, pos2, dir2, juncSeq)
+        realignmentFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa", chr1, pos1, dir1, chr2, pos2, dir2, juncSeq,
+                                           reference_genome, split_refernece_thres, validate_sequence_length)
 
         ####################
         # alignment tumor short reads to the reference and alternative sequences
@@ -404,7 +397,7 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         
         ####################
         # alignment normal short reads to the reference and alternative sequences
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
                             stdout = FNULL, stderr = subprocess.STDOUT)
 
@@ -414,12 +407,12 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
 
         normalRef, normalAlt = "---", "---"
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
 
         # fisher test
         lpvalue = "---"
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             oddsratio, pvalue = stats.fisher_exact([[tumorRef, tumorAlt], [normalRef, normalAlt]], 'less')
             if pvalue < 1e-100: pvalue = 1e-100
             lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
@@ -439,7 +432,7 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
         subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
 
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
             subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
 
@@ -448,18 +441,13 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
 
 
 
-def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
+def filterNumAFFis(inputFilePath, outputFilePath, normalBamFilePath, 
+                   min_tumor_read_pair, min_tumor_alleleFreq, max_control_read_pair, max_control_allele_freq, max_fisher_pvalue):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
-   
-    min_tumor_alleleFreq = Params["min_tumor_alleleFreq"]
-    min_tumor_read_pair = Params["min_tumor_read_pair"]
-    max_control_read_pair = Params["max_control_read_pair"]
-    max_control_allele_freq = Params["max_control_allele_freq"]
-    max_fisher_pvalue = Params["max_fisher_pvalue"]
-
-
+  
+ 
     for line in hIN:
         F = line.rstrip('\n').split('\t')
 
@@ -468,7 +456,7 @@ def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
         tumorAF = str(round(tumorAF, 4))
 
         normalAF = "---"
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             normalAF = 0
             if float(F[9]) + float(F[10]) > 0: normalAF = float(F[10]) / (float(F[9]) + float(F[10]))
             normalAF = str(round(normalAF, 4))
@@ -476,7 +464,7 @@ def filterNumAFFis(inputFilePath, outputFilePath, matchedControlFlag, Params):
         if int(F[8]) < int(min_tumor_read_pair): continue
         if float(tumorAF) < float(min_tumor_alleleFreq): continue
 
-        if matchedControlFlag == True:
+        if normalBamFilePath != "":
             if int(F[10]) > int(max_control_read_pair): continue
             if float(normalAF) > float(max_control_allele_freq): continue
             if 10**(-float(F[11])) > float(max_fisher_pvalue): continue

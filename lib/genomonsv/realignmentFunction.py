@@ -3,7 +3,7 @@
 import sys, pysam
 import utils
 
-def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2):
+def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, max_depth, search_length, search_margin):
 
     """
         read pairs containing break points are extracted. (yshira 2015/04/23)
@@ -20,9 +20,6 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     """
 
     bamfile = pysam.Samfile(bamFilePath, 'rb')
-    max_depth = Params["max_depth"]
-    search_length = Params["search_length"]
-    search_margin = Params["search_margin"]
 
     # if the #sequence read is over the `maxDepth`, then that key is ignored
     depthFlag = 0
@@ -194,7 +191,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, Params, juncChr1, juncPos1, 
     return 0
 
 
-def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, juncSeq):
+def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, juncSeq, reference_genome, split_refernece_thres, validate_sequence_length):
 
     """
         for short SV (mid-range (<= split_refernece_thres bp) deletion, tandem duplication), we get the two sequence
@@ -204,10 +201,6 @@ def getRefAltForSV(outputFilePath, Params, juncChr1, juncPos1, juncDir1, juncChr
         however, this will be filtered beforehand by the "cover filter", and maybe we have to give up detecting these class of SVs.
 
     """
-
-    reference_genome = Params["reference_genome"]
-    split_refernece_thres = Params["split_refernece_thres"]
-    validate_sequence_length = Params["validate_sequence_length"]
 
     hOUT = open(outputFilePath, 'w')
 
