@@ -134,6 +134,7 @@ GenomonSV filt [-h] [--matched_control_bam matched_control.bam]
                [--max_fisher_pvalue MAX_FISHER_PVALUE]
                input.bam output_prefix reference.fa annotation_dir
 ```
+
 - **input.bam**: Path to input indexed bam file
 - **output_prefix**: Output file prefix (assuming files generated at the parse step already exist).
 - **reference.fa**: Path to reference genome sequence (fasta format) used for alignment.
@@ -143,7 +144,6 @@ The following options are not mandatory, but we strongly believe is necessary fo
 - **--matched_control_bam**: The path to matched control bam file. when this is specified, GenomonSV performs Fisher's exact test on the numbers of variant and non-variant read pairs between tumor and control and remove those with high p-value. we believe this filtering step is crucial for removing massive false positives and highly recommend to use this. even when matched control sequence data is not available, using *dummy* mathced control may be helpful.
 - **--non_matched_control_junction**: The path to merged junction files created at the merge step. for each structural variation candidate, when the number of supporing junction read pairs shared by any of the pooled control samples is equal to or more than the specified threshould (**control_panel_num_thres** option), then that candidate is filtered out. 
 - **--matched_control_label**: In the above filtering step using non-matched control junctions, ignore the sample speficied by this option. Typically, matched control sample label is specified for avoiding filtering true positives because of tumor cell contamination in the control sample.
-- 
 
 See the help (``GenomonSV filt -h``) for other options.
 You may want to tune up **min_junc_num**, **min_support_num**, **min_overhang_size**, **max_depth**, **min_tumor_variant_read_pair**,
