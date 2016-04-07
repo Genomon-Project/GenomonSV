@@ -127,11 +127,11 @@ def genomonSV_filt(args):
     if not os.path.exists(args.reference_genome):
         raise ValueError('No file: ' + args.reference_genome)
 
-    if not os.path.exists(args.annotation_dir + "/refGene.bed.gz"):
-        raise ValueError('No file: ' + args.annotation_dir + "/refGene.bed.gz")
+    if not os.path.exists(args.annotation_dir + "/gene.bed.gz"):
+        raise ValueError('No file: ' + args.annotation_dir + "/gene.bed.gz")
 
-    if not os.path.exists(args.annotation_dir + "/refExon.bed.gz"):
-        raise ValueError('No file: ' + args.annotation_dir + "/refExon.bed.gz")
+    if not os.path.exists(args.annotation_dir + "/exon.bed.gz"):
+        raise ValueError('No file: ' + args.annotation_dir + "/exon.bed.gz")
 
  
     ####################

@@ -7,8 +7,8 @@ def addAnnotation(inputFilePath, outputFilePath, annotation_dir):
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
-    gene_bed = annotation_dir + "/refGene.bed.gz"
-    exon_bed = annotation_dir + "/refExon.bed.gz"
+    gene_bed = annotation_dir + "/gene.bed.gz"
+    exon_bed = annotation_dir + "/exon.bed.gz"
 
     gene_tb = pysam.TabixFile(gene_bed)
     exon_tb = pysam.TabixFile(exon_bed)
