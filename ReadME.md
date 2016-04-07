@@ -53,31 +53,86 @@ bash prepGeneInfo.sh
 
 Genomon SV accept just bam file aligned by `bwa mem` with -T0 option.
 We do not guarantee the results for other cases.
+Also, we assume that the sequencing data is paired-end. All the single-end reads are ignored in the program.
 
 
 ## Commands
 
-* Parsing breakpoint-containing and improperly aligned read pairs
+### Parsing breakpoint-containing and improperly aligned read pairs
 
 ```
-GenomonSV parse sample.yaml param.yaml
+GenomonSV parse [-h] [--debug]
+                [--junction_abnormal_insert_size JUNCTION_ABNORMAL_INSERT_SIZE]
+                [--junction_min_major_clipping_size JUNCTION_MIN_MAJOR_CLIPPING_SIZE]
+                [--junction_max_minor_clipping_size JUNCTION_MAX_MINOR_CLIPPING_SIZE]
+                [--junction_check_margin_size JUNCTION_CHECK_MARGIN_SIZE]
+                [--improper_abnormal_insert_size IMPROPER_ABNORMAL_INSERT_SIZE]
+                [--improper_min_mapping_qual IMPROPER_MIN_MAPPING_QUAL]
+                [--improper_max_clipping_size IMPROPER_MAX_CLIPPING_SIZE]
+                [--junction_dist_margin JUNCTION_DIST_MARGIN]
+                [--junction_opposite_dist_margin_margin JUNCTION_OPPOSITE_DIST_MARGIN_MARGIN]
+                [--improper_check_margin_size IMPROPER_CHECK_MARGIN_SIZE]
+                input.bam output_prefix
 ```
+-- **input.bam**: path to input indexed bam file
+-- **output_prefix**: output file prefix
+See the help (GenomonSV parse -h) for other options. 
+But I believe the default option is 
+enough for typical illumina sequence data (with the length of 50bp ~ 200bp).
 
-* Merging non-matched control panel breakpoint-containing read pairs
-(for later filtering).
+After successful completion, you will find possible breakpoint regions evidenced by
+breakpoint containing read pairs ({output_prefix}/junction.clustered.bedpe.gz, {output_prefix}/junction.clustered.bedpe.gz.gbi)
+and improperly aligned read pairs ({output_prefix}/improper.clustered.bedpe.gz, {output_prefix}/improper.clustered.bedpe.gz.gbi)
+
+
+### Merging non-matched control panel breakpoint-containing read pairs.
+
+This step picks up germline and artifacts breakpoints (e.g., black-list breakpoints) for later filtering steps,
+typically using several control samples.
+We strongly believe this step is crucial for improving accuracy of somatic structural variation calling.
 
 ```
-GenomonSV merge control.yaml mergedControl.bedpe.gz param.yaml                                        
+GenomonSV merge [-h] [--debug]
+                [--merge_check_margin_size MERGE_CHECK_MARGIN_SIZE]
+                control_info.txt merge_output_file                                     
 ```
+-- **control_info.txt*: tab-delimited file on non-matched control. 
+The 1st column is sample label for each breakpoint information file, and can be freely specified.
+The 2nd column is the output_prefix generated at the above parse stage
+(GenomonSV merge program assumes each {output_prefix}.junction.clustered.bedpe.gz file is already generated).
+-- **merge_output_file**: output merged breakpoint information file
 
-* Filtering and annotating candidate somatic structural variations
+### Filtering and annotating candidate somatic structural variations
 
 ```
-GenomonSV filt sample.yaml param.yaml
+GenomonSV filt [-h] [--matched_control_bam matched_control.bam]
+               [--non_matched_control_junction merged.junction.control.bedpe.gz]
+               [--matched_control_label MATCHED_CONTROL_LABEL]
+               [--debug] [--min_junc_num MIN_JUNC_NUM]
+               [--min_sv_size MIN_SV_SIZE]
+               [--min_inversion_size MIN_INVERSION_SIZE]
+               [--control_panel_num_thres CONTROL_PANEL_NUM_THRES]
+               [--control_panel_check_margin CONTROL_PANEL_CHECK_MARGIN]
+               [--min_support_num MIN_SUPPORT_NUM]
+               [--min_mapping_qual MIN_MAPPING_QUAL]
+               [--min_overhang_size MIN_OVERHANG_SIZE]
+               [--close_check_margin CLOSE_CHECK_MARGIN]
+               [--close_check_thres CLOSE_CHECK_THRES]
+               [--max_depth MAX_DEPTH] [--search_length SEARCH_LENGTH]
+               [--search_margin SEARCH_MARGIN]
+               [--split_refernece_thres SPLIT_REFERNECE_THRES]
+               [--validate_sequence_length VALIDATE_SEQUENCE_LENGTH]
+               [--short_tandem_reapeat_thres SHORT_TANDEM_REAPEAT_THRES]
+               [--blat_option BLAT_OPTION]
+               [--min_tumor_variant_read_pair MIN_TUMOR_VARIANT_READ_PAIR]
+               [--min_tumor_allele_freq MIN_TUMOR_ALLELE_FREQ]
+               [--max_control_variant_read_pair MAX_CONTROL_VARIANT_READ_PAIR]
+               [--max_control_allele_freq MAX_CONTROL_ALLELE_FREQ]
+               [--max_fisher_pvalue MAX_FISHER_PVALUE]
+               input.bam output_prefix reference.fa annotation_dir
 ```
 
 ## Results
-
 
 * **Chr_1**: chromosome for the 1st breakpoint
 * **Pos_1**: coordinate for the 1st breakpoint
