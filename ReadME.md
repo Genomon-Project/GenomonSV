@@ -58,8 +58,9 @@ Also, we assume that the sequencing data is paired-end. All the single-end reads
 
 ## Commands
 
-### Parsing breakpoint-containing and improperly aligned read pairs
+### parse
 
+Parsing breakpoint-containing and improperly aligned read pairs
 ```
 GenomonSV parse [-h] [--debug]
                 [--junction_abnormal_insert_size JUNCTION_ABNORMAL_INSERT_SIZE]
@@ -74,8 +75,8 @@ GenomonSV parse [-h] [--debug]
                 [--improper_check_margin_size IMPROPER_CHECK_MARGIN_SIZE]
                 input.bam output_prefix
 ```
--- **input.bam**: path to input indexed bam file
--- **output_prefix**: output file prefix
+- **input.bam**: path to input indexed bam file
+- **output_prefix**: output file prefix
 See the help (GenomonSV parse -h) for other options. 
 But I believe the default option is 
 enough for typical illumina sequence data (with the length of 50bp ~ 200bp).
@@ -96,11 +97,11 @@ GenomonSV merge [-h] [--debug]
                 [--merge_check_margin_size MERGE_CHECK_MARGIN_SIZE]
                 control_info.txt merge_output_file                                     
 ```
--- **control_info.txt*: tab-delimited file on non-matched control. 
+- **control_info.txt**: tab-delimited file on non-matched control. 
 The 1st column is sample label for each breakpoint information file, and can be freely specified.
 The 2nd column is the output_prefix generated at the above parse stage
 (GenomonSV merge program assumes each {output_prefix}.junction.clustered.bedpe.gz file is already generated).
--- **merge_output_file**: output merged breakpoint information file
+- **merge_output_file**: output merged breakpoint information file
 
 ### Filtering and annotating candidate somatic structural variations
 
