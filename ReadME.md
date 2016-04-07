@@ -12,31 +12,48 @@ Several characteristics of Genomon SV includes but not limited to;
 ## Dependency
 
 ### Python
-Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy`, `pyyaml` packages
+Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 
 ### Software
-tabix, bgzip, blat
+[hstlib](http://www.htslib.org), [blat](http://hgdownload.cse.ucsc.edu/admin/exe/)
 
 ## Install
 
 ```
-git clone https://github.com/friend1ws/genomonSV.git
-cd genomonSV
-python setup.py build
-python setup.py install
+git clone https://github.com/friend1ws/GeomonSV.git
+cd GenomonSV
+python setup.py build install
 ```
+For the last command, you may need to add --user if using a shared computing cluster.
+
 ## Preparation
 
-First, Genomon SV accept bam file aligned by `bwa mem` with -T0 option.
+Before using GenomonSV, 3 preparation steps are required
+
+### Install required softwares and add them to the PATH
+
+GenomonSV uses tabix, bgzip (which are part of HTSlib projects) and blat inside the programs, 
+assuming those are installed and the pathes are already added to the running environment.
+Please install and add them to the PATH.
+
+### Prepare annotation files
+
+At the last step, GenomonSV add annotation information to each structural variation candidates.
+We need bgzip compressed bed format gene and exon information files named as gene.bed.gz and exon.bed.gz,
+with tabix index files (gene.bed.gz.tbi and exon.bed.gz.tbi).
+
+We prepared a sample program for preparing them
+
+```
+cd GenomonSV/resource
+bash prepGeneInfo.sh
+```
+
+### Prepare bam files
+
+Genomon SV accept just bam file aligned by `bwa mem` with -T0 option.
 We do not guarantee the results for other cases.
 
-Then, two types of configuration files (in yaml format) should be prepared.
-
-1. sample.yaml
-2. param.yaml
-3. control.yaml
-
-See sample files for description of each parameters.
 
 ## Commands
 
