@@ -67,7 +67,7 @@ cluster_improper_group = parse_parser.add_argument_group("cluster_improper_condi
 cluster_improper_group.add_argument("--junction_dist_margin", type = int, default = 500,
                                     help = "possible junction position margin from the junction direction (default: %(default)s)")
 
-cluster_improper_group.add_argument("--junction_opposite_dist_margin_margin", type = int, default = 30,
+cluster_improper_group.add_argument("--junction_opposite_dist_margin", type = int, default = 30,
                                     help = "possible junction position in the opposite side (default: %(default)s)")
 
 cluster_improper_group.add_argument("--improper_check_margin_size", type = int, default = 1500,

@@ -79,7 +79,7 @@ def genomonSV_parse(args):
     # create and organize bedpe file integrating pair information
     utils.processingMessage("sorting improperly aligned read pairs") 
     parseFunction.makeImproperBedpe(args.output_prefix + ".improper.unsort.txt", args.output_prefix + ".improper.bedpe", 
-                                    args.junction_dist_margin, args.junction_opposite_dist_margin_margin)
+                                    args.junction_dist_margin, args.junction_opposite_dist_margin)
 
     # cluster read pairs possibly representing the same junction
     utils.processingMessage("clustering improperly aligned read pairs")
