@@ -119,7 +119,7 @@ filter_condition_group.add_argument("--min_junc_num", type = int, default = 3,
 filter_condition_group.add_argument("--min_sv_size", type = int, default = 10,
                                    help = "minimum structural variation size (default: %(default)s)")
 
-filter_condition_group.add_argument("--min_inversion_size", type = int, default = 300,
+filter_condition_group.add_argument("--min_inversion_size", type = int, default = 500,
                                     help = "minimum inversion size (default: %(default)s)")
 
 filter_condition_group.add_argument("--control_panel_num_thres", type = int, default = 2,
