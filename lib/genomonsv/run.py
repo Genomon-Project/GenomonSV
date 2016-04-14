@@ -29,7 +29,7 @@ def genomonSV_parse(args):
     ####################
     # parse breakpoint containing read pairs from input bam files
     utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
-    parseFunction.parseJunctionFromBam(args.bam_file, args.output_prefix + ".junction.unsort.txt",
+    parseFunction.parseJunctionFromBam(args.bam_file, args.output_prefix + ".junction.unsort.txt", args.junction_min_mapping_qual,
                                        args.junction_abnormal_insert_size, args.junction_min_major_clipping_size, args.junction_max_minor_clipping_size)
 
     utils.processingMessage("sorting parsed breakpoint containing read pairs")

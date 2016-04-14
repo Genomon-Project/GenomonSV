@@ -7,7 +7,7 @@ import argparse
 # top level parser
 parser = argparse.ArgumentParser(prog = "GenomonSV", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser.add_argument("--version", action = "version", version = "GenomonSV-0.4.0beta")
+parser.add_argument("--version", action = "version", version = "GenomonSV-0.4.0beta2")
 
 subparsers = parser.add_subparsers()
 
@@ -40,6 +40,9 @@ parse_junction_group.add_argument("--junction_min_major_clipping_size", type = i
 parse_junction_group.add_argument("--junction_max_minor_clipping_size", type = int, default = 15,
                                   help = "if the clipped bases numbers of both sides are greater than this value, then the read is filtered out (default: %(default)s)")
 
+parse_junction_group.add_argument("--junction_min_mapping_qual", type = int, default = 0,
+                                  help = "the minimum acceptable mapping qualitiy of the primary junction read (default: %(default)s)")
+
 
 cluster_junction_group = parse_parser.add_argument_group("cluster_junction_condition",
                                                          "parameters used for clustering breakpoint containing read pairs")
@@ -55,7 +58,7 @@ parse_improper_group.add_argument("--improper_abnormal_insert_size", type = int,
                                   help = "the size of abnormal insert size used for identifying improper read pairs (default: %(default)s)")
 
 parse_improper_group.add_argument("--improper_min_mapping_qual", type = int, default = 30,
-                                  help = "the minimum acceptable mapping qualitiy reads within improper read pairs (default: %(default)s)")
+                                  help = "the minimum acceptable mapping qualities of reads within improper read pairs (default: %(default)s)")
 
 parse_improper_group.add_argument("--improper_max_clipping_size", type = int, default = 5,
                                   help = "the maximum acceptable clipping size of reads within improper read pairs(default: %(default)s) ")

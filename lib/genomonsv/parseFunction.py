@@ -7,7 +7,7 @@
 import sys, pysam, re, subprocess, collections
 import utils
 
-def parseJunctionFromBam(inputBAM, outputFilePath, abnormal_insert_size, min_major_clip_size, max_minor_clip_size):
+def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_insert_size, min_major_clip_size, max_minor_clip_size):
 
     """
     This function utilizes the SA tags (SA:Z:rname, pos, strand, CIGAR, mapQ, number of mismatch).
@@ -43,6 +43,9 @@ def parseJunctionFromBam(inputBAM, outputFilePath, abnormal_insert_size, min_maj
 
         # no clipping
         if len(read.cigar) == 1: continue
+
+        # skip if below the minimum mapping quality
+        if (read.mapq < min_mapping_qual): continue
 
         # skip if the read aligned to hs37d5"
         # (in the future, this step will be replaced to some more sophisticated way;

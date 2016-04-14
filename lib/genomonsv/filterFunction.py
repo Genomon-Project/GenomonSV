@@ -4,7 +4,7 @@
      functions for filtering candidates of structural variations
 """
 
-import sys, gzip, subprocess, pysam, numpy, math, os
+import sys, gzip, subprocess, pysam, numpy, math, os, re
 import coveredRegions
 import realignmentFunction
 import utils
@@ -61,12 +61,9 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
-    print controlFile
     use_control = True if controlFile != "" else False
-
     if use_control == True: tabixfile = pysam.TabixFile(controlFile)
 
-   
     tabixErrorMsg = "" 
     for line in hIN:
         F = line.rstrip('\n').split('\t')
@@ -94,8 +91,8 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
 
             ####################
             # for each record in control junction extracted, check the consistency with the current junction
-            max_control_sample = "---"
-            max_control_num = 0 
+            # max_control_sample = "---"
+            # max_control_num = 0 
             if tabixErrorFlag == 0:
                 for record_line in records:
                     record = record_line.split('\t')
@@ -117,16 +114,28 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
                         if flag == 1:
                             controlSamples = record[10].split(';')
                             controlNums = record[11].split(';')
+
                             for i in range(0, len(controlSamples)):
-                                if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(controlPanel_num_thres):
+                                if controlSamples[i] == matchedNormal: continue
+
+                                if int(controlNums[i]) > max_control_num:
+                                    max_control_sample = controlSamples[i]
+                                    max_control_num = int(controlNums[i])
+
+                                if int(controlNums[i]) >= int(controlPanel_num_thres):
+                                    controlFlag = 1
+
+                                """
+                                # if controlSamples[i] != matchedNormal is not None and int(controlNums[i]) >= int(controlPanel_num_thres):
                                 # if controlSamples[i] != matchedNormal and int(controlNums[i]) >= int(supportReadThres):
                                     controlFlag = 1
                                     if int(controlNums[i]) > max_control_num:
                                         max_control_sample = controlSamples[i]
                                         max_control_num = int(controlNums[i]) 
-                              
+                                """
+                            
             ####################
-                        
+              
         if controlFlag == 0:
             print >> hOUT, "\t".join(F) + '\t' + max_control_sample + '\t' + str(max_control_num)
 
@@ -217,13 +226,20 @@ def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping
         improperCoveredRegion = ([] if F[19] == "---" else F[19].split(';'))
 
         # enumerate support read number
+        junc_ids = [re.sub(r'/\d$', '', x) for x in F[6].split(';')]
+        improper_ids = F[17].split(';')
+        if len(list(set(junc_ids + improper_ids))) < min_support_num:
+            continue
+
         juncSupport = len(MQs)
         improperMQs = ([] if F[18] == "---" else F[18].split(';'))
+        """
         improperSupport = len(improperMQs)
         # skip if the number of suppor read is below the minSupReadNum 
         if juncSupport + improperSupport < min_support_num:
             continue
-
+        """
+        
 
         ####################
         # check for the mapping quality
