@@ -20,7 +20,7 @@ Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 ## Install
 
 ```
-git clone https://github.com/friend1ws/GeomonSV.git
+git clone https://github.com/Genomon-Project/GenomonSV.git
 cd GenomonSV
 python setup.py build install
 ```
