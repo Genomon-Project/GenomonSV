@@ -165,6 +165,8 @@ def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_in
 
             if validFlag == 1:
 
+                if juncPos_SA < 0: continue
+
                 juncSurplus = "---"
                 if clipLen_SA > expected_clipLen_SA and readLength_current == len(read.seq):
                     surPlus_start = readLength_current - clipLen_current
@@ -249,6 +251,8 @@ def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_in
 
 
             if validFlag == 1:
+
+                if juncPos_SA < 0: continue
 
                 juncSurplus = "---"
                 if clipLen_SA > expected_clipLen_SA and readLength_current == len(read.seq):
