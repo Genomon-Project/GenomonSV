@@ -1,5 +1,8 @@
 # Genomon SV
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Build Status](https://travis-ci.org/Genomon-Project/GenomonSV.svg?branch=devel)](https://travis-ci.org/Genomon-Project/GenomonSV)
+
 ## Introduction
 
 Genomon SV is a software for detecting somatic structural variations from cancer genome sequencing data.
