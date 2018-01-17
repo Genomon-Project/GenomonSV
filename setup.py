@@ -30,6 +30,6 @@ setup(
     packages = find_packages(exclude = ['tests']),
 
     install_requires = [],
-    entry_points = {'console_scripts': ['genomon_sv = genomon_sv:main']}
+    entry_points = {'console_scripts': ['GenomonSV = genomon_sv:main']}
 
 )
