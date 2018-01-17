@@ -97,8 +97,8 @@ def create_parser():
     filt_parser.add_argument("reference_genome", metavar = "reference.fa", type = str,
                              help = "the path to the reference genomoe sequence")
 
-    filt_parser.add_argument("annotation_dir", metavar = "annotation_dir", type = str,
-                             help = "the path to database directory")
+    # filt_parser.add_argument("annotation_dir", metavar = "annotation_dir", type = str,
+    #                          help = "the path to database directory")
 
     filt_parser.add_argument("--matched_control_bam", metavar = "matched_control.bam", default = "", type = str,
                              help = "path to matched control bam file")
@@ -108,6 +108,12 @@ def create_parser():
 
     filt_parser.add_argument("--matched_control_label", default = "", type = str,
                              help = "matched control sample label (junction read pairs of this label is ignored in the non-matched control filtering step)")
+
+    filt_parser.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
+                             help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
+
+    filt_parser.add_argument("--grc", default = False, action = 'store_true',
+                             help = "Use Genome Reference Consortium nomenclature rather than UCSC (default: %(default)s)")
 
     filt_parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
 

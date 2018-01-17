@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
-import sys, pysam
+import sys, pysam, subprocess
+import annot_utils.gene, annot_utils.exon
 
-def addAnnotation(inputFilePath, outputFilePath, annotation_dir):
+def addAnnotation(inputFilePath, outputFilePath, genome_id, is_grc):
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
 
-    gene_bed = annotation_dir + "/gene.bed.gz"
-    exon_bed = annotation_dir + "/exon.bed.gz"
+    annot_utils.gene.make_gene_info(outputFilePath + ".tmp.refGene.bed.gz", "refseq", genome_id, is_grc, False)
+    annot_utils.exon.make_exon_info(outputFilePath + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, False)
+
+    gene_bed = outputFilePath + ".tmp.refGene.bed.gz" 
+    exon_bed = outputFilePath + ".tmp.refExon.bed.gz"
 
     gene_tb = pysam.TabixFile(gene_bed)
     exon_tb = pysam.TabixFile(exon_bed)
@@ -117,6 +121,10 @@ def addAnnotation(inputFilePath, outputFilePath, annotation_dir):
                        '\t'.join(F[7:]) 
 #               '\t'.join(F[7:11]) + '\t' + str(round(tumorAF, 4)) + '\t' + str(round(normalAF, 4)) + '\t' + str(round(float(F[11]), 4))
 
+    subprocess.check_call(["rm", "-rf", outputFilePath + ".tmp.refGene.bed.gz"])
+    subprocess.check_call(["rm", "-rf", outputFilePath + ".tmp.refGene.bed.gz.tbi"])
+    subprocess.check_call(["rm", "-rf", outputFilePath + ".tmp.refExon.bed.gz"])
+    subprocess.check_call(["rm", "-rf", outputFilePath + ".tmp.refExon.bed.gz.tbi"])
 
 
     hIN.close()

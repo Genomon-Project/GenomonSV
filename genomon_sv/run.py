@@ -127,11 +127,11 @@ def genomonSV_filt(args):
     if not os.path.exists(args.reference_genome):
         raise ValueError('No file: ' + args.reference_genome)
 
-    if not os.path.exists(args.annotation_dir + "/gene.bed.gz"):
-        raise ValueError('No file: ' + args.annotation_dir + "/gene.bed.gz")
+    # if not os.path.exists(args.annotation_dir + "/gene.bed.gz"):
+    #     raise ValueError('No file: ' + args.annotation_dir + "/gene.bed.gz")
 
-    if not os.path.exists(args.annotation_dir + "/exon.bed.gz"):
-        raise ValueError('No file: ' + args.annotation_dir + "/exon.bed.gz")
+    # if not os.path.exists(args.annotation_dir + "/exon.bed.gz"):
+    #     raise ValueError('No file: ' + args.annotation_dir + "/exon.bed.gz")
 
  
     ####################
@@ -180,7 +180,7 @@ def genomonSV_filt(args):
     utils.processingMessage("adding annotation")
     annotationFunction.addAnnotation(args.output_prefix + ".junction.clustered.filt7.bedpe",
                                      args.output_prefix + ".genomonSV.result.txt",
-                                     args.annotation_dir)
+                                     args.genome_id, args.grc)
 
     if args.debug == False:
         subprocess.call(["rm", args.output_prefix + ".junction.clustered.filt1.bedpe"])
