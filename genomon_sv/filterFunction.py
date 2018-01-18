@@ -151,9 +151,6 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
 
 def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
 
-    juncFile = sys.argv[1]
-    improperFile = sys.argv[2]
-
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
     tabixfile = pysam.TabixFile(improperFilePath)
