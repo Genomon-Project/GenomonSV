@@ -4,7 +4,7 @@ import unittest
 import os, glob, tempfile, shutil, filecmp
 import genomon_sv 
 
-class TestMergeControl(unittest.TestCase):
+class TestMerge(unittest.TestCase):
 
     def setUp(self):
         self.parser = genomon_sv.arg_parser.create_parser()
@@ -36,4 +36,3 @@ class TestMergeControl(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 
-l.junction.clustered.bedpe.gz 
