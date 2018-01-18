@@ -1,0 +1,18 @@
+language: python
+python:
+  - "2.7"
+before_script:
+  - wget https://github.com/samtools/htslib/releases/download/1.3.2/htslib-1.3.2.tar.bz2
+  - tar jxvf htslib-1.3.2.tar.bz2 
+  - cd htslib-1.3.2 && make && export PATH=$PATH:$PWD && cd ..
+  - wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
+  - chmod a+x blat && export PATH=$PATH:$PWD 
+  - pip install annot_utils
+  - pip install pysam
+  - pip install scipy
+  - pip install numpy
+  - git clone https://github.com/Genomon-Project/GenomonSV.git
+  - cd GenomonSV && pip install . 
+
+script:
+  - python setup.py test
