@@ -11,8 +11,7 @@ before_script:
   - pip install pysam
   - pip install scipy
   - pip install numpy
-  - git clone https://github.com/Genomon-Project/GenomonSV.git
-  - cd GenomonSV && pip install . 
+  - pip install genomon-sv
 
 script:
   - python setup.py test
