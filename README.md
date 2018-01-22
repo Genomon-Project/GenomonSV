@@ -23,9 +23,7 @@ Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 ## Install
 
 ```
-git clone https://github.com/Genomon-Project/GenomonSV.git
-cd GenomonSV
-python setup.py build install
+pip install genomon-sv
 ```
 For the last command, you may need to add --user if using a shared computing cluster.
 
@@ -39,18 +37,6 @@ GenomonSV uses tabix, bgzip (which are part of HTSlib projects) and blat inside 
 assuming those are installed and the pathes are already added to the running environment.
 Please install and add them to the PATH.
 
-### Prepare annotation files
-
-At the last step, GenomonSV add annotation information to each structural variation candidates.
-We need bgzip compressed bed format gene and exon information files named as gene.bed.gz(.tbi) and exon.bed.gz(.tbi),
-with tabix index files.
-
-We prepared a sample program for preparing them
-
-```
-cd GenomonSV/resource
-bash prepGeneInfo.sh
-```
 
 ### Prepare bam files
 
@@ -112,30 +98,31 @@ Filtering and annotating candidate somatic structural variation.
 
 ```
 GenomonSV filt [-h] [--matched_control_bam matched_control.bam]
-               [--non_matched_control_junction merged.junction.control.bedpe.gz]
-               [--matched_control_label MATCHED_CONTROL_LABEL]
-               [--debug] [--min_junc_num MIN_JUNC_NUM]
-               [--min_sv_size MIN_SV_SIZE]
-               [--min_inversion_size MIN_INVERSION_SIZE]
-               [--control_panel_num_thres CONTROL_PANEL_NUM_THRES]
-               [--control_panel_check_margin CONTROL_PANEL_CHECK_MARGIN]
-               [--min_support_num MIN_SUPPORT_NUM]
-               [--min_mapping_qual MIN_MAPPING_QUAL]
-               [--min_overhang_size MIN_OVERHANG_SIZE]
-               [--close_check_margin CLOSE_CHECK_MARGIN]
-               [--close_check_thres CLOSE_CHECK_THRES]
-               [--max_depth MAX_DEPTH] [--search_length SEARCH_LENGTH]
-               [--search_margin SEARCH_MARGIN]
-               [--split_refernece_thres SPLIT_REFERNECE_THRES]
-               [--validate_sequence_length VALIDATE_SEQUENCE_LENGTH]
-               [--short_tandem_reapeat_thres SHORT_TANDEM_REAPEAT_THRES]
-               [--blat_option BLAT_OPTION]
-               [--min_tumor_variant_read_pair MIN_TUMOR_VARIANT_READ_PAIR]
-               [--min_tumor_allele_freq MIN_TUMOR_ALLELE_FREQ]
-               [--max_control_variant_read_pair MAX_CONTROL_VARIANT_READ_PAIR]
-               [--max_control_allele_freq MAX_CONTROL_ALLELE_FREQ]
-               [--max_fisher_pvalue MAX_FISHER_PVALUE]
-               input.bam output_prefix reference.fa annotation_dir
+                      [--non_matched_control_junction merged.junction.control.bedpe.gz]
+                      [--matched_control_label MATCHED_CONTROL_LABEL]
+                      [--genome_id {hg19,hg38,mm10}] [--grc] [--debug]
+                      [--min_junc_num MIN_JUNC_NUM]
+                      [--min_sv_size MIN_SV_SIZE]
+                      [--min_inversion_size MIN_INVERSION_SIZE]
+                      [--control_panel_num_thres CONTROL_PANEL_NUM_THRES]
+                      [--control_panel_check_margin CONTROL_PANEL_CHECK_MARGIN]
+                      [--min_support_num MIN_SUPPORT_NUM]
+                      [--min_mapping_qual MIN_MAPPING_QUAL]
+                      [--min_overhang_size MIN_OVERHANG_SIZE]
+                      [--close_check_margin CLOSE_CHECK_MARGIN]
+                      [--close_check_thres CLOSE_CHECK_THRES]
+                      [--max_depth MAX_DEPTH] [--search_length SEARCH_LENGTH]
+                      [--search_margin SEARCH_MARGIN]
+                      [--split_refernece_thres SPLIT_REFERNECE_THRES]
+                      [--validate_sequence_length VALIDATE_SEQUENCE_LENGTH]
+                      [--short_tandem_reapeat_thres SHORT_TANDEM_REAPEAT_THRES]
+                      [--blat_option BLAT_OPTION]
+                      [--min_tumor_variant_read_pair MIN_TUMOR_VARIANT_READ_PAIR]
+                      [--min_tumor_allele_freq MIN_TUMOR_ALLELE_FREQ]
+                      [--max_control_variant_read_pair MAX_CONTROL_VARIANT_READ_PAIR]
+                      [--max_control_allele_freq MAX_CONTROL_ALLELE_FREQ]
+                      [--max_fisher_pvalue MAX_FISHER_PVALUE]
+                      input.bam output_prefix reference.fa
 ```
 
 - **input.bam**: Path to input indexed bam file
