@@ -224,7 +224,8 @@ def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping
 
         # enumerate support read number
         junc_ids = [re.sub(r'/\d$', '', x) for x in F[6].split(';')]
-        improper_ids = F[17].split(';')
+        # improper_ids = F[17].split(';')
+        improper_ids = [] if F[17] == "---" else F[17].split(';')
         if len(list(set(junc_ids + improper_ids))) < min_support_num:
             continue
 
