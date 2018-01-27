@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import sys, os, subprocess, logging
+import sys, os, subprocess, re, logging
+import pysam
 
 def make_directory(inputDir):
     """
@@ -54,6 +55,24 @@ def warningMessage(message):
     # logger = logging.getLogger('genomonSV_log')
     # logger.warning(message)
     print >> sys.stderr, message
+
+
+def get_seq(reference, chr, start, end):
+
+    seq = ""
+    for item in pysam.faidx(reference, chr + ":" + str(start) + "-" + str(end)):
+        # if item[0] == ">": continue
+        seq = seq + item.rstrip('\n')
+    seq = seq.replace('>', '')
+    seq = seq.replace(chr + ":" + str(start) + "-" + str(end), '')
+
+    if re.search(r'[^ACGTNacgtn]', seq) is not None:
+        print >> sys.stderr, "The return value in get_seq function includes non-nucleotide characters:"
+        print >> sys.stderr, seq
+        sys.exit(1)
+
+    return seq
+
 
 
 def reverseComplement(seq):

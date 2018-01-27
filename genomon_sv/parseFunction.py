@@ -463,7 +463,7 @@ def addPairCoverRegionFromBam(inputFilePath, outputFilePath, pairCoverRegionInfo
 
 
 
-def clusterJunction(inputFilePath, outputFilePath, check_margin_size):
+def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_unique_pairs):
 
     """
         script for merging and summarizing junction read pairs
@@ -475,9 +475,14 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size):
 
     mergedBedpeInfo = {}
     mergedJunction = {}
+    temp_chr = None
+    skip_pos = 0
     for line in hIN:
 
         F = line.rstrip('\n').split('\t')
+
+        if F[0] != temp_chr: temp_chr, skip_pos = F[0], 0
+        if int(F[1]) < skip_pos: continue
 
         match = 0
         delList = []
@@ -562,6 +567,13 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size):
                 tinseq = utils.reverseComplement(F[7])
 
             mergedJunction[newKey] = ','.join([F[0], F[2], F[8], F[3], F[5], F[9], tinseq])
+
+        if len(mergedJunction) > maximum_unique_pairs:
+            print >> sys.stderr, "Exceeded maximum number of unique junction pairs at %s:%s-%s" % (F[0], F[1], F[2])
+            print >> sys.stderr, "Skipp %s:%s-%s" % (F[0], F[1], str(int(F[2]) + check_margin_size))
+            mergedJunction = {}
+            mergedBedpeInfo = {}
+            skip_pos = int(F[1]) + check_margin_size
 
     hIN.close()
 

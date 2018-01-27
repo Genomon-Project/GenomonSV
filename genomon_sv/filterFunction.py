@@ -166,7 +166,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
         # get the records for control junction data for the current position
         tabixErrorFlag = 0
         try:
-            records = tabixfile.fetch(F[0], int(F[1]) - -1, int(F[2]) + 1)
+            records = tabixfile.fetch(F[0], int(F[1]) - 1, int(F[2]) + 1)
         except Exception as inst:
             # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
             tabixErrorMsg = str(inst.args)
@@ -400,6 +400,8 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         
         ####################
         # generate reference sequence and sequence containing the presumed variants
+        if int(pos1) - validate_sequence_length < 0: continue
+        if int(pos2) - validate_sequence_length < 0: continue
         realignmentFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa", chr1, pos1, dir1, chr2, pos2, dir2, juncSeq,
                                            reference_genome, split_refernece_thres, validate_sequence_length)
 

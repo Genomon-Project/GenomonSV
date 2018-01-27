@@ -49,7 +49,8 @@ def genomonSV_parse(args):
     parseFunction.addPairCoverRegionFromBam(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.pairCoverage.txt")
 
     utils.processingMessage("clustering breakpoint containing read pairs")
-    parseFunction.clusterJunction(args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.clustered.bedpe.unsort", args.junction_check_margin_size)
+    parseFunction.clusterJunction(args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.clustered.bedpe.unsort", \
+                                  args.junction_check_margin_size, args.junction_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered breakpoint containing read pairs")
     utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.bedpe")

@@ -209,19 +209,26 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
     # for mid-range deletion or tandem duplication
     if juncChr1 == juncChr2 and abs(int(juncPos1) - int(juncPos2)) <= split_refernece_thres and juncDir1 != juncDir2:
 
+        seq = utils.get_seq(reference_genome, juncChr1, int(juncPos1) - validate_sequence_length, int(juncPos2) + validate_sequence_length) 
+        """
         seq = ""
         for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
         seq = seq.replace('>', '')
         seq = seq.replace(juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length), '')
-
+        """
         print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref"
         print >> hOUT, seq
 
         # for mid-range deletion
         if juncDir1 == "+" and juncDir2 == "-":
+   
+            seq = utils.get_seq(reference_genome, juncChr1, int(juncPos1) - validate_sequence_length, int(juncPos1)) 
+            seq = seq + juncSeq
+            seq = seq + utils.get_seq(reference_genome, juncChr2, int(juncPos2), int(juncPos2) + validate_sequence_length)
 
+            """
             seq = ""
             for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
@@ -236,12 +243,19 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
                 seq = seq + item.rstrip('\n').upper()
             seq = seq.replace('>', '')
             seq = seq.replace(juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length), '')
+            """
 
             print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
             print >> hOUT, seq
 
         # for mid-range tandem duplication
         else:
+
+            seq = utils.get_seq(reference_genome, juncChr2, int(juncPos2) - validate_sequence_length, int(juncPos2))                             
+            seq = seq + juncSeq
+            seq = seq + utils.get_seq(reference_genome, juncChr1, int(juncPos1), int(juncPos1) + validate_sequence_length)
+
+            """
             seq = "" 
             for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
@@ -256,70 +270,86 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
                 seq = seq + item.rstrip('\n').upper()
             seq = seq.replace('>', '')
             seq = seq.replace(juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length), '')
-            
+            """
+
             print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
             print >> hOUT, seq
-
+            
 
     else:
 
+        seq = utils.get_seq(reference_genome, juncChr1, int(juncPos1) - validate_sequence_length, int(juncPos1) + validate_sequence_length) 
+
+        """
         seq = ""
         for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos1) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
         seq = seq.replace('>', '')
         seq = seq.replace(juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos1) + validate_sequence_length), '')
+        """
 
         print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref1"
         print >> hOUT, seq
 
+        seq = utils.get_seq(reference_genome, juncChr2, int(juncPos2) - validate_sequence_length, int(juncPos2) + validate_sequence_length)
+        """
         seq = ""
         for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length)):
             if item[0] == ">": continue
             seq = seq + item.rstrip('\n').upper()
         seq = seq.replace('>', '')
         seq = seq.replace(juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length), '')
+        """
 
         print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref2"
         print >> hOUT, seq
 
-
         seq = ""
         if juncDir1 == "+":
+            tseq = utils.get_seq(reference_genome, juncChr1, int(juncPos1) - validate_sequence_length, int(juncPos1))
+            """
             tseq = ""
             for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(juncPos1)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = tseq.replace('>', '')
             tseq = tseq.replace(juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(juncPos1), '')
+            """
         else:
+            tseq = utils.get_seq(reference_genome, juncChr1, int(juncPos1), int(juncPos1) + validate_sequence_length)
+            """
             tseq = ""
             for item in pysam.faidx(reference_genome, juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = tseq.replace('>', '')
             tseq = tseq.replace(juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length), '')
-
+            """
             tseq = utils.reverseComplement(tseq)
 
         seq = tseq + juncSeq
 
         if juncDir2 == "-":
+            tseq = utils.get_seq(reference_genome, juncChr2, int(juncPos2), int(juncPos2) + validate_sequence_length)
+            """
             tseq = "" 
             for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = tseq.replace('>', '')
             tseq = tseq.replace(juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length), '')
-
+            """
         else:
+            tseq = utils.get_seq(reference_genome, juncChr2, int(juncPos2) - validate_sequence_length, int(juncPos2))
+            """
             tseq = ""
             for item in pysam.faidx(reference_genome, juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2)):
                 if item[0] == ">": continue
                 tseq = tseq + item.rstrip('\n').upper()
             tseq = tseq.replace('>', '')
             tseq = tseq.replace(juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(juncPos2), '')
-
+            """
             tseq = utils.reverseComplement(tseq)
 
         seq = seq + tseq
