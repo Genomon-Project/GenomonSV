@@ -9,7 +9,7 @@ def create_parser():
     # top level parser
     parser = argparse.ArgumentParser(prog = "GenomonSV", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--version", action = "version", version = "GenomonSV-0.5.1")
+    parser.add_argument("--version", action = "version", version = "GenomonSV-0.6.0b1")
 
     subparsers = parser.add_subparsers()
 
@@ -121,6 +121,8 @@ def create_parser():
 
     filt_parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
 
+    filt_parser.add_argument('--thread_num', default = 1, type=int,
+                             help = "The number of threads")
 
     filter_condition_group = filt_parser.add_argument_group("filter_condition",
                                                              "Parameters used in various filtering steps in GenomonSV filt command")

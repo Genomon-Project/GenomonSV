@@ -7,8 +7,106 @@
 import sys, gzip, subprocess, pysam, numpy, math, os, re
 import coveredRegions
 import realignmentFunction
+import annotationFunction
 import utils
 from scipy import stats
+
+
+def genomon_sv_filt_main(output_prefix, args, thread_str = ""):
+
+    utils.processingMessage("Filtering by # of breakpoint containing read pairs and variant sizes" + thread_str)
+    filterJuncNumAndSize(output_prefix + ".junction.clustered.bedpe.gz",
+                         output_prefix + ".junction.clustered.filt1.bedpe",
+                         args.min_junc_num, args.min_sv_size, args.min_inversion_size)
+
+    utils.processingMessage("Filtering by nonmatched control panel" + thread_str)
+    filterNonMatchControl(output_prefix + ".junction.clustered.filt1.bedpe",
+                          output_prefix + ".junction.clustered.filt2.bedpe",
+                          args.non_matched_control_junction,
+                          args.matched_control_label,
+                          args.control_panel_num_thres, args.control_panel_check_margin)
+
+    utils.processingMessage("Incorporating improperly alinged read pair infomation" + thread_str)
+    addImproperInfo(output_prefix + ".junction.clustered.filt2.bedpe",
+                    output_prefix + ".junction.clustered.filt3.bedpe",
+                    args.output_prefix + ".improper.clustered.bedpe.gz")
+
+    utils.processingMessage("Filtering by sizes of covered regions, mapping quality and # of support read pairs" + thread_str)
+    filterMergedJunc(output_prefix + ".junction.clustered.filt3.bedpe",
+                     output_prefix + ".junction.clustered.filt4.bedpe",
+                     args.min_support_num, args.min_mapping_qual, args.min_overhang_size)
+
+    utils.processingMessage("Filtering too close candidates" + thread_str)
+    removeClose(output_prefix + ".junction.clustered.filt4.bedpe",
+                output_prefix + ".junction.clustered.filt5.bedpe",
+                args.close_check_margin, args.close_check_thres)
+
+    utils.processingMessage("Performing realignments" + thread_str)
+    validateByRealignment(output_prefix + ".junction.clustered.filt5.bedpe",
+                          output_prefix + ".junction.clustered.filt6.bedpe",
+                          args.bam_file, args.matched_control_bam, args.reference_genome, args.blat_option,
+                          args.short_tandem_reapeat_thres, args.max_depth, args.search_length, args.search_margin, 
+                          args.split_refernece_thres, args.validate_sequence_length)
+
+    utils.processingMessage("Filtering allele frequencies, Fisher's exact test p-values and # of support read pairs" + thread_str)
+    filterNumAFFis(output_prefix + ".junction.clustered.filt6.bedpe", 
+                   output_prefix + ".junction.clustered.filt7.bedpe",
+                   args.matched_control_bam,
+                   args.min_tumor_variant_read_pair, args.min_tumor_allele_freq, 
+                   args.max_control_variant_read_pair, args.max_control_allele_freq,
+                   args.max_fisher_pvalue)
+
+    utils.processingMessage("Adding annotation" + thread_str)
+    annotationFunction.addAnnotation(output_prefix + ".junction.clustered.filt7.bedpe",
+                                     output_prefix + ".genomonSV.result.txt",
+                                     args.genome_id, args.grc)
+
+    if args.debug == False:
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt1.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt2.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt3.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt4.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt5.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt6.bedpe"])
+        subprocess.call(["rm", output_prefix + ".junction.clustered.filt7.bedpe"])
+
+
+def partition_junction(output_prefix, thread_num):
+
+    # count the number of junctions
+    line_num = 0
+    with gzip.open(output_prefix + ".junction.clustered.bedpe.gz") as hin:
+        for line in hin:
+            line_num = line_num + 1
+
+    thread_num_mod = min(line_num, thread_num)
+    if thread_num_mod == 0: thread_num_mod = 1
+
+    each_partition_line_num = line_num / thread_num_mod
+
+    current_line_num = 0
+    current_partition_num = 1
+    hout = open(output_prefix + ".thread_1.junction.clustered.bedpe", 'w')
+    with gzip.open(output_prefix + ".junction.clustered.bedpe.gz") as hin:
+        for line in hin:
+            print >> hout, line.rstrip('\n')
+            current_line_num = current_line_num + 1
+            if current_line_num >= each_partition_line_num and current_partition_num < thread_num_mod:
+                current_line_num = 0
+                current_partition_num = current_partition_num + 1
+                hout.close()
+                hout = open(output_prefix + ".thread_" + str(current_partition_num) + ".junction.clustered.bedpe", 'w')   
+    
+    hout.close()
+
+    for i in range(1, thread_num_mod + 1):
+        utils.compress_index_bed(output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe",
+                                 output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe.gz")
+        subprocess.check_call(["rm", "-rf", output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe"])
+ 
+    return thread_num_mod
+    
+
 
 def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_thres, inversion_size_thres):
      

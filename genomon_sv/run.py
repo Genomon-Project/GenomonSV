@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-import sys, argparse, subprocess, os
+import sys, argparse, subprocess, os, multiprocessing
 # import config 
 import utils
 import parseFunction
@@ -134,7 +134,40 @@ def genomonSV_filt(args):
     # if not os.path.exists(args.annotation_dir + "/exon.bed.gz"):
     #     raise ValueError('No file: ' + args.annotation_dir + "/exon.bed.gz")
 
+    if args.thread_num == 1:
+        filterFunction.genomon_sv_filt_main(args.output_prefix, args)
+    else:
+        thread_num_mod = filterFunction.partition_junction(args.output_prefix, args.thread_num)
+
+        jobs = []
+        for i in range(1, thread_num_mod + 1):
+            proc = multiprocessing.Process(target = filterFunction.genomon_sv_filt_main, \
+                                           args = (args.output_prefix + ".thread_" + str(i), args, " (thread " + str(i) + ')'))
+            jobs.append(proc)
+            proc.start()
+
+        for i in range(0, thread_num_mod):
+            jobs[i].join()
+
+        header_flag = 0
+        with open(args.output_prefix + ".genomonSV.result.txt", 'w') as hout:
+            for i in range(1, thread_num_mod + 1):
+                with open(args.output_prefix + ".thread_" + str(i) + ".genomonSV.result.txt", 'r') as hin:
+                    header = hin.readline().rstrip('\n')
+                    if header_flag == 0: 
+                        print >> hout, header
+                        header_flag = 1
+                    for line in hin:
+                       print >> hout, line.rstrip('\n') 
  
+        for i in range(1, thread_num_mod + 1):
+            subprocess.check_call(["rm", "-rf", args.output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe.gz"])
+            subprocess.check_call(["rm", "-rf", args.output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe.gz.tbi"])
+            subprocess.check_call(["rm", "-rf", args.output_prefix + ".thread_" + str(i) + ".genomonSV.result.txt"])
+
+
+        
+    """ 
     ####################
     utils.processingMessage("filtering by # of breakpoint containing read pairs and variant sizes")
     filterFunction.filterJuncNumAndSize(args.output_prefix + ".junction.clustered.bedpe.gz",
@@ -193,6 +226,7 @@ def genomonSV_filt(args):
         subprocess.call(["rm", args.output_prefix + ".junction.clustered.filt7.bedpe"])
 
     ####################
+    """
 
 
 def genomonSV_merge(args):
