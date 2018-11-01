@@ -179,7 +179,7 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
             # get the records for control junction data for the current position
             tabixErrorFlag = 0
             try:
-                records = tabixfile.fetch(F[0], int(F[1]) - controlPanel_check_margin, int(F[2]) + controlPanel_check_margin)
+                records = tabixfile.fetch(F[0], max(int(F[1]) - controlPanel_check_margin, 0), int(F[2]) + controlPanel_check_margin)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
                 tabixErrorMsg = str(inst.args)
