@@ -9,7 +9,7 @@ def create_parser():
     # top level parser
     parser = argparse.ArgumentParser(prog = "GenomonSV", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--version", action = "version", version = "GenomonSV-0.6.0")
+    parser.add_argument("--version", action = "version", version = "GenomonSV-0.6.1b1")
 
     subparsers = parser.add_subparsers()
 
@@ -82,6 +82,9 @@ def create_parser():
     cluster_improper_group.add_argument("--improper_check_margin_size", type = int, default = 1500,
                                         help = "This should be sufficiently greater than insert size, but the computational time will increase when too large (default: %(default)s)")
 
+    cluster_improper_group.add_argument("--improper_check_maximum_unique_pairs", type = int, default = 10000,
+                                        help = "The number of unique improper pairs at each local region. \
+                                                Set mainly for avoiding local regions with extremely high depths and huge amount of junction reads (default: %(default)s)")
 
     parse_parser.set_defaults(func = genomonSV_parse)
     ####################   

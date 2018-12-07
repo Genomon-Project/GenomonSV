@@ -84,7 +84,8 @@ def genomonSV_parse(args):
 
     # cluster read pairs possibly representing the same junction
     utils.processingMessage("clustering improperly aligned read pairs")
-    parseFunction.clusterImproperBedpe(args.output_prefix + ".improper.bedpe", args.output_prefix + ".improper.clustered.unsort.bedpe", args.improper_check_margin_size)
+    parseFunction.clusterImproperBedpe(args.output_prefix + ".improper.bedpe", args.output_prefix + ".improper.clustered.unsort.bedpe", 
+                                       args.improper_check_margin_size, args.improper_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered improperly aligned read pairs")
     utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.bedpe")

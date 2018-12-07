@@ -570,7 +570,7 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
 
         if len(mergedJunction) > maximum_unique_pairs:
             print >> sys.stderr, "Exceeded maximum number of unique junction pairs at %s:%s-%s" % (F[0], F[1], F[2])
-            print >> sys.stderr, "Skipp %s:%s-%s" % (F[0], F[1], str(int(F[2]) + check_margin_size))
+            print >> sys.stderr, "Skip %s:%s-%s" % (F[0], F[1], str(int(F[2]) + check_margin_size))
             mergedJunction = {}
             mergedBedpeInfo = {}
             skip_pos = int(F[1]) + check_margin_size
@@ -737,7 +737,7 @@ def makeImproperBedpe(inputFilePath, outputFilePath, junction_dist_margin, clipp
 
 
 
-def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size):
+def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maximum_unique_pairs):
    
     ####################
     # cluster and summarize improper read pair bed file
@@ -745,9 +745,13 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size):
     hOUT = open(outputFilePath, "w")
 
     mergedBedpe = {}
+    temp_chr = None
+    skip_pos = 0
     for line in hIN:
 
         F = line.rstrip('\n').split('\t')
+        if F[0] != temp_chr: temp_chr, skip_pos = F[0], 0
+        if int(F[1]) < skip_pos: continue
 
         match = 0
         delList = []
@@ -796,6 +800,11 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size):
             newKey = '\t'.join([F[0], F[1], F[2], F[3], F[4], F[5], F[8], F[9]])
             mergedBedpe[newKey] = F[6] + '\t' + F[7] + '\t' + F[10]
 
+        if len(mergedBedpe) > maximum_unique_pairs:
+            print >> sys.stderr, "Exceeded maximum number of unique improper pairs at %s:%s-%s" % (F[0], F[1], F[2])
+            print >> sys.stderr, "Skip %s:%s-%s" % (F[0], F[1], str(int(F[2]) + check_margin_size))
+            mergedBedpe
+            skip_pos = int(F[1]) + check_margin_size
  
     for key in sorted(mergedBedpe):
 
