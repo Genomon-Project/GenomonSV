@@ -26,11 +26,11 @@ RUN wget https://github.com/samtools/htslib/releases/download/1.7/htslib-1.7.tar
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 
-RUN pip install annot_utils==0.2.0
-RUN pip install pysam==0.13
-RUN pip install numpy==1.14.0
-RUN pip install scipy==1.0.0
-RUN pip install genomon_sv==0.5.0
+RUN pip install annot_utils==0.2.1
+RUN pip install pysam==0.15
+RUN pip install numpy==1.15.1
+RUN pip install scipy==1.1.0
+RUN pip install genomon_sv==0.6.0rc1
 
 # for blat
 RUN apt-get update && apt-get install -y \
@@ -42,7 +42,7 @@ RUN cd  /usr/local/bin && \
 RUN chmod a+x /usr/local/bin/blat
 
 # sv_utils
-RUN pip install sv_utils==0.5.0rc1
+RUN pip install sv_utils==0.5.1
 RUN pip install primer3-py==0.5.5
 
 
