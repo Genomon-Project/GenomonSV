@@ -10,7 +10,7 @@ def simplifyJunc(inputFilePath, outputFilePath, label):
         function for creating control junction information for filtering
     """
 
-    hIN = gzip.open(inputFilePath, 'r')
+    hIN = gzip.open(inputFilePath, 'rt')
     hOUT = open(outputFilePath, 'a')
     
     num = 1

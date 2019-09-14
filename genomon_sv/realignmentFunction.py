@@ -453,6 +453,7 @@ def summarizeRefAlt(inputFile, ITDFlag):
         elif F[13][-3:] == "ref":
             tempRef.append((tNM, tpos, tdir))
 
+    hIN.close()
 
     tempAltNM = checkScore(tempAlt)
     tempRefNM = min(checkScore(tempRef1), checkScore(tempRef2), checkScore(tempRef))

@@ -88,7 +88,7 @@ def partition_junction(output_prefix, thread_num):
     current_line_num = 0
     current_partition_num = 1
     hout = open(output_prefix + ".thread_1.junction.clustered.bedpe", 'w')
-    with gzip.open(output_prefix + ".junction.clustered.bedpe.gz") as hin:
+    with gzip.open(output_prefix + ".junction.clustered.bedpe.gz", 'rt') as hin:
         for line in hin:
             print(line.rstrip('\n'), file = hout)
             current_line_num = current_line_num + 1
@@ -115,7 +115,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_
         script for filtering by the length of SV size and support read junctions
     """
 
-    hIN = gzip.open(inputFilePath, 'r')
+    hIN = gzip.open(inputFilePath, 'rt')
     hOUT = open(outputFilePath, 'w')
 
     for line in hIN:

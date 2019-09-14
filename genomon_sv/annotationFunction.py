@@ -49,7 +49,7 @@ def addAnnotation(inputFilePath, outputFilePath, genome_id, is_grc):
                 gene1.append(record[3])
 
         if len(gene1) == 0: gene1.append("---")
-        gene1 = list(set(gene1))
+        gene1 = sorted(list(set(gene1)))
         ##########
 
         ##########
@@ -68,7 +68,7 @@ def addAnnotation(inputFilePath, outputFilePath, genome_id, is_grc):
                 gene2.append(record[3])
 
         if len(gene2) == 0: gene2.append("---")
-        gene2 = list(set(gene2))
+        gene2 = sorted(list(set(gene2)))
         ##########
 
         ##########
@@ -87,7 +87,7 @@ def addAnnotation(inputFilePath, outputFilePath, genome_id, is_grc):
                 exon1.append(record[3])
 
         if len(exon1) == 0: exon1.append("---")
-        exon1 = list(set(exon1))
+        exon1 = sorted(list(set(exon1)))
         ##########
 
         ##########
@@ -106,7 +106,7 @@ def addAnnotation(inputFilePath, outputFilePath, genome_id, is_grc):
                 exon2.append(record[3])
 
         if len(exon2) == 0: exon2.append("---")
-        exon2 = list(set(exon2))
+        exon2 = sorted(list(set(exon2)))
         ##########
 
         if F[0] != F[3]:
