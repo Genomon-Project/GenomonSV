@@ -1,7 +1,6 @@
 language: python
 python:
   - "2.7"
-  - "3.5"
   - "3.6"
 before_script:
   - wget https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2
