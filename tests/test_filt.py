@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import unittest
 import os, tempfile, shutil, filecmp
 import genomon_sv 
@@ -34,7 +35,7 @@ class TestFilt(unittest.TestCase):
         output_file = tmp_dir + "/5929_tumor.genomonSV.result.txt"
         answer_file = cur_dir + "/data/parse/5929_tumor.genomonSV.result.txt"
 
-        print ' '.join(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam])
+        print(' '.join(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam]))
         args = self.parser.parse_args(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam])
         args.func(args)
 
@@ -61,7 +62,7 @@ class TestFilt(unittest.TestCase):
         output_file = tmp_dir + "/5929_tumor.genomonSV.result.txt"
         answer_file = cur_dir + "/data/parse/5929_tumor.genomonSV.result.txt"
 
-        print ' '.join(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam, "--thread_num", "4"])
+        print(' '.join(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam, "--thread_num", "4"]))
         args = self.parser.parse_args(["filt", tumor_bam, output_prefix, ref_genome, "--grc", "--matched_control_bam", control_bam, "--thread_num", "4"])
         args.func(args)
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys, pysam
 import utils
 
@@ -26,7 +27,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1
     if bamfile.count(juncChr1, int(juncPos1) - 1, int(juncPos1) + 1) >= max_depth: depthFlag = 1
     if bamfile.count(juncChr2, int(juncPos2) - 1, int(juncPos2) + 1) >= max_depth: depthFlag = 1
     if depthFlag == 1:
-        print >> sys.stderr, "sequence depth exceeds the threshould for: " + ','.join([juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2]) 
+        print("sequence depth exceeds the threshould for: " + ','.join([juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2]), file = sys.stderr)
         return 1 
 
     hOUT = open(outputFilePath, 'w')
@@ -180,10 +181,10 @@ def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1
 
     for readID in readID2seq1:
         if readID in readID2seq2:
-            print >> hOUT, '>' + readID + '/1'
-            print >> hOUT, readID2seq1[readID]
-            print >> hOUT, '>' + readID + '/2'
-            print >> hOUT, readID2seq2[readID]
+            print('>' + readID + '/1', file = hOUT) 
+            print(readID2seq1[readID], file = hOUT)
+            print('>' + readID + '/2', file = hOUT)
+            print(readID2seq2[readID], file = hOUT)
 
     bamfile.close()
     hOUT.close()
@@ -218,8 +219,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
         seq = seq.replace('>', '')
         seq = seq.replace(juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length), '')
         """
-        print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref"
-        print >> hOUT, seq
+        print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref", file = hOUT)
+        print(seq, file = hOUT)
 
         # for mid-range deletion
         if juncDir1 == "+" and juncDir2 == "-":
@@ -245,8 +246,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
             seq = seq.replace(juncChr2 + ":" + str(juncPos2) + "-" + str(int(juncPos2) + validate_sequence_length), '')
             """
 
-            print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
-            print >> hOUT, seq
+            print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt", file = hOUT)
+            print(seq, file = hOUT)
 
         # for mid-range tandem duplication
         else:
@@ -272,8 +273,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
             seq = seq.replace(juncChr1 + ":" + str(juncPos1) + "-" + str(int(juncPos1) + validate_sequence_length), '')
             """
 
-            print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
-            print >> hOUT, seq
+            print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt", file = hOUT)
+            print(seq, file = hOUT)
             
 
     else:
@@ -289,8 +290,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
         seq = seq.replace(juncChr1 + ":" + str(int(juncPos1) - validate_sequence_length) + "-" + str(int(juncPos1) + validate_sequence_length), '')
         """
 
-        print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref1"
-        print >> hOUT, seq
+        print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref1", file = hOUT)
+        print(seq, file = hOUT)
 
         seq = utils.get_seq(reference_genome, juncChr2, int(juncPos2) - validate_sequence_length, int(juncPos2) + validate_sequence_length)
         """
@@ -302,8 +303,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
         seq = seq.replace(juncChr2 + ":" + str(int(juncPos2) - validate_sequence_length) + "-" + str(int(juncPos2) + validate_sequence_length), '')
         """
 
-        print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref2"
-        print >> hOUT, seq
+        print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_ref2", file = hOUT)
+        print(seq, file = hOUT)
 
         seq = ""
         if juncDir1 == "+":
@@ -354,8 +355,8 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
 
         seq = seq + tseq
 
-        print >> hOUT, '>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt"
-        print >> hOUT, seq
+        print('>' + ','.join([juncChr1, str(juncPos1), juncDir1, juncChr2, str(juncPos2), juncDir2]) + "_alt", file = hOUT)
+        print(seq, file = hOUT)
 
     
     hOUT.close()

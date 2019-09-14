@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import unittest
 import os, glob, tempfile, shutil, filecmp
 import genomon_sv 
@@ -19,7 +20,7 @@ class TestMerge(unittest.TestCase):
             for junc_file in sorted(all_junc_file):
                 sample = os.path.basename(junc_file).replace(".junction.clustered.bedpe.gz", '')
                 prefix = junc_file.replace(".junction.clustered.bedpe.gz", '')
-                print >> hout, "%s\t%s" % (sample, prefix)
+                print("%s\t%s" % (sample, prefix), file = hout)
 
         control_list_file = tmp_dir + "/control_info.txt"
         output_file = tmp_dir + "/merge_control.bedpe.gz"

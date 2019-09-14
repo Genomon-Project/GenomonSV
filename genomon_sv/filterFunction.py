@@ -4,6 +4,7 @@
      functions for filtering candidates of structural variations
 """
 
+from __future__ import print_function
 import sys, gzip, subprocess, pysam, numpy, math, os, re
 import coveredRegions
 import realignmentFunction
@@ -89,7 +90,7 @@ def partition_junction(output_prefix, thread_num):
     hout = open(output_prefix + ".thread_1.junction.clustered.bedpe", 'w')
     with gzip.open(output_prefix + ".junction.clustered.bedpe.gz") as hin:
         for line in hin:
-            print >> hout, line.rstrip('\n')
+            print(line.rstrip('\n'), file = hout)
             current_line_num = current_line_num + 1
             if current_line_num >= each_partition_line_num and current_partition_num < thread_num_mod:
                 current_line_num = 0
@@ -140,7 +141,7 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_
         if juncSupport < int(junc_num_thres): continue
         ##########
 
-        print >> hOUT, '\t'.join(F)
+        print('\t'.join(F), file = hOUT)
 
 
     hIN.close()
@@ -235,7 +236,7 @@ def filterNonMatchControl(inputFilePath, outputFilePath, controlFile, matchedNor
             ####################
               
         if controlFlag == 0:
-            print >> hOUT, "\t".join(F) + '\t' + max_control_sample + '\t' + str(max_control_num)
+            print("\t".join(F) + '\t' + max_control_sample + '\t' + str(max_control_num), file = hOUT)
 
 
     if tabixErrorMsg != "":
@@ -281,7 +282,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
                     improper_coveredRegions = FF[10]
     
         # last two columns are about pooled control information
-        print >> hOUT, "\t".join(F[:-2]) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions + '\t' + '\t'.join(F[-2:])
+        print("\t".join(F[:-2]) + "\t" + improper_readNames + "\t" + improper_MQs + "\t" + improper_coveredRegions + '\t' + '\t'.join(F[-2:]), file = hOUT)
 
     if tabixErrorMsg != "":
         utils.warningMessage("One or more error occured in tabix file fetch, e.g.: " + tabixErrorMsg)
@@ -408,7 +409,7 @@ def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping
             continue
 
         # every condition is satisfied
-        print >> hOUT, '\t'.join(F) + '\t' + str(region1.regionSize()) + '\t' + str(region2.regionSize())
+        print('\t'.join(F) + '\t' + str(region1.regionSize()) + '\t' + str(region2.regionSize()), file = hOUT)
 
 
     hIN.close()
@@ -433,7 +434,7 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
 
             if F[0] != tchr1 or int(F[1]) > int(tend1) + close_check_margin:
 
-                print >> hOUT, key2info[tkey]
+                print(key2info[tkey], file = hOUT)
                 delList.append(tkey)
         
             else:
@@ -457,7 +458,7 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
 
 
     for tkey in key2info:
-        print >> hOUT, key2info[tkey]
+        print(key2info[tkey], file = hOUT)
 
 
     hOUT.close()
@@ -532,12 +533,12 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
             lpvalue = (- math.log(pvalue, 10) if pvalue < 1 else 0)
             lpvalue = str(round(lpvalue, 4)) 
 
-        print >> hOUT, '\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, \
-                                  str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue), \
-                                  max_control_sample, max_control_num, overhang1, overhang2])
+        print('\t'.join([chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, \
+                         str(tumorRef), str(tumorAlt), str(normalRef), str(normalAlt), str(lpvalue), \
+                         max_control_sample, max_control_num, overhang1, overhang2]), file = hOUT)
 
         if num % 100 == 0:        
-            print >> sys.stderr, "finished checking " + str(num) + " candidates"
+            print("finished checking " + str(num) + " candidates", file = sys.stderr)
         num = num + 1
 
     
@@ -583,7 +584,7 @@ def filterNumAFFis(inputFilePath, outputFilePath, normalBamFilePath,
             if float(normalAF) > float(max_control_allele_freq): continue
             if 10**(-float(F[11])) > float(max_fisher_pvalue): continue
 
-        print >> hOUT, '\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + '\t'.join(F[11:])
+        print('\t'.join(F[0:9]) + '\t' + tumorAF + '\t' + '\t'.join(F[9:11]) + '\t' + normalAF + '\t' + '\t'.join(F[11:]), file = hOUT)
 
     hIN.close()
     hOUT.close()

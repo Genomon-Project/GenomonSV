@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 
+from __future__ import print_function
 import sys, argparse, subprocess, os, multiprocessing
 # import config 
 import utils
@@ -156,10 +157,10 @@ def genomonSV_filt(args):
                 with open(args.output_prefix + ".thread_" + str(i) + ".genomonSV.result.txt", 'r') as hin:
                     header = hin.readline().rstrip('\n')
                     if header_flag == 0: 
-                        print >> hout, header
+                        print(header, file = hout)
                         header_flag = 1
                     for line in hin:
-                       print >> hout, line.rstrip('\n') 
+                       print(line.rstrip('\n'), file = hout)
  
         for i in range(1, thread_num_mod + 1):
             subprocess.check_call(["rm", "-rf", args.output_prefix + ".thread_" + str(i) + ".junction.clustered.bedpe.gz"])
@@ -247,7 +248,7 @@ def genomonSV_merge(args):
     utils.make_directory(os.path.dirname(args.merge_output_file))
     
     if os.path.exists(args.merge_output_file + ".temp"):
-        print >> sys.stderr, "Remove existing intermediate file " + args.merge_output_file + ".temp" 
+        print("Remove existing intermediate file " + args.merge_output_file + ".temp", file = sys.stderr) 
         os.remove(args.merge_output_file + ".temp")
 
     with open(args.control_info_file, 'r') as hin:
