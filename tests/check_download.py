@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
-import os, urllib2
+import os
+import requests
 
 def check_download(url, output_path):
 
@@ -8,8 +9,7 @@ def check_download(url, output_path):
        os.makedirs(os.path.dirname(output_path))
 
     if not os.path.exists(output_path):
-        ufile = urllib2.urlopen(url)
-        with open(output_path, 'w') as hout:
-            for x in ufile:
-                hout.write(x)
+        response = requests.get(url)
+        with open(output_path, 'wb') as hout:
+            hout.write(response.content)
 

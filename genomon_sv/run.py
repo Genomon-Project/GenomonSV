@@ -4,11 +4,11 @@
 from __future__ import print_function
 import sys, argparse, subprocess, os, multiprocessing
 # import config 
-import utils
-import parseFunction
-import filterFunction
-import mergeFunction
-import annotationFunction
+from . import utils
+from . import parseFunction
+from . import filterFunction
+from . import mergeFunction
+from . import annotationFunction
 
 def genomonSV_parse(args):
 

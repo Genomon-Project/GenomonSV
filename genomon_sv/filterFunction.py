@@ -6,10 +6,10 @@
 
 from __future__ import print_function
 import sys, gzip, subprocess, pysam, numpy, math, os, re
-import coveredRegions
-import realignmentFunction
-import annotationFunction
-import utils
+from . import coveredRegions
+from . import realignmentFunction
+from . import annotationFunction
+from . import utils
 from scipy import stats
 
 

@@ -6,7 +6,7 @@
 
 from __future__ import print_function
 import sys, pysam, re, subprocess, collections
-import utils
+from . import utils
 
 def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_insert_size, min_major_clip_size, max_minor_clip_size):
 
@@ -389,6 +389,7 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
 
     bamfile.close()
     tabixfile.close()
+    hOUT.close()
     ####################
 
     ####################

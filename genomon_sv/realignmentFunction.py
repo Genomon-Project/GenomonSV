@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 import sys, pysam
-import utils
+from . import utils
 
 def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, max_depth, search_length, search_margin):
 

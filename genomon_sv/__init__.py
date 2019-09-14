@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from arg_parser import create_parser
+from .arg_parser import create_parser
 
 def main():
 

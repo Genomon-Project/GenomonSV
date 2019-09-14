@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-from run import *
+from .run import *
 import argparse
 
 def create_parser():
@@ -9,7 +9,7 @@ def create_parser():
     # top level parser
     parser = argparse.ArgumentParser(prog = "GenomonSV", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--version", action = "version", version = "GenomonSV-0.6.1b1")
+    parser.add_argument("--version", action = "version", version = "GenomonSV-0.7.0b1")
 
     subparsers = parser.add_subparsers()
 

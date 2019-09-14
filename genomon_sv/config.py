@@ -8,8 +8,8 @@ def sample_yaml_config_parse(filePath, method):
     try:
         with open(filePath, 'r') as fIN:
             sampleConf = yaml.load(fIN)
-    except yaml.YAMLError, exc:
-        print("Error in sample information file:", exc)
+    except yaml.YAMLErrorx:
+        print("Error in sample information file:")
 
     # check whether necessary information is provided in right way
     # target:
@@ -76,7 +76,7 @@ def param_yaml_contig_parse(filePath, method):
     try:
         with open(filePath, 'r') as fIN:
             paramConf = yaml.load(fIN)
-    except yaml.YAMLError, exc:
+    except yaml.YAMLError:
         print("Error in sample information file:", exc)
 
     # check whether necessary information is provided in right way
@@ -91,7 +91,7 @@ def control_yaml_config_parse(filePath):
     try:
         with open(filePath, 'r') as fIN:
             controlConf = yaml.load(fIN)
-    except yaml.YAMLError, exc:
+    except yaml.YAMLError:
         print("Error in sample information file:", exc)
 
     for label in controlConf:

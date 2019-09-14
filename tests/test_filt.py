@@ -4,7 +4,7 @@ from __future__ import print_function
 import unittest
 import os, tempfile, shutil, filecmp
 import genomon_sv 
-from check_download import *
+from .check_download import *
 
 class TestFilt(unittest.TestCase):
 
