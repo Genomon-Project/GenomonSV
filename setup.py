@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name = 'genomon_sv',
-    version = '0.7.0',
+    version = '0.7.1',
     description='Python tools for detecting somatic structural variation from cancer genome sequencing data.',
     url = 'https://github.com/friend1ws/GenomonSV',
     author = 'Yuichi Shiraishi',
@@ -25,6 +25,7 @@ setup(
         'Operating System :: Unix',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Scientific/Engineering :: Bio-Informatics'
     ],
 
