@@ -15,7 +15,7 @@ Several characteristics of Genomon SV includes but not limited to;
 ## Dependency
 
 ### Python
-Python (>= 2.7), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
+Python (>= 3.5), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 
 ### Software
 [hstlib](http://www.htslib.org), [blat](http://hgdownload.cse.ucsc.edu/admin/exe/)
