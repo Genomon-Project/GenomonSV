@@ -329,7 +329,10 @@ def getRefAltForSV(outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncP
             """
             tseq = utils.reverseComplement(tseq)
 
-        seq = tseq + juncSeq
+        if juncDir1 == "+":
+            seq = tseq + juncSeq
+        else:
+            seq = tseq + utils.reverseComplement(juncSeq)
 
         if juncDir2 == "-":
             tseq = utils.get_seq(reference_genome, juncChr2, int(juncPos2), int(juncPos2) + validate_sequence_length)
