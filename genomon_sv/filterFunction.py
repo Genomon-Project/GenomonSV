@@ -511,9 +511,9 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         if f_edlib == True:
 
             fa_alt, fa_ref1, fa_ref2, fa_ref = edlibFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa")
-            tumorRef, tumorAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref)
+            tumorRef, tumorAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFilePath + ".tmp.tumor.edlib")
             if normalBamFilePath != "":
-                normalRef, normalAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref)
+                normalRef, normalAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFilePath + ".tmp.normal.edlib")
 
         else:
             ####################
@@ -557,11 +557,18 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     if num > 1:
         subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
         subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
-        if f_edlib != True: subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+        if f_edlib != True:
+            subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+        else:
+            subprocess.call(["rm", outputFilePath + ".tmp.tumor.edlib"])
+
 
         if normalBamFilePath != "":
             subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
-            if f_edlib != True: subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+            if f_edlib != True:
+                subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+            else:
+                subprocess.call(["rm", outputFilePath + ".tmp.normal.edlib"])
 
     hIN.close()
     hOUT.close()

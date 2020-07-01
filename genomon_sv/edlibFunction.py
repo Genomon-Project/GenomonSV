@@ -39,12 +39,13 @@ def getRefAltForSV(inputFile):
         return([fa_alt, fa_ref1, fa_ref2, fa_ref])
            
 
-def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref):
+def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFile):
 
     read_pair = 0 
     name = "" 
     d_edlib_read1 = {}
     d_edlib_read2 = {}
+    hout = open(outputFile, "w")
     with open(inputFile, "r") as hinT:
         for line in hinT:
             line = line.rstrip('\n')
@@ -107,13 +108,22 @@ def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref):
         ed_alt_tmp_1  = ret1[0]+ret2[1]
         ed_alt_tmp_2  = ret1[1]+ret2[0]
         ed_alt = min(ed_alt_tmp_1, ed_alt_tmp_2)
-        ed_ref1_tmp_1 = ret1[2]+ret2[3]
-        ed_ref1_tmp_2 = ret1[3]+ret2[2]
-        ed_ref2_tmp_1 = ret1[4]+ret2[5]
-        ed_ref2_tmp_2 = ret1[5]+ret2[4]
-        ed_ref_tmp_1  = ret1[6]+ret2[7]
-        ed_ref_tmp_2  = ret1[7]+ret2[6]
-        ed_ref = min(ed_ref1_tmp_1, ed_ref1_tmp_2, ed_ref2_tmp_1, ed_ref2_tmp_2, ed_ref_tmp_1, ed_ref_tmp_2)
+
+        ed_ref = 0
+        if fa_ref == "":
+            ed_ref1_tmp_1 = ret1[2]+ret2[3]
+            ed_ref1_tmp_2 = ret1[3]+ret2[2]
+            ed_ref2_tmp_1 = ret1[4]+ret2[5]
+            ed_ref2_tmp_2 = ret1[5]+ret2[4]
+            ed_ref = min(ed_ref1_tmp_1, ed_ref1_tmp_2, ed_ref2_tmp_1, ed_ref2_tmp_2)
+            # print(name ,file=hout)
+            # print("\t".join([str(ed_alt_tmp_1), str(ed_alt_tmp_2), str(ed_ref1_tmp_1), str(ed_ref1_tmp_2), str(ed_ref2_tmp_1), str(ed_ref2_tmp_2)]), file=hout)
+        else:
+            ed_ref_tmp_1  = ret1[6]+ret2[7]
+            ed_ref_tmp_2  = ret1[7]+ret2[6]
+            ed_ref = min(ed_ref_tmp_1, ed_ref_tmp_2)
+            # print(name ,file=hout)
+            # print("\t".join([str(ed_alt_tmp_1), str(ed_alt_tmp_2), str(ed_ref_tmp_1), str(ed_ref_tmp_2)]), file=hout)
 
         # ed_alt  = min(ret1[0],ret1[1]) + min(ret2[0],ret2[1])
         # ed_ref1_tmp = min(ret1[2],ret1[3]) + min(ret2[2],ret2[3])
@@ -128,6 +138,7 @@ def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref):
         elif STDFlag == 0 and ed_ref < ed_alt - 5 or STDFlag == 1 and ed_ref <= ed_alt:
             numRef += 1 
 
+    hout.close()
     return([numRef, numAlt])
 
 
