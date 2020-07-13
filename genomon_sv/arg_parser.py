@@ -44,6 +44,9 @@ def create_parser():
 
     parse_junction_group.add_argument("--junction_min_mapping_qual", type = int, default = 0,
                                       help = "The minimum acceptable mapping qualitiy of the primary junction read (default: %(default)s)")
+   
+    parse_junction_group.add_argument("--reference_genome", type = str, default = "",
+                                      help = "The path to the reference genomoe sequence")
 
 
     cluster_junction_group = parse_parser.add_argument_group("cluster_junction_condition",
@@ -127,7 +130,7 @@ def create_parser():
     filt_parser.add_argument('--thread_num', default = 1, type=int,
                              help = "The number of threads")
 
-    filt_parser.add_argument("--edlib", default = False, action = 'store_true', help = "use Edit Distance Library")
+    filt_parser.add_argument("--blat", default = False, action = 'store_true', help = "use blat in the realignment function")
 
     filter_condition_group = filt_parser.add_argument_group("filter_condition",
                                                              "Parameters used in various filtering steps in GenomonSV filt command")

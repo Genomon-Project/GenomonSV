@@ -7,8 +7,9 @@
 from __future__ import print_function
 import sys, pysam, re, subprocess, collections
 from . import utils
+import os
 
-def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_insert_size, min_major_clip_size, max_minor_clip_size):
+def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_insert_size, min_major_clip_size, max_minor_clip_size, reference_genome):
 
     """
     This function utilizes the SA tags (SA:Z:rname, pos, strand, CIGAR, mapQ, number of mismatch).
@@ -16,8 +17,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_in
     Therefore, please not that when the primary alignment is in the reverse direction, the sequence shown in the bam file does not match
     to the SA tags..
     """
-
-    bamfile = pysam.Samfile(inputBAM, "rb")
+    bamfile = utils.getPysamSamfile(inputBAM, reference_genome)
     hOUT = open(outputFilePath, "w")
  
     SAre = re.compile('([^ \t\n\r\f\v,]+),(\d+),([\-\+]),(\w+),(\d+),(\d+);')
@@ -330,13 +330,13 @@ def getPairStartPos(inputFilePath, outputFilePath):
 
 
 
-def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile):
+def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile, reference_genome):
 
     """
         script for obtaining pair read information (mainly end position, because it cannot recovered from bam files)
     """
     ####################
-    bamfile = pysam.Samfile(inputBam, "rb")
+    bamfile = utils.getPysamSamfile(inputBam, reference_genome)
     tabixfile = pysam.TabixFile(inputTabixFile)
     hOUT = open(outputFilePath + ".tmp", "w")
 
@@ -599,7 +599,7 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
 
 
 
-def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_mapping_qual, soft_clip_thres):
+def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_mapping_qual, soft_clip_thres, reference_genome):
 
     """
         script for parsing improper read pairs.
@@ -611,7 +611,7 @@ def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_map
         This is a bit old and will be necessary to modify for the newer version of pysam 
     """
 
-    bamfile = pysam.Samfile(inputBam, "rb")
+    bamfile = utils.getPysamSamfile(inputBam, reference_genome)
     hOUT = open(outputFilePath, "w")
 
     for read in bamfile.fetch():

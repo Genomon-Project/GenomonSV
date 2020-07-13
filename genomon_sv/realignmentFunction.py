@@ -4,7 +4,7 @@ from __future__ import print_function
 import sys, pysam
 from . import utils
 
-def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, max_depth, search_length, search_margin):
+def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1, juncChr2, juncPos2, juncDir2, max_depth, search_length, search_margin, reference_genome):
 
     """
         read pairs containing break points are extracted. (yshira 2015/04/23)
@@ -20,7 +20,7 @@ def extractSVReadPairs(bamFilePath, outputFilePath, juncChr1, juncPos1, juncDir1
 
     """
 
-    bamfile = pysam.Samfile(bamFilePath, 'rb')
+    bamfile = utils.getPysamSamfile(bamFilePath, reference_genome)
 
     # if the #sequence read is over the `maxDepth`, then that key is ignored
     depthFlag = 0
