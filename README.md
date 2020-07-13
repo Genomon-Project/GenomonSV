@@ -18,7 +18,9 @@ Several characteristics of Genomon SV includes but not limited to;
 Python (>= 3.6), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 
 ### Software
-[hstlib](http://www.htslib.org), [blat](http://hgdownload.cse.ucsc.edu/admin/exe/)
+[hstlib](http://www.htslib.org), [edlib](https://pypi.org/project/edlib/1.3.6/).
+You can use blat instead of edlib.
+[blat](http://hgdownload.cse.ucsc.edu/admin/exe/)
 
 ## Install
 
@@ -33,7 +35,7 @@ Before using GenomonSV, 3 preparation steps are required
 
 ### Install required softwares and add them to the PATH
 
-GenomonSV uses tabix, bgzip (which are part of HTSlib projects) and blat inside the programs, 
+GenomonSV uses tabix, bgzip (which are part of HTSlib projects) and edlib inside the programs, 
 assuming those are installed and the pathes are already added to the running environment.
 Please install and add them to the PATH.
 
@@ -62,6 +64,7 @@ GenomonSV parse [-h] [--debug]
                 [--junction_dist_margin JUNCTION_DIST_MARGIN]
                 [--junction_opposite_dist_margin_margin JUNCTION_OPPOSITE_DIST_MARGIN_MARGIN]
                 [--improper_check_margin_size IMPROPER_CHECK_MARGIN_SIZE]
+                [--reference_genome REFERENCE_GENOME]
                 input.bam output_prefix
 ```
 - **input.bam**: Path to input indexed bam file
