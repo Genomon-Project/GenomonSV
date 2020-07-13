@@ -18,9 +18,8 @@ Several characteristics of Genomon SV includes but not limited to;
 Python (>= 3.6), `pysam (>= 0.8.1)`, `numpy`, `scipy` packages
 
 ### Software
-[hstlib](http://www.htslib.org), [edlib](https://pypi.org/project/edlib/1.3.6/).
-You can use blat instead of edlib.
-[blat](http://hgdownload.cse.ucsc.edu/admin/exe/)
+[hstlib](http://www.htslib.org), [edlib](https://pypi.org/project/edlib/).
+You can use [blat](http://hgdownload.cse.ucsc.edu/admin/exe/) instead of edlib.
 
 ## Install
 
