@@ -31,7 +31,7 @@ def genomonSV_parse(args):
     # parse breakpoint containing read pairs from input bam files
     utils.processingMessage("parsing breakpoint containing read pairs from bam file") 
     parseFunction.parseJunctionFromBam(args.bam_file, args.output_prefix + ".junction.unsort.txt", args.junction_min_mapping_qual,
-                                       args.junction_abnormal_insert_size, args.junction_min_major_clipping_size, args.junction_max_minor_clipping_size)
+                                       args.junction_abnormal_insert_size, args.junction_min_major_clipping_size, args.junction_max_minor_clipping_size, args.reference_genome)
 
     utils.processingMessage("sorting parsed breakpoint containing read pairs")
     utils.sortBedpe(args.output_prefix + ".junction.unsort.txt", args.output_prefix + ".junction.sort.txt")
@@ -44,7 +44,7 @@ def genomonSV_parse(args):
 
 
     utils.processingMessage("getting covered regions of paired-end reads from bam file")
-    parseFunction.getPairCoverRegionFromBam(args.bam_file, args.output_prefix + ".junction.pairCoverage.txt", args.output_prefix + ".junction.pairStart.bed.gz")
+    parseFunction.getPairCoverRegionFromBam(args.bam_file, args.output_prefix + ".junction.pairCoverage.txt", args.output_prefix + ".junction.pairStart.bed.gz", args.reference_genome)
 
     utils.processingMessage("adding information of covered regions of paired-end reads")
     parseFunction.addPairCoverRegionFromBam(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.pairCoverage.txt")
@@ -76,7 +76,7 @@ def genomonSV_parse(args):
     # parse potentially improper read pairs from input bam files
     utils.processingMessage("parsing improperly aligned read pairs from bam file")
     parseFunction.parseImproperFromBam(args.bam_file, args.output_prefix + ".improper.unsort.txt",
-                                       args.improper_abnormal_insert_size, args.improper_min_mapping_qual, args.improper_max_clipping_size)
+                                       args.improper_abnormal_insert_size, args.improper_min_mapping_qual, args.improper_max_clipping_size, args.reference_genome)
 
     # create and organize bedpe file integrating pair information
     utils.processingMessage("sorting improperly aligned read pairs") 

@@ -9,6 +9,7 @@ import sys, gzip, subprocess, pysam, numpy, math, os, re
 from . import coveredRegions
 from . import realignmentFunction
 from . import annotationFunction
+from . import edlibFunction
 from . import utils
 from scipy import stats
 
@@ -42,12 +43,13 @@ def genomon_sv_filt_main(output_prefix, args, thread_str = ""):
                 output_prefix + ".junction.clustered.filt5.bedpe",
                 args.close_check_margin, args.close_check_thres)
 
-    utils.processingMessage("Performing realignments" + thread_str)
+    realignment_tool = 'blat' if args.blat == True else 'edlib'
+    utils.processingMessage("Performing realignments using " + realignment_tool + thread_str)
     validateByRealignment(output_prefix + ".junction.clustered.filt5.bedpe",
                           output_prefix + ".junction.clustered.filt6.bedpe",
                           args.bam_file, args.matched_control_bam, args.reference_genome, args.blat_option,
                           args.short_tandem_reapeat_thres, args.max_depth, args.search_length, args.search_margin, 
-                          args.split_refernece_thres, args.validate_sequence_length)
+                          args.split_refernece_thres, args.validate_sequence_length, args.blat)
 
     utils.processingMessage("Filtering allele frequencies, Fisher's exact test p-values and # of support read pairs" + thread_str)
     filterNumAFFis(output_prefix + ".junction.clustered.filt6.bedpe", 
@@ -466,7 +468,8 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
 
 
 def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, normalBamFilePath, reference_genome, blat_option,
-                          short_tandem_reapeat_thres, max_depth, search_length, search_margin, split_refernece_thres, validate_sequence_length):
+                          short_tandem_reapeat_thres, max_depth, search_length, search_margin, split_refernece_thres, validate_sequence_length, f_blat):
+
 
     hIN = open(inputFilePath, 'r')
     hOUT = open(outputFilePath, 'w')
@@ -487,13 +490,13 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         ####################
         # extract short reads from tumor sequence data around the candidate
         fRet = realignmentFunction.extractSVReadPairs(tumorBamFilePath, outputFilePath + ".tmp.tumor.fa", chr1, pos1, dir1, chr2, pos2, dir2, 
-                                                      max_depth, search_length, search_margin)
+                                                      max_depth, search_length, search_margin, reference_genome)
         if fRet == 1: continue
 
         if normalBamFilePath != "":
             # extract short reads from matched-control sequence data around the candidate
             fRet = realignmentFunction.extractSVReadPairs(normalBamFilePath, outputFilePath + ".tmp.normal.fa", chr1, pos1, dir1, chr2, pos2, dir2,
-                                                          max_depth, search_length, search_margin)
+                                                          max_depth, search_length, search_margin, reference_genome)
             if fRet == 1: continue
         ####################
         
@@ -504,26 +507,37 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
         realignmentFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa", chr1, pos1, dir1, chr2, pos2, dir2, juncSeq,
                                            reference_genome, split_refernece_thres, validate_sequence_length)
 
-        ####################
-        # alignment tumor short reads to the reference and alternative sequences
-        FNULL = open(os.devnull, 'w')
-        subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"], 
+        tumorRef, tumorAlt = "---", "---"
+        normalRef, normalAlt = "---", "---"
+        if f_blat == True:
+
+            ####################
+            # alignment tumor short reads to the reference and alternative sequences
+            FNULL = open(os.devnull, 'w')
+            subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.tumor.fa", outputFilePath + ".tmp.tumor.psl"],
                         stdout = FNULL, stderr = subprocess.STDOUT)
         
-        ####################
-        # alignment normal short reads to the reference and alternative sequences
-        if normalBamFilePath != "":
-            subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
+            ####################
+            # alignment normal short reads to the reference and alternative sequences
+            if normalBamFilePath != "":
+                subprocess.call(blat_cmds + [outputFilePath + ".tmp.refalt.fa", outputFilePath + ".tmp.normal.fa", outputFilePath + ".tmp.normal.psl"],
                             stdout = FNULL, stderr = subprocess.STDOUT)
 
-        FNULL.close()
-        ####################
-        # summarize alignment results
-        tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
+            FNULL.close()
 
-        normalRef, normalAlt = "---", "---"
-        if normalBamFilePath != "":
-            normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
+            ####################
+            # summarize alignment results
+            tumorRef, tumorAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.psl", STDFlag)
+
+            if normalBamFilePath != "":
+                normalRef, normalAlt = realignmentFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.psl", STDFlag)
+
+        else:
+
+            fa_alt, fa_ref1, fa_ref2, fa_ref = edlibFunction.getRefAltForSV(outputFilePath + ".tmp.refalt.fa")
+            tumorRef, tumorAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.tumor.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFilePath + ".tmp.tumor.edlib")
+            if normalBamFilePath != "":
+                normalRef, normalAlt = edlibFunction.summarizeRefAlt(outputFilePath + ".tmp.normal.fa", STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFilePath + ".tmp.normal.edlib")
 
         # fisher test
         lpvalue = "---"
@@ -545,11 +559,18 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     if num > 1:
         subprocess.call(["rm", outputFilePath + ".tmp.tumor.fa"])
         subprocess.call(["rm", outputFilePath + ".tmp.refalt.fa"])
-        subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+        if f_blat == True:
+            subprocess.call(["rm", outputFilePath + ".tmp.tumor.psl"])
+        else:
+            subprocess.call(["rm", outputFilePath + ".tmp.tumor.edlib"])
+
 
         if normalBamFilePath != "":
             subprocess.call(["rm", outputFilePath + ".tmp.normal.fa"])
-            subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+            if f_blat == True:
+                subprocess.call(["rm", outputFilePath + ".tmp.normal.psl"])
+            else:
+                subprocess.call(["rm", outputFilePath + ".tmp.normal.edlib"])
 
     hIN.close()
     hOUT.close()

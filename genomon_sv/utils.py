@@ -83,4 +83,18 @@ def reverseComplement(seq):
 
     return("".join(complement.get(base, base) for base in reversed(seq)))
 
+def getPysamSamfile(inputBAM, reference_genome):
+    bamfile = ""
+    seq_filename, seq_ext = os.path.splitext(inputBAM)
+    if seq_ext == ".cram":
+        if os.path.isfile(reference_genome):
+            bamfile = pysam.Samfile(inputBAM, "rc", reference_filename=reference_genome)
+        else:
+            # bamfile = pysam.Samfile(inputBAM, "rc")
+            print("Please enter the reference genome, when reading the cram file.")
+            sys.exit(1)
+    else:
+        bamfile = pysam.Samfile(inputBAM, "rb")
+    return bamfile
+
 
