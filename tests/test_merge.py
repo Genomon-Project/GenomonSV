@@ -4,6 +4,7 @@ from __future__ import print_function
 import unittest
 import os, glob, tempfile, shutil, filecmp
 import genomon_sv 
+import gzip
 
 class TestMerge(unittest.TestCase):
 
@@ -29,7 +30,17 @@ class TestMerge(unittest.TestCase):
         args = self.parser.parse_args(["merge", control_list_file, output_file])
         args.func(args)
 
-        self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
+        tmp_answer_file = tmp_dir+"/answer_merge_control.bedpe"
+        with gzip.open(answer_file,"rt") as hin:
+            with open(tmp_answer_file,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        tmp_output_file = tmp_dir+"/output_merge_control.bedpe"
+        with gzip.open(output_file,"rt") as hin:
+            with open(tmp_output_file,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        self.assertTrue(filecmp.cmp(tmp_output_file, tmp_answer_file, shallow=False))
 
         shutil.rmtree(tmp_dir)
 

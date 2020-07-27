@@ -3,6 +3,7 @@
 import unittest
 import os, tempfile, shutil, filecmp
 import genomon_sv 
+import gzip
 
 class TestParse(unittest.TestCase):
 
@@ -30,10 +31,30 @@ class TestParse(unittest.TestCase):
         args = self.parser.parse_args(["parse", input_file, output_prefix])
         args.func(args)
 
-        self.assertTrue(filecmp.cmp(output_file1, answer_file1, shallow=False))
-        self.assertTrue(filecmp.cmp(output_file2, answer_file2, shallow=False))
-        self.assertTrue(filecmp.cmp(output_file3, answer_file3, shallow=False))
-        self.assertTrue(filecmp.cmp(output_file4, answer_file4, shallow=False))
+        tmp_answer_file1 = tmp_dir+"/answer_5929_tumor.junction.clustered.bedpe"
+        with gzip.open(answer_file1,"rt") as hin:
+            with open(tmp_answer_file1,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        tmp_output_file1 = tmp_dir+"/output_5929_tumor.junction.clustered.bedpe"
+        with gzip.open(output_file1,"rt") as hin:
+            with open(tmp_output_file1,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        tmp_answer_file3 = tmp_dir+"/answer_5929_tumor.improper.clustered.bedpe"
+        with gzip.open(answer_file3,"rt") as hin:
+            with open(tmp_answer_file3,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        tmp_output_file3 = tmp_dir+"/output_5929_tumor.improper.clustered.bedpe"
+        with gzip.open(output_file3,"rt") as hin:
+            with open(tmp_output_file3,"w") as hout:
+                shutil.copyfileobj(hin,hout)
+
+        self.assertTrue(filecmp.cmp(tmp_output_file1, tmp_answer_file1, shallow=False))
+        # self.assertTrue(filecmp.cmp(output_file2, answer_file2, shallow=False))
+        self.assertTrue(filecmp.cmp(tmp_output_file3, tmp_answer_file3, shallow=False))
+        # self.assertTrue(filecmp.cmp(output_file4, answer_file4, shallow=False))
 
         shutil.rmtree(tmp_dir)
 
