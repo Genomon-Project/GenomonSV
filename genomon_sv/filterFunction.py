@@ -136,8 +136,9 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_
     
         ##########
         # enumerate support read number
-        IDs = F[6].split(';')
-        juncSupport = int(len(IDs))
+        # IDs = F[6].split(';')
+        # juncSupport = int(len(IDs))
+        juncSupport = int(F[6])
 
         # skip if the number of suppor read is below the minSupReadNum 
         if juncSupport < int(junc_num_thres): continue
@@ -324,11 +325,12 @@ def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping
         improperCoveredRegion = ([] if F[19] == "---" else F[19].split(';'))
 
         # enumerate support read number
-        junc_ids = [re.sub(r'/\d$', '', x) for x in F[6].split(';')]
+        # junc_ids = [re.sub(r'/\d$', '', x) for x in F[6].split(';')]
         # improper_ids = F[17].split(';')
         improper_ids = [] if F[17] == "---" else F[17].split(';')
-        if len(list(set(junc_ids + improper_ids))) < min_support_num:
-            continue
+        junc_ids = F[6] 
+        if int(junc_ids) + len(improper_ids) < min_support_num:
+           continue
 
         juncSupport = len(MQs)
         improperMQs = ([] if F[18] == "---" else F[18].split(';'))
@@ -444,9 +446,11 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
                 if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - int(tend1)) <= close_check_margin and abs(int(F[5]) - int(tend2)) <= close_check_margin:
 
                     infos = key2info[tkey].split('\t')
-                    if len(F[6].split(';')) < len(infos[6].split(';')) and len(F[6].split(';')) < int(close_check_thres):
+                    # if len(F[6].split(';')) < len(infos[6].split(';')) and len(F[6].split(';')) < int(close_check_thres):
+                    if len(F[7].split(';')) < len(infos[7].split(';')) and len(F[7].split(';')) < int(close_check_thres):
                         skipFlag = 1
-                    elif len(F[6].split(';')) > len(infos[6].split(';')) and len(infos[6].split(';')) < int(close_check_thres):
+                    # elif len(F[6].split(';')) > len(infos[6].split(';')) and len(infos[6].split(';')) < int(close_check_thres):
+                    elif len(F[7].split(';')) > len(infos[7].split(';')) and len(infos[7].split(';')) < int(close_check_thres):
                         delList.append(tkey)
 
 
