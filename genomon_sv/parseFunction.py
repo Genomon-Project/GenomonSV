@@ -479,6 +479,7 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
     mergedJunction = {}
     temp_chr = None
     skip_pos = 0
+    increment_num = 1
     for line in hIN:
 
         F = line.rstrip('\n').split('\t')
@@ -503,14 +504,14 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
                 btstart1 = str(int(btend1) - 1)
                 btstart2 = str(int(btend2) - 1)
 
-                junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
+
                 print('\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
-                                 # tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
-                                 str(len(junc_ids)), btinseq, btdir1, btdir2, tmqs1, talns1, \
-                                 tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key], file = hOUT)
+                                 "GenomonSVJunction_"+str(increment_num), btinseq, btdir1, btdir2, tmqs1, talns1, \
+                                 tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key] +'\t'+ tids, file = hOUT)
 
                 # add to the deletion list (later the key will removed from the dictionaries)
                 delList.append(key)
+                increment_num += 1
                 continue
 
             else:
@@ -592,12 +593,10 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
         btstart1 = str(int(btend1) - 1)
         btstart2 = str(int(btend2) - 1)
 
-        junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
         print('\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
-                         # tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
-                         str(len(junc_ids)), btinseq, btdir1, btdir2, tmqs1, talns1, \
-                         tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key], file = hOUT)
-
+                         "GenomonSVJunction_"+str(increment_num), btinseq, btdir1, btdir2, tmqs1, talns1, \
+                         tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key] +'\t'+ tids, file = hOUT)
+        increment_num += 1
     hOUT.close()
 
 
@@ -750,6 +749,7 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maxim
     mergedBedpe = {}
     temp_chr = None
     skip_pos = 0
+    increment_num = 1
     for line in hIN:
 
         F = line.rstrip('\n').split('\t')
@@ -769,11 +769,10 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maxim
 
                 if len(talns_a_uniq) >= 1:
                     
-                    junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
                     print('\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
-                                     # tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
-                                     str(len(junc_ids)), tmqs, tdir1, tdir2, talns]), file = hOUT)
+                                     "GenomonSVImproper_"+str(increment_num), tmqs, tdir1, tdir2, talns, tids]), file = hOUT)
                     delList.append(key)
+                    increment_num += 1
                     continue
 
             else:
@@ -821,11 +820,9 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maxim
 
         if len(talns_a_uniq) >= 1:
 
-            junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
             print('\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
-            #                tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
-                             str(len(junc_ids)), tmqs, tdir1, tdir2, talns]), file = hOUT)
-
+                             "GenomonSVImproper_"+str(increment_num), tmqs, tdir1, tdir2, talns, tids]), file = hOUT)
+            increment_num += 1
 
     hIN.close()
     hOUT.close()
