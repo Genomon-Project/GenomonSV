@@ -444,9 +444,9 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
                 if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - int(tend1)) <= close_check_margin and abs(int(F[5]) - int(tend2)) <= close_check_margin:
 
                     infos = key2info[tkey].split('\t')
-                    if len(F[17].split(';')) < len(infos[17].split(';')) and len(F[17].split(';')) < int(close_check_thres):
+                    if len(F[18].split(';')) < len(infos[18].split(';')) and len(F[18].split(';')) < int(close_check_thres):
                         skipFlag = 1
-                    elif len(F[17].split(';')) > len(infos[17].split(';')) and len(infos[17].split(';')) < int(close_check_thres):
+                    elif len(F[18].split(';')) > len(infos[18].split(';')) and len(infos[18].split(';')) < int(close_check_thres):
                         delList.append(tkey)
 
 
