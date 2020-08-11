@@ -54,7 +54,11 @@ def genomonSV_parse(args):
                                   args.junction_check_margin_size, args.junction_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered breakpoint containing read pairs")
-    utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.bedpe")
+    utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.tmp.bedpe")
+
+    utils.processingMessage("Move the ID of the seventh column to the last column")
+    parseFunction.moveIDsColumn(args.output_prefix + ".junction.clustered.tmp.bedpe", args.output_prefix + ".junction.clustered.bedpe",
+                                "GenomonSVJunction_")    
 
     utils.processingMessage("compressing clustered breakpoint containing read pairs")
     utils.compress_index_bed(args.output_prefix + ".junction.clustered.bedpe", args.output_prefix + ".junction.clustered.bedpe.gz")
@@ -68,6 +72,7 @@ def genomonSV_parse(args):
         subprocess.call(["rm", args.output_prefix + ".junction.pairCoverage.txt"])
         subprocess.call(["rm", args.output_prefix + ".junction.clustered.bedpe.unsort"])
         subprocess.call(["rm", args.output_prefix + ".junction.pairStart.bed"])
+        subprocess.call(["rm", args.output_prefix + ".junction.clustered.tmp.bedpe"])
         subprocess.call(["rm", args.output_prefix + ".junction.clustered.bedpe"])
  
     ####################
@@ -89,7 +94,12 @@ def genomonSV_parse(args):
                                        args.improper_check_margin_size, args.improper_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered improperly aligned read pairs")
-    utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.bedpe")
+    utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.tmp.bedpe")
+
+    utils.processingMessage("Move the ID of the seventh column to the last column")
+    parseFunction.moveIDsColumn(args.output_prefix + ".improper.clustered.tmp.bedpe", args.output_prefix + ".improper.clustered.bedpe",
+                                "GenomonSVImproper_")    
+
 
     utils.processingMessage("compressing clustered improperly aligned read pairs")
     utils.compress_index_bed(args.output_prefix + ".improper.clustered.bedpe", args.output_prefix + ".improper.clustered.bedpe.gz")
