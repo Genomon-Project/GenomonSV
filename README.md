@@ -74,7 +74,7 @@ enough for typical illumina sequence data (with the length of 50bp ~ 200bp).
 
 After successful completion, you will find possible breakpoint regions evidenced by
 breakpoint containing read pairs ({output_prefix}/junction.clustered.bedpe.gz(.tbi))
-and improperly aligned read pairs ({output_prefix}/improper.clustered.bedpe.gz(.tbi))).
+and improperly aligned read pairs ({output_prefix}/improper.clustered.bedpe.gz(.tbi)).
 
 
 ### merge
