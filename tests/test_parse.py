@@ -52,9 +52,9 @@ class TestParse(unittest.TestCase):
                 shutil.copyfileobj(hin,hout)
 
         self.assertTrue(filecmp.cmp(tmp_output_file1, tmp_answer_file1, shallow=False))
-        # self.assertTrue(filecmp.cmp(output_file2, answer_file2, shallow=False))
+        self.assertTrue(filecmp.cmp(output_file2, answer_file2, shallow=False))
         self.assertTrue(filecmp.cmp(tmp_output_file3, tmp_answer_file3, shallow=False))
-        # self.assertTrue(filecmp.cmp(output_file4, answer_file4, shallow=False))
+        self.assertTrue(filecmp.cmp(output_file4, answer_file4, shallow=False))
 
         shutil.rmtree(tmp_dir)
 

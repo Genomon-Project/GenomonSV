@@ -108,6 +108,7 @@ def genomonSV_parse(args):
         subprocess.call(["rm", args.output_prefix + ".improper.unsort.txt"])
         subprocess.call(["rm", args.output_prefix + ".improper.bedpe"])
         subprocess.call(["rm", args.output_prefix + ".improper.clustered.unsort.bedpe"])
+        subprocess.call(["rm", args.output_prefix + ".improper.clustered.tmp.bedpe"])
         subprocess.call(["rm", args.output_prefix + ".improper.clustered.bedpe"])
 
     ####################
