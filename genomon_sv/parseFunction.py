@@ -278,6 +278,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_in
 
 
 def getPairStartPos(inputFilePath, outputFilePath):
+    
 
     """
         script for obtaining the position information about the pair read from the junction file 
@@ -503,10 +504,9 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
                 btstart1 = str(int(btend1) - 1)
                 btstart2 = str(int(btend2) - 1)
 
-                junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
+
                 print('\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
-                                 # tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
-                                 str(len(junc_ids)), btinseq, btdir1, btdir2, tmqs1, talns1, \
+                                 tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
                                  tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key], file = hOUT)
 
                 # add to the deletion list (later the key will removed from the dictionaries)
@@ -592,14 +592,10 @@ def clusterJunction(inputFilePath, outputFilePath, check_margin_size, maximum_un
         btstart1 = str(int(btend1) - 1)
         btstart2 = str(int(btend2) - 1)
 
-        junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
         print('\t'.join([btchr1, btstart1, btend1, btchr2, btstart2, btend2, \
-                         # tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
-                         str(len(junc_ids)), btinseq, btdir1, btdir2, tmqs1, talns1, \
+                         tids, btinseq, btdir1, btdir2, tmqs1, talns1, \
                          tmqs2, talns2, tpinds, tcinds]) + '\t' + mergedJunction[key], file = hOUT)
-
     hOUT.close()
-
 
 
 def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_mapping_qual, soft_clip_thres, reference_genome):
@@ -769,10 +765,8 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maxim
 
                 if len(talns_a_uniq) >= 1:
                     
-                    junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
                     print('\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
-                                     # tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
-                                     str(len(junc_ids)), tmqs, tdir1, tdir2, talns]), file = hOUT)
+                                     tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
                     delList.append(key)
                     continue
 
@@ -821,15 +815,26 @@ def clusterImproperBedpe(inputFilePath, outputFilePath, check_margin_size, maxim
 
         if len(talns_a_uniq) >= 1:
 
-            junc_ids = [re.sub(r'/\d$', '', x) for x in tids.split(';')]
             print('\t'.join([tchr1, tstart1, tend1, tchr2, tstart2, tend2, \
-            #                tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
-                             str(len(junc_ids)), tmqs, tdir1, tdir2, talns]), file = hOUT)
-
+                             tids, tmqs, tdir1, tdir2, talns]), file = hOUT)
 
     hIN.close()
     hOUT.close()
     ####################
  
 
+def moveIDsColumn(inputFilePath, outputFilePath, genomon_id_prefix):
+
+    hIN = open(inputFilePath, 'r')
+    hOUT = open(outputFilePath, 'w')
+    num = 1
+
+    for line in hIN:
+        F = line.rstrip('\n').split('\t')
+        ids = F[6]
+        print('\t'.join(F[:6]) + '\t' + genomon_id_prefix+str(num) + '\t' + '\t'.join(F[7:])  + '\t' + ids, file = hOUT)
+        num = num + 1
+
+    hIN.close()
+    hOUT.close()
     

@@ -136,9 +136,8 @@ def filterJuncNumAndSize(inputFilePath, outputFilePath, junc_num_thres, sv_size_
     
         ##########
         # enumerate support read number
-        # IDs = F[6].split(';')
-        # juncSupport = int(len(IDs))
-        juncSupport = int(F[6])
+        IDs = F[17].split(';')
+        juncSupport = int(len(IDs))
 
         # skip if the number of suppor read is below the minSupReadNum 
         if juncSupport < int(junc_num_thres): continue
@@ -280,7 +279,7 @@ def addImproperInfo(inputFilePath, outputFilePath, improperFilePath):
                 FF = record_line.split('\t')
 
                 if F[0] == FF[0] and F[3] == FF[3] and int(F[1]) >= int(FF[1]) and int(F[2]) <= int(FF[2]) and int(F[4]) >= int(FF[4]) and int(F[5]) <= int(FF[5]) and F[8] == FF[8] and F[9] == FF[9]:
-                    improper_readNames = FF[6]
+                    improper_readNames = FF[11]
                     improper_MQs = FF[7]
                     improper_coveredRegions = FF[10]
     
@@ -322,18 +321,17 @@ def filterMergedJunc(inputFilePath, outputFilePath, min_support_num, min_mapping
         pairMQs = map(lambda x: int(x), F[12].split(';'))
         juncPairPos = F[14].split(';')
         juncReadTypes = F[15].split(';')
-        improperCoveredRegion = ([] if F[19] == "---" else F[19].split(';'))
+        improperCoveredRegion = ([] if F[20] == "---" else F[20].split(';'))
 
         # enumerate support read number
-        # junc_ids = [re.sub(r'/\d$', '', x) for x in F[6].split(';')]
+        junc_ids = [re.sub(r'/\d$', '', x) for x in F[17].split(';')]
         # improper_ids = F[17].split(';')
-        improper_ids = [] if F[17] == "---" else F[17].split(';')
-        junc_ids = F[6] 
-        if int(junc_ids) + len(improper_ids) < min_support_num:
-           continue
+        improper_ids = [] if F[18] == "---" else F[18].split(';')
+        if len(list(set(junc_ids + improper_ids))) < min_support_num:
+            continue
 
         juncSupport = len(MQs)
-        improperMQs = ([] if F[18] == "---" else F[18].split(';'))
+        improperMQs = ([] if F[19] == "---" else F[19].split(';'))
         """
         improperSupport = len(improperMQs)
         # skip if the number of suppor read is below the minSupReadNum 
@@ -446,11 +444,9 @@ def removeClose(inputFilePath, outputFilePath, close_check_margin, close_check_t
                 if F[0] == tchr1 and F[3] == tchr2 and F[8] == tdir1 and F[9] == tdir2 and abs(int(F[2]) - int(tend1)) <= close_check_margin and abs(int(F[5]) - int(tend2)) <= close_check_margin:
 
                     infos = key2info[tkey].split('\t')
-                    # if len(F[6].split(';')) < len(infos[6].split(';')) and len(F[6].split(';')) < int(close_check_thres):
-                    if len(F[7].split(';')) < len(infos[7].split(';')) and len(F[7].split(';')) < int(close_check_thres):
+                    if len(F[17].split(';')) < len(infos[17].split(';')) and len(F[17].split(';')) < int(close_check_thres):
                         skipFlag = 1
-                    # elif len(F[6].split(';')) > len(infos[6].split(';')) and len(infos[6].split(';')) < int(close_check_thres):
-                    elif len(F[7].split(';')) > len(infos[7].split(';')) and len(infos[7].split(';')) < int(close_check_thres):
+                    elif len(F[17].split(';')) > len(infos[17].split(';')) and len(infos[17].split(';')) < int(close_check_thres):
                         delList.append(tkey)
 
 
@@ -483,7 +479,7 @@ def validateByRealignment(inputFilePath, outputFilePath, tumorBamFilePath, norma
     for line in hIN:
         F = line.rstrip('\n').split('\t')
         # if len(F) >= 24:
-        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[20], F[21], F[22], F[23]
+        chr1, pos1, dir1, chr2, pos2, dir2, juncSeq, max_control_sample, max_control_num, overhang1, overhang2 = F[0], F[2], F[8], F[3], F[5], F[9], F[7], F[21], F[22], F[23], F[24]
         # else:
         #     chr1, pos1, dir1, chr2, pos2, dir2, juncSeq = F[0], F[2], F[8], F[3], F[5], F[9], F[7]
         #     max_control_sample, max_control_num, overhang1, overhang2 = "---", "---", "---", "---"
