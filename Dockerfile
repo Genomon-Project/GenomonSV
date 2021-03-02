@@ -1,6 +1,6 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Yuichi Shiraishi <friend1ws@gmail.com> 
-
+MAINTAINER Kenichi Chiba <kchiba@hgc.jp>
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -13,36 +13,28 @@ RUN apt-get update && apt-get install -y \
     liblzma-dev \
     libcurl4-openssl-dev \
     libssl-dev \
-    python \
-    python-pip
+    python3 \
+    python3-pip
 
-RUN wget https://github.com/samtools/htslib/releases/download/1.7/htslib-1.7.tar.bz2 && \
-    tar jxvf htslib-1.7.tar.bz2 && \
-    cd htslib-1.7 && \
+RUN wget https://github.com/samtools/htslib/releases/download/1.11/htslib-1.11.tar.bz2 && \
+    tar jxvf htslib-1.11.tar.bz2 && \
+    cd htslib-1.11 && \
     ./configure && \
     make && \
     make install
 
-RUN pip install --upgrade pip
-RUN pip install --upgrade setuptools
+RUN pip3 install --upgrade pip
+RUN pip3 install --upgrade setuptools
 
-RUN pip install annot_utils==0.2.1
-RUN pip install pysam==0.15
-RUN pip install numpy==1.15.1
-RUN pip install scipy==1.1.0
-RUN pip install genomon_sv==0.6.0rc1
-
-# for blat
-RUN apt-get update && apt-get install -y \
-    libkrb5-3 \
-    libpng12-0
-
-RUN cd  /usr/local/bin && \
-    wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat
-RUN chmod a+x /usr/local/bin/blat
+RUN pip3 install annot_utils==0.3.1
+RUN pip3 install pysam==0.16.0.1
+RUN pip3 install numpy==1.19.5
+RUN pip3 install scipy==1.5.4
+RUN pip3 install genomon_sv==0.8.0
+RUN pip3 install edlib==1.3.8.post2
 
 # sv_utils
-RUN pip install sv_utils==0.5.1
-RUN pip install primer3-py==0.5.5
+RUN pip3 install sv_utils==0.6.1
+RUN pip3 install primer3-py==0.6.1
 
 
