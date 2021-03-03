@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 MAINTAINER Yuichi Shiraishi <friend1ws@gmail.com> 
 MAINTAINER Kenichi Chiba <kchiba@hgc.jp>
 
@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
     liblzma-dev \
     libcurl4-openssl-dev \
     libssl-dev \
-    python3 \
     python3-pip
 
 RUN wget https://github.com/samtools/htslib/releases/download/1.11/htslib-1.11.tar.bz2 && \
