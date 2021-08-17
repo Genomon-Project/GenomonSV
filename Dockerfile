@@ -29,7 +29,7 @@ RUN pip3 install annot_utils==0.3.1
 RUN pip3 install pysam==0.16.0.1
 RUN pip3 install numpy==1.19.5
 RUN pip3 install scipy==1.5.4
-RUN pip3 install genomon_sv==0.8.1
+RUN pip3 install genomon_sv==0.8.2
 RUN pip3 install edlib==1.3.8.post2
 
 # sv_utils
