@@ -28,13 +28,13 @@ def getRefAltForSV(inputFile):
             # Handling the body 
             else:
                 if code == "alt":
-                    fa_alt = line
+                    fa_alt = line.upper()
                 elif code == "ref1":
-                    fa_ref1 = line
+                    fa_ref1 = line.upper()
                 elif code == "ref2":
-                    fa_ref2 = line
+                    fa_ref2 = line.upper()
                 elif code == "ref":
-                    fa_ref = line
+                    fa_ref = line.upper()
         
         return([fa_alt, fa_ref1, fa_ref2, fa_ref])
            
