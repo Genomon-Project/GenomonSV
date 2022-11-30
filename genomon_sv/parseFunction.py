@@ -277,7 +277,7 @@ def parseJunctionFromBam(inputBAM, outputFilePath, min_mapping_qual, abnormal_in
 
 
 
-def getPairStartPos(inputFilePath, outputFilePath):
+def getPairStartPos(inputFilePath, outputFilePath, sort_option):
     
 
     """
@@ -321,7 +321,7 @@ def getPairStartPos(inputFilePath, outputFilePath):
 
 
     hOUT = open(outputFilePath, 'w')
-    subprocess.call(["sort", "-k1,1", "-k3,3n", outputFilePath + ".tmp"], stdout = hOUT)
+    subprocess.call(["sort", "-k1,1", "-k3,3n"] + sort_option.split(" ") + [outputFilePath + ".tmp"], stdout = hOUT)
     hOUT.close()
 
 
@@ -331,7 +331,7 @@ def getPairStartPos(inputFilePath, outputFilePath):
 
 
 
-def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile, reference_genome):
+def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile, reference_genome, sort_option):
 
     """
         script for obtaining pair read information (mainly end position, because it cannot recovered from bam files)
@@ -395,7 +395,7 @@ def getPairCoverRegionFromBam(inputBam, outputFilePath, inputTabixFile, referenc
 
     ####################
     hOUT = open(outputFilePath, 'w')
-    subprocess.call(["sort", "-k5n", outputFilePath + ".tmp"], stdout = hOUT)
+    subprocess.call(["sort", "-k5n"] + sort_option.split(" ") + [outputFilePath + ".tmp"], stdout = hOUT)
     hOUT.close()
     ####################
 
@@ -663,12 +663,12 @@ def parseImproperFromBam(inputBam, outputFilePath, abnormal_insert_size, min_map
 
 
 
-def makeImproperBedpe(inputFilePath, outputFilePath, junction_dist_margin, clipping_margin):
+def makeImproperBedpe(inputFilePath, outputFilePath, junction_dist_margin, clipping_margin, sort_option):
 
     ####################
     # sort according to the read ID for the later processing
     hOUT = open(outputFilePath + ".tmp1", "w")
-    subprocess.call(["sort", "-k1", inputFilePath], stdout = hOUT)
+    subprocess.call(["sort", "-k1"] + sort_option.split(" ") + [inputFilePath], stdout = hOUT)
     hOUT.close()
     ####################
 
@@ -724,7 +724,7 @@ def makeImproperBedpe(inputFilePath, outputFilePath, junction_dist_margin, clipp
 
     ####################
     # sort according to the chromosome coordinates
-    utils.sortBedpe(outputFilePath + ".tmp2", outputFilePath)
+    utils.sortBedpe(outputFilePath + ".tmp2", outputFilePath, sort_option)
     ####################
 
 

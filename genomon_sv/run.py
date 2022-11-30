@@ -34,17 +34,17 @@ def genomonSV_parse(args):
                                        args.junction_abnormal_insert_size, args.junction_min_major_clipping_size, args.junction_max_minor_clipping_size, args.reference_genome)
 
     utils.processingMessage("sorting parsed breakpoint containing read pairs")
-    utils.sortBedpe(args.output_prefix + ".junction.unsort.txt", args.output_prefix + ".junction.sort.txt")
+    utils.sortBedpe(args.output_prefix + ".junction.unsort.txt", args.output_prefix + ".junction.sort.txt", args.sort_option)
 
     utils.processingMessage("getting start positions of paired-end reads")
-    parseFunction.getPairStartPos(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.pairStart.bed")
+    parseFunction.getPairStartPos(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.pairStart.bed", args.sort_option)
 
     utils.processingMessage("compressing start position infomation file")
     utils.compress_index_bed(args.output_prefix + ".junction.pairStart.bed", args.output_prefix + ".junction.pairStart.bed.gz")
 
 
     utils.processingMessage("getting covered regions of paired-end reads from bam file")
-    parseFunction.getPairCoverRegionFromBam(args.bam_file, args.output_prefix + ".junction.pairCoverage.txt", args.output_prefix + ".junction.pairStart.bed.gz", args.reference_genome)
+    parseFunction.getPairCoverRegionFromBam(args.bam_file, args.output_prefix + ".junction.pairCoverage.txt", args.output_prefix + ".junction.pairStart.bed.gz", args.reference_genome, args.sort_option)
 
     utils.processingMessage("adding information of covered regions of paired-end reads")
     parseFunction.addPairCoverRegionFromBam(args.output_prefix + ".junction.sort.txt", args.output_prefix + ".junction.sort.withPair.txt", args.output_prefix + ".junction.pairCoverage.txt")
@@ -54,7 +54,7 @@ def genomonSV_parse(args):
                                   args.junction_check_margin_size, args.junction_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered breakpoint containing read pairs")
-    utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.tmp.bedpe")
+    utils.sortBedpe(args.output_prefix + ".junction.clustered.bedpe.unsort", args.output_prefix + ".junction.clustered.tmp.bedpe", args.sort_option)
 
     utils.processingMessage("Move the ID of the seventh column to the last column")
     parseFunction.moveIDsColumn(args.output_prefix + ".junction.clustered.tmp.bedpe", args.output_prefix + ".junction.clustered.bedpe",
@@ -86,7 +86,7 @@ def genomonSV_parse(args):
     # create and organize bedpe file integrating pair information
     utils.processingMessage("sorting improperly aligned read pairs") 
     parseFunction.makeImproperBedpe(args.output_prefix + ".improper.unsort.txt", args.output_prefix + ".improper.bedpe", 
-                                    args.junction_dist_margin, args.junction_opposite_dist_margin)
+                                    args.junction_dist_margin, args.junction_opposite_dist_margin, args.sort_option)
 
     # cluster read pairs possibly representing the same junction
     utils.processingMessage("clustering improperly aligned read pairs")
@@ -94,7 +94,7 @@ def genomonSV_parse(args):
                                        args.improper_check_margin_size, args.improper_check_maximum_unique_pairs)
 
     utils.processingMessage("sorting clustered improperly aligned read pairs")
-    utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.tmp.bedpe")
+    utils.sortBedpe(args.output_prefix + ".improper.clustered.unsort.bedpe", args.output_prefix + ".improper.clustered.tmp.bedpe", args.sort_option)
 
     utils.processingMessage("Move the ID of the seventh column to the last column")
     parseFunction.moveIDsColumn(args.output_prefix + ".improper.clustered.tmp.bedpe", args.output_prefix + ".improper.clustered.bedpe",
@@ -270,13 +270,13 @@ def genomonSV_merge(args):
 
     
     utils.processingMessage("sorting the aggregated junction file")
-    utils.sortBedpe(args.merge_output_file + ".temp", args.merge_output_file + ".temp.sort")
+    utils.sortBedpe(args.merge_output_file + ".temp", args.merge_output_file + ".temp.sort", args.sort_option)
 
     utils.processingMessage("merging the same junction in the aggregated junction file")
     mergeFunction.organizeControl(args.merge_output_file + ".temp.sort", args.merge_output_file + ".temp.merged", args.merge_check_margin_size)
 
     utils.processingMessage("sorting the merged junction file")
-    utils.sortBedpe(args.merge_output_file + ".temp.merged", args.merge_output_file + ".temp.merged.sort")
+    utils.sortBedpe(args.merge_output_file + ".temp.merged", args.merge_output_file + ".temp.merged.sort", args.sort_option)
 
     utils.processingMessage("compressing the merged junction file")
     utils.compress_index_bed(args.merge_output_file + ".temp.merged.sort", args.merge_output_file)

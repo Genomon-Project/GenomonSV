@@ -48,6 +48,8 @@ def create_parser():
     parse_junction_group.add_argument("--reference_genome", type = str, default = "",
                                       help = "The path to the reference genomoe sequence")
 
+    parse_junction_group.add_argument("--sort_option", metavar = "-S 1G", type = str, default = "-S 1G", 
+                                      help = "Options for Linux sort command (default: '-S 1G')")
 
     cluster_junction_group = parse_parser.add_argument_group("cluster_junction_condition",
                                                              "Parameters used for clustering breakpoint containing read pairs")
@@ -131,6 +133,10 @@ def create_parser():
                              help = "The number of threads")
 
     filt_parser.add_argument("--blat", default = False, action = 'store_true', help = "use blat in the realignment function")
+
+    filt_parser.add_argument("--sort_option", metavar = "-S 1G", type = str, default = "-S 1G", 
+                             help = "Options for Linux sort command (default: '-S 1G')")
+
 
     filter_condition_group = filt_parser.add_argument_group("filter_condition",
                                                              "Parameters used in various filtering steps in GenomonSV filt command")
@@ -228,6 +234,8 @@ def create_parser():
     merge_parser.add_argument("--merge_check_margin_size", type = int, default = 100,
                              help = "This value should be at least 50 (more than the length of possible inserted sequence between break points)")
 
+    merge_parser.add_argument("--sort_option", metavar = "-S 1G", type = str, default = "-S 1G", 
+                             help = "Options for Linux sort command (default: '-S 1G')")
 
     merge_parser.set_defaults(func = genomonSV_merge)
     ####################
