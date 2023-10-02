@@ -4,6 +4,7 @@ from __future__ import print_function
 import sys, pysam
 from . import utils
 import edlib
+import parasail
 
 def getRefAltForSV(inputFile):
 
@@ -39,13 +40,11 @@ def getRefAltForSV(inputFile):
         return([fa_alt, fa_ref1, fa_ref2, fa_ref])
            
 
-def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, outputFile):
+def summarizeRefAltEdlib(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref):
 
     read_pair = 0 
-    name = "" 
     d_edlib_read1 = {}
     d_edlib_read2 = {}
-    hout = open(outputFile, "w")
     with open(inputFile, "r") as hinT:
         for line in hinT:
             line = line.rstrip('\n')
@@ -57,6 +56,7 @@ def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, output
                     read_pair = 2 
                 else:
                     utils.warningMessage("ID in FASTA files do not have a /1 or /2 suffix. " + line)
+                    sys.exit(1)
                 line = line.replace(">","",1).replace("/1","").replace("/2","")
                 name = line  
             # Handling the body 
@@ -67,7 +67,7 @@ def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, output
                 # [2]=ref1,[3]=ref1_rev,
                 # [4]=ref2,[5]=ref2_rev,
                 # [6]=ref, [7]=ref_rev
-                edlib_ret = [100,100,100,100,100,100,100,100]
+                edlib_ret = [None,None,None,None,None,None,None,None]
 
                 # alt
                 ret = edlib.align(line, fa_alt, mode="HW", task="path")
@@ -138,7 +138,92 @@ def summarizeRefAlt(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref, output
         elif STDFlag == 0 and ed_ref < ed_alt - 5 or STDFlag == 1 and ed_ref <= ed_alt:
             numRef += 1 
 
-    hout.close()
+    return([numRef, numAlt])
+
+
+def summarizeRefAltParasail(inputFile, STDFlag, fa_alt, fa_ref1, fa_ref2, fa_ref):
+
+    # user_matrix = parasail.matrix_create("ACGT", 2, -2)
+    user_matrix = parasail.matrix_create("ACGT", 1, -1)
+
+    read_pair = 0 
+    d_parasail_read1 = {}
+    d_parasail_read2 = {}
+    with open(inputFile, "r") as hinT:
+        for line in hinT:
+            line = line.rstrip('\n')
+            # Handling the eader 
+            if line.startswith(">"):
+                if line.endswith("/1"):
+                    read_pair = 1 
+                elif line.endswith("/2"):
+                    read_pair = 2 
+                else:
+                    utils.warningMessage("ID in FASTA files do not have a /1 or /2 suffix. " + line)
+                    sys.exit(1)
+                line = line.replace(">","",1).replace("/1","").replace("/2","")
+                name = line  
+            # Handling the body 
+            else:
+                rc_line = utils.reverseComplement(line)
+                # edlib_ret
+                # [0]=alt, [1]=alt_rev,
+                # [2]=ref1,[3]=ref1_rev,
+                # [4]=ref2,[5]=ref2_rev,
+                # [6]=ref, [7]=ref_rev
+                parasail_ret = [None,None,None,None,None,None,None,None]
+                max_score = len(line)
+                # p_open = 3
+                # p_extend = 1
+                p_open = 1
+                p_extend = 1
+
+                # alt
+                res = parasail.ssw(fa_alt, line, p_open, p_extend, user_matrix)
+                parasail_ret[0] = (max_score - res.score1)
+                res = parasail.ssw(fa_alt, rc_line, p_open, p_extend, user_matrix)
+                parasail_ret[1] = (max_score - res.score1)
+
+                if fa_ref == "":
+                    # ref1
+                    res = parasail.ssw(fa_ref1, line, p_open, p_extend, user_matrix)
+                    parasail_ret[2] = (max_score - res.score1)
+                    res = parasail.ssw(fa_ref1, rc_line, p_open, p_extend, user_matrix)
+                    parasail_ret[3] = (max_score - res.score1)
+                    # ref2
+                    res = parasail.ssw(fa_ref2, line, p_open, p_extend, user_matrix)
+                    parasail_ret[4] = (max_score - res.score1)
+                    res = parasail.ssw(fa_ref2, rc_line, p_open, p_extend, user_matrix)
+                    parasail_ret[5] = (max_score - res.score1)
+                else:
+                    # ref
+                    res = parasail.ssw(fa_ref, line, p_open, p_extend, user_matrix)
+                    parasail_ret[6] = (max_score - res.score1)
+                    res = parasail.ssw(fa_ref, rc_line, p_open, p_extend, user_matrix)
+                    parasail_ret[7] = (max_score - res.score1)
+
+                if read_pair == 1:
+                    d_parasail_read1[name] = parasail_ret
+                else:
+                    d_parasail_read2[name] = parasail_ret
+
+    numRef = 0 
+    numAlt = 0
+    numOther = 0
+    for name in d_parasail_read1.keys():
+        ret1 = d_parasail_read1[name]
+        ret2 = d_parasail_read2[name]
+
+        parasail_alt = min(ret1[0]+ret2[1], ret1[1]+ret2[0])
+        parasail_ref = min(ret1[2]+ret2[3], ret1[3]+ret2[2], ret1[4]+ret2[5], ret1[5]+ret2[4]) if fa_ref == "" else min(ret1[6]+ret2[7], ret1[7]+ret2[6]) 
+
+        if parasail_alt >= 10 and parasail_ref >= 10:
+            numOther += 1
+        elif parasail_alt < parasail_ref - 5:
+            numAlt += 1
+        elif STDFlag == 0 and parasail_ref < parasail_alt - 5 or STDFlag == 1 and parasail_ref <= parasail_alt:
+            numRef += 1 
+
     return([numRef, numAlt])
 
 

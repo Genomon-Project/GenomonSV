@@ -133,6 +133,7 @@ def create_parser():
                              help = "The number of threads")
 
     filt_parser.add_argument("--blat", default = False, action = 'store_true', help = "use blat in the realignment function")
+    filt_parser.add_argument("--edlib", default = False, action = 'store_true', help = "use edlib in the realignment function")
 
     filt_parser.add_argument("--sort_option", metavar = "-S 1G", type = str, default = "-S 1G", 
                              help = "Options for Linux sort command (default: '-S 1G')")
